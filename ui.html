@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Moood! – Connect</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* 1. RESET & VARS */
+        :root {
+            --bg: #FFFFFF;
+            --surface: #F5F5F5;
+            --text-main: #000;
+            --text-sec: #8E8E8E;
+            --border: #E0E0E0;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 2. LAYOUT SYSTEM (UPDATED) */
+        #view-wrapper {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Cada vista ahora se comporta como pantalla completa */
+        .view {
+            position: absolute;
+            inset: 0;
+            display: none !important;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .view.active {
+            display: flex !important;
+        }
+
+        /* Para vistas centradas vertical + horizontal */
+        .view.centered {
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        /* 3. CONTAINERS */
+        .container {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .container.welcome {
+            max-width: 440px;
+            width: 100%;
+            margin: auto;
+        }
+
+        /* Header & Typography */
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #808080;
+            margin-bottom: 32px;
+        }
+
+        /* 4. INTERACTIVE ELEMENTS */
+        button {
+            background: #000;
+            color: #fff;
+            border: 0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 14px 24px;
+            cursor: pointer;
+            transition: opacity .2s;
+        }
+
+        button:hover {
+            opacity: .85;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #E6E6E6;
+            border-radius: 6px;
+            padding: 0 12px;
+            font-size: 14px;
+        }
+
+        .row.code {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .row.code input {
+            flex: 1;
+        }
+
+        /* Search Styles */
+        .search-content {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .input-box {
+            flex: 1;
+        }
+
+        .popular-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .popular-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, .7);
+        }
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .chip {
+            padding: 7px 17px;
+            border-radius: 20px;
+            border: 1px solid rgba(222, 222, 222, .6);
+            font-size: 11px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .chip:hover {
+            background: #eee;
+        }
+
+        /* 5. MAIN UI STRUCTURE */
+        .container.search-results {
+            justify-content: flex-start;
+            align-items: stretch;
+            text-align: left;
+            height: 100%;
+            padding: 0;
+            max-width: none;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e7e7e7;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+        }
+
+        .tab {
+            cursor: pointer;
+            padding-bottom: 4px;
+            color: rgba(0, 0, 0, 0.4);
+            font-weight: 500;
+        }
+
+        .tab.active {
+            color: #000;
+            font-weight: 600;
+            opacity: 1;
+        }
+
+        /* 6. MASONRY GRID SYSTEM */
+        .grid-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+            position: relative;
+        }
+
+        #moodboardGrid {
+            display: block;
+            column-count: 3;
+            column-gap: 16px;
+            width: 100%;
+            padding-bottom: 120px;
+            min-height: 300px;
+        }
+
+        .pin-container {
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            background: var(--surface);
+            overflow: hidden;
+            break-inside: avoid;
+            position: relative;
+        }
+
+        .pin-image {
+            display: block;
+            width: 100%;
+            height: auto !important;
+            min-height: 100px;
+            object-fit: cover;
+            object-position: top;
+            background-color: #e0e0e0;
+        }
+
+        .pin-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, .3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity .2s;
+            cursor: pointer;
+        }
+
+        .pin-container:hover .pin-overlay {
+            opacity: 1;
+        }
+
+        /* 7. COLOR PALETTE */
+        .palette-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+            margin-bottom: 24px;
+        }
+
+        .palette-title h3 {
+            text-align: left;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .palette-title p {
+            text-align: left;
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-sec);
+        }
+
+        .palette-layout {
+            display: flex;
+            gap: 24px;
+            width: 100%;
+            padding: 0 16px;
+            align-items: flex-start;
+        }
+
+        .palette-source {
+            width: 25%;
+            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+        }
+
+        .source-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-sec);
+            margin-bottom: 4px;
+        }
+
+        .source-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 8px;
+        }
+
+        .source-thumb {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            opacity: 0.9;
+        }
+
+        .palette-result {
+            width: 75%;
+            flex: 1;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+            padding-bottom: 120px;
+        }
+
+        .role-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .role-card:hover {
+            border-color: #000;
+        }
+
+        .role-preview {
+            height: 70px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .contrast-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+            opacity: 0.4;
+        }
+
+        .role-info {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .role-name {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-sec);
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .role-hex {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-family: monospace;
+        }
+
+        .role-primitive {
+            font-size: 10px;
+            color: var(--text-sec);
+            margin-top: 4px;
+            display: block;
+            opacity: 0.6;
+        }
+
+        /* 8. TYPOGRAPHY */
+        .type-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            text-align: left;
+            padding-bottom: 120px;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .font-pair-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+        }
+
+        .font-preview-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .font-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-sec);
+            font-weight: 600;
+        }
+
+        .font-name {
+            font-size: 20px;
+            font-weight: 400;
+            color: var(--text-main);
+        }
+
+        .scale-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .scale-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 16px 0;
+        }
+
+        .scale-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-family: monospace;
+            color: var(--text-sec);
+        }
+
+        .scale-role {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 2px;
+        }
+
+        .scale-specs {
+            font-size: 9px;
+            opacity: 0.7;
+        }
+
+        .scale-preview {
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* 9. UTILS */
+        .dummy-content {
+            padding: 60px 24px;
+            text-align: center;
+            color: #8E8E8E;
+            background: #FAFAFA;
+            border-radius: 12px;
+            border: 2px dashed #E0E0E0;
+            margin-bottom: 120px;
+        }
+
+        .dummy-content h3 {
+            color: #000;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .bottom-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(360deg, #fff 0%, rgba(255, 255, 255, 0) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .fab {
+            pointer-events: auto;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+        }
+
+        /* Modals, Lightbox, Spinner */
+        .modal,
+        .lightbox,
+        .spinner-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .8);
+            display: none !important;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active,
+        .lightbox.active,
+        .spinner-overlay.active {
+            display: flex !important;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 280px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, .2);
+            border-left-color: #fff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Lightbox Details */
+        .container.details {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: #000;
+            padding: 0;
+            overflow: hidden;
+            display: block;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .container.details .panel {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background: transparent;
+            display: block;
+            padding-bottom: 0;
+        }
+
+        #detailsImage {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            margin: 0;
+            padding: 0;
+        }
+
+        #detailsCloseBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            background: #fff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 9999;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .container.details .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .container.details .circle-btn {
+            pointer-events: auto;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .container.details .circle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .container.details .circle-btn.delete {
+            width: 64px;
+            height: 64px;
+        }
+
+        .container.details .circle-btn svg {
+            stroke: black;
+            stroke-width: 2;
+            width: 24px;
+            height: 24px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 3000;
+            transition: bottom .5s ease-in-out;
+        }
+
+        .toast.show {
+            bottom: 30px;
+        }
+
+        .toast.error {
+            background-color: #dc3545;
+        }
+
+        /* 10. DRAWER */
+        .drawer-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 4000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+            z-index: 4001;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .drawer.active {
+            transform: translateY(0);
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 1;
+        }
+
+        .drawer-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .drawer-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: transparent;
+            transition: background 0.2s;
+        }
+
+        .drawer-close:hover {
+            background: var(--surface);
+        }
+
+        .drawer-content {
+            padding: 24px;
+        }
+
+        .drawer-section {
+            margin-bottom: 32px;
+        }
+
+        .drawer-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .drawer-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+        }
+
+        .drawer-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .drawer-option:last-child {
+            border-bottom: none;
+        }
+
+        .drawer-option-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .drawer-option-label.disabled {
+            color: var(--text-sec);
+            opacity: 0.6;
+        }
+
+        .chip-soon {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #ccc;
+            border-radius: 24px;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background-color: #000;
+        }
+
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-switch input:disabled+.toggle-slider {
+            background-color: #e0e0e0;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .drawer-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            background: #fff;
+            position: sticky;
+            bottom: 0;
+        }
+
+        .drawer-footer button {
+            width: 100%;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="view-wrapper" class="view-wrapper">
+
+        <!-- 1. WELCOME -->
+        <div id="view-auth" class="view active centered">
+            <div class="container welcome">
+                <div class="title">
+                    <svg width="23" height="32" viewBox="0 0 23 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12.0466 6.72634L14.3647 6.1052L13.7049 3.6425C13.1955 1.74137 11.2413 0.613153 9.34021 1.12256L3.64226 2.64932C1.74112 3.15873 0.612909 5.11285 1.12232 7.01398L1.78219 9.47669L4.4308 8.76699M12.0466 6.72634L14.7791 14.2751M12.0466 6.72634L4.4308 8.76699M14.7791 14.2751L15.9173 13.9701C17.8184 13.4607 19.7725 14.5889 20.282 16.4901L21.2393 20.063L11.968 22.5472M14.7791 14.2751L5.83879 16.6707M4.4308 8.76699L5.83879 16.6707L5.83879 16.6707L4.25919 17.0939C2.35806 17.6033 1.22984 19.5574 1.73925 21.4586L2.6966 25.0315L11.968 22.5472M11.968 22.5472L14.1991 30.874"
+                            stroke="black" stroke-width="2" />
+                    </svg>
+                    Pins in.
+                    <svg width="31" height="31" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M7.52042 15.4744V18.2379M3.76358 11.7502H1M7.52042 5.23792V8.0015M13.9999 11.7502H11.2363M7.28711 11.7502H7.52353M12.9248 22.1505L10.0537 23.2129C9.47689 23.4263 9.47689 24.2422 10.0537 24.4556L12.9248 25.518C13.1061 25.5851 13.2491 25.7281 13.3162 25.9094L14.3786 28.7805C14.592 29.3573 15.4079 29.3573 15.6213 28.7805L16.6837 25.9094C16.7508 25.7281 16.8938 25.5851 17.0752 25.518L19.9462 24.4556C20.523 24.2422 20.523 23.4263 19.9462 23.2129L17.0752 22.1505C16.8938 22.0834 16.7508 21.9404 16.6837 21.759L15.6213 18.888C15.4079 18.3112 14.592 18.3112 14.3786 18.888L13.3162 21.759C13.2491 21.9404 13.1061 22.0834 12.9248 22.1505Z"
+                            stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Style out!
+                </div>
+                <p class="subtitle">Tell Moood! the style you’re after, and it will find aligned inspiration, build your
+                    mood
+                    board, and turn it into a style guide ready in Figma.</p>
+                <button type="button" id="connectButton" class="cta">Connect Pinterest</button>
+            </div>
+        </div>
+
+        <!-- 2. AUTH -->
+        <div id="view-authorization" class="view centered">
+            <div class="container authorization">
+                <h1>Got the code?</h1>
+                <p class="subtitle">Paste the access code here and get inspired!</p>
+                <div class="row code">
+                    <input type="text" id="tokenInput" placeholder="Paste the token you copied..." />
+                    <button type="button" id="confirmButton">Go!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. SEARCH -->
+        <div id="view-search" class="view centered">
+            <div class="container search">
+                <div class="search-content">
+                    <h1 class="title">Tell us your vibe. <br>We’ll find the pins for you.</h1>
+                    <div class="input-row">
+                        <div class="input-box">
+                            <input type="text" id="searchInput" placeholder="What type of inspiration you need?" />
+                        </div>
+                        <button type="button" id="createMoodboardButton" class="btn">Create Mood board</button>
+                    </div>
+                    <div class="popular-row">
+                        <span class="popular-label">Popular:</span>
+                        <div class="chips">
+                            <div class="chip" data-category="landing">landing</div>
+                            <div class="chip" data-category="dashboard">dashboard</div>
+                            <div class="chip" data-category="typography">typography</div>
+                            <div class="chip" data-category="mobile app">mobile app</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. RESULTS -->
+        <div id="view-moodboard" class="view">
+            <div class="container search-results">
+                <header>
+                    <div class="header-left">
+                        <div id="backButton" class="back-btn" title="Back">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M14.1377 12.3198L10.6963 15.7612H23.0889V16.7612H10.6973L14.1377 20.2017L13.4307 20.9087L8.7832 16.2612L9.13672 15.9077L13.4307 11.6128L14.1377 12.3198Z"
+                                    fill="black" />
+                            </svg>
+                        </div>
+                        <div class="header-text">
+                            <div id="moodboardTitle" class="header-title">Results</div>
+                        </div>
+                    </div>
+                    <div class="tabs">
+                        <div id="tab-moodboard" class="tab active">Mood board</div>
+                        <div id="tab-colors" class="tab">Color palette</div>
+                        <div id="tab-typography" class="tab">Type scale</div>
+                        <div id="tab-layout" class="tab">Layout</div>
+                    </div>
+                </header>
+
+                <div class="grid-scroll">
+                    <div id="moodboardGrid"></div>
+
+                    <!-- Color Palette -->
+                    <div id="section-colors" class="section-container" style="display: none;">
+                        <div class="palette-header">
+                            <div class="palette-title">
+                                <h3>System Colors</h3>
+                                <p>Semantic roles generated from moodboard.</p>
+                            </div>
+                        </div>
+                        <div class="palette-layout">
+                            <div class="palette-source"><span class="source-title">Source Inspiration</span>
+                                <div id="sourceImagesGrid" class="source-thumbnails"></div>
+                            </div>
+                            <div class="palette-result">
+                                <div id="paletteGrid" class="palette-grid">
+                                    <p style="grid-column:1/-1; text-align:center; color:#999; margin-top:20px;">
+                                        Analyzing pixels...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Typography -->
+                    <div id="section-typography" class="section-container" style="display: none;">
+                        <div class="palette-header" style="margin-bottom: 24px; padding: 0 16px;">
+                            <div class="palette-title">
+                                <h3 style="margin:0; font-size:18px;">Type Scale</h3>
+                                <p style="line-height: 1.5; margin: 4px 0 0 0; color: #8E8E8E; font-size: 13px;">Based
+                                    on your moodboard
+                                    vibe, we suggest a <strong>functional pairing</strong> to start your
+                                    system.<br><span style="opacity: 0.7; font-size: 12px;">(Note: We can't detect exact
+                                        fonts from images yet, so we
+                                        provide a solid match for the style).</span></p>
+                            </div>
+                        </div>
+                        <div id="typographyContent" class="type-grid">
+                            <p style="text-align:center; color:#999;">Analyzing style...</p>
+                        </div>
+                    </div>
+
+                    <!-- Layouts -->
+                    <div id="section-layout" class="dummy-content" style="display: none;">
+                        <h3>Layouts</h3>
+                        <p>Features coming soon...</p>
+                    </div>
+                </div>
+
+                <div class="bottom-bar">
+                    <div class="fab">
+                        <svg width="31" height="31" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M7.52042 15.4744V18.2379M3.76358 11.7502H1M7.52042 5.23792V8.0015M13.9999 11.7502H11.2363M7.28711 11.7502H7.52353M12.9248 22.1505L10.0537 23.2129C9.47689 23.4263 9.47689 24.2422 10.0537 24.4556L12.9248 25.518C13.1061 25.5851 13.2491 25.7281 13.3162 25.9094L14.3786 28.7805C14.592 29.3573 15.4079 29.3573 15.6213 28.7805L16.6837 25.9094C16.7508 25.7281 16.8938 25.5851 17.0752 25.518L19.9462 24.4556C20.523 24.2422 20.523 23.4263 19.9462 23.2129L17.0752 22.1505C16.8938 22.0834 16.7508 21.9404 16.6837 21.759L15.6213 18.888C15.4079 18.3112 14.592 18.3112 14.3786 18.888L13.3162 21.759C13.2491 21.9404 13.1061 22.0834 12.9248 22.1505ZM21.8305 4.69511L18.9595 5.75749C18.3826 5.97093 18.3826 6.78679 18.9595 7.00023L21.8305 8.06261C22.0119 8.12972 22.1549 8.27271 22.222 8.45406L23.2843 11.3251C23.4978 11.9019 24.3136 11.9019 24.5271 11.3251L25.5895 8.45406C25.6566 8.27271 25.7996 8.12972 25.9809 8.06261L28.852 7.00023C29.4288 6.78679 29.4288 5.97093 28.852 5.75749L25.9809 4.69511C25.7996 4.628 25.6566 4.48502 25.5895 4.30366L24.5271 1.43262C24.3136 0.855793 23.4978 0.855794 23.2843 1.43262L22.222 4.30366C22.1549 4.48502 22.0119 4.628 21.8305 4.69511Z"
+                                stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. DETAILS -->
+        <div id="view-details" class="view">
+            <div class="container details">
+                <div class="panel">
+                    <div id="detailsCloseBtn" class="chip-close">Close</div>
+                    <img id="detailsImage" class="details-image" alt="Preview" />
+                    <div class="bottom-bar">
+                        <div id="detailsPrevBtn" class="circle-btn"><svg fill="none" viewBox="0 0 24 24">
+                                <path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg></div>
+                        <div id="detailsDeleteBtn" class="circle-btn delete"><svg fill="none" viewBox="0 0 24 24">
+                                <path
+                                    d="M4 7H20M9 3H15M10 11V17M14 11V17M6 7L7 19C7 20.1046 7.89543 21 9 21H15C16.1046 21 17 20.1046 17 19L18 7"
+                                    stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg></div>
+                        <div id="detailsNextBtn" class="circle-btn"><svg fill="none" viewBox="0 0 24 24">
+                                <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UTILS -->
+        <div id="lightbox" class="lightbox">
+            <div id="spinnerOverlay" class="spinner-overlay">
+                <div class="spinner"></div>
+            </div>
+            <span id="lightboxClose" class="lightbox-close">&times;</span>
+            <button id="lightboxPrev" class="lightbox-nav prev">&lt;</button>
+            <img id="lightboxImage" class="lightbox-content">
+            <button id="lightboxNext" class="lightbox-nav next">&gt;</button>
+            <div class="lightbox-actions"><button id="lightboxDeleteButton" class="danger">Eliminar</button></div>
+        </div>
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <p><strong>¿Quitar esta imagen del moodboard?</strong></p>
+                <div class="modal-buttons"><button id="cancelDeleteButton" class="secondary">Cancelar</button><button
+                        id="confirmDeleteButton" class="danger">Quitar</button></div>
+            </div>
+        </div>
+        <div id="toast" class="toast"></div>
+
+        <!-- DRAWER -->
+        <div id="drawerBackdrop" class="drawer-backdrop"></div>
+        <div id="styleGuideDrawer" class="drawer">
+            <div class="drawer-header">
+                <div class="drawer-title">Style guide set</div>
+                <div id="drawerCloseBtn" class="drawer-close">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="black" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </div>
+            </div>
+            <div class="drawer-content">
+                <!-- Basic Download Section -->
+                <div class="drawer-section">
+                    <div class="drawer-section-title">Basic download</div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Download mood board</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-moodboard" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Download color palette</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-palette" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Download type scale</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-typography" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Advanced Download Section -->
+                <div class="drawer-section">
+                    <div class="drawer-section-title">Advanced download</div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Create Figma styles</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-styles">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Create Figma variables</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-variables">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label disabled">
+                            Create basic components
+                            <span class="chip-soon">Soon</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-components" disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="drawer-footer">
+                <button id="generateStyleGuideBtn">Get style guide</button>
+            </div>
+        </div>
+    </div>

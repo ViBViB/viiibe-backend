@@ -1,0 +1,17 @@
+{
+  "name": "Moood! Refactored",
+  "id": "moood-refactored",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "dist/index.html",
+  "editorType": [
+    "figma"
+  ],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://api.pinterest.com",
+      "https://moood-refactor.vercel.app",
+      "https://moood-backend-test-ctui.vercel.app"
+    ]
+  }
+}

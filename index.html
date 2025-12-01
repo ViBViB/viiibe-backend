@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Moood! – Connect</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="view-wrapper" class="view-wrapper">
+        <!-- 1. WELCOME -->
+        <div id="view-auth" class="view active centered">
+            <div class="container welcome">
+                <div class="title">
+                    From mood board to style guide in no time!
+                </div>
+                <p class="subtitle">Moood! pulls the right pins, shapes your mood board, and sets color, type, and
+                    ready‑to‑use Figma Variables & Styles.</p>
+                <button type="button" id="connectButton" class="cta">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 24C10.8187 24 9.675 23.8219 8.59687 23.5031C9.05625 22.7812 9.55312 21.8531 9.80625 20.9344C9.95625 20.4 10.65 17.6344 10.65 17.6344C11.0625 18.4312 12.2812 19.125 13.5844 19.125C17.4469 19.125 20.0625 15.6094 20.0625 10.9031C20.0625 7.34063 17.0437 4.03125 12.4687 4.03125C6.76875 4.03125 3.89062 8.11875 3.89062 11.5312C3.89062 13.5937 4.66875 15.4313 6.34687 16.1156C6.61875 16.2281 6.8625 16.1156 6.94687 15.8156C7.00312 15.6094 7.13437 15.075 7.19062 14.85C7.275 14.55 7.2375 14.4469 7.02187 14.1844C6.54375 13.6125 6.23437 12.8813 6.23437 11.8313C6.23437 8.80313 8.50312 6.08438 12.1406 6.08438C15.3656 6.08438 17.1375 8.05313 17.1375 10.6781C17.1375 14.1375 15.6094 17.0531 13.3313 17.0531C12.075 17.0531 11.1375 16.0125 11.4375 14.7469C11.7937 13.2281 12.4969 11.5875 12.4969 10.4906C12.4969 9.50625 11.9719 8.69063 10.875 8.69063C9.59062 8.69063 8.55937 10.0219 8.55937 11.7938C8.55937 12.9281 8.94375 13.6875 8.94375 13.6875C8.94375 13.6875 7.63125 19.2562 7.39687 20.2219C7.18125 21.1312 7.15312 22.1438 7.19062 22.9781C2.95312 21.1406 0 16.9125 0 12C0 5.37187 5.37188 0 12 0C18.6281 0 24 5.37187 24 12C24 18.6281 18.6281 24 12 24Z"
+                            fill="white" />
+                    </svg>
+                    Connect Pinterest
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. AUTH -->
+        <div id="view-authorization" class="view centered">
+            <div class="container authorization">
+                <h1>Connecting...</h1>
+                <p class="subtitle">Check your browser to authorize Moood!</p>
+                <div class="spinner"
+                    style="margin-top: 20px; border-color: #eee; border-left-color: #000; display: inline-block;"></div>
+            </div>
+        </div>
+
+        <!-- 3. SEARCH -->
+        <div id="view-search" class="view centered">
+            <div class="container search-agent">
+                <h1 class="agent-title">What will spark your creativity today?</h1>
+                <div class="agent-input-wrapper">
+                    <textarea id="searchInput" class="agent-input"
+                        placeholder="Describe: &quot;modern red landing, big imagery, strong titles&quot;"></textarea>
+                    <button id="createMoodboardButton" class="agent-submit-btn">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="40" height="40" rx="20" fill="black" />
+                            <path d="M26 20L14 20M26 20L21 15.5M26 20L21 24.5" stroke="white" stroke-width="1.6"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3.5 LOADING -->
+        <div id="view-loading" class="view centered">
+            <div class="container loading">
+                <h2 class="loading-title">Creating your mood board</h2>
+                <div class="progress-list">
+                    <div class="progress-item" data-step="1">
+                        <span class="checkbox">☐</span>
+                        <span class="text">Getting the creative spark you're chasing</span>
+                    </div>
+                    <div class="progress-item" data-step="2">
+                        <span class="checkbox">☐</span>
+                        <span class="text">Roaming across Pinterest for the good stuff</span>
+                    </div>
+                    <div class="progress-item" data-step="3">
+                        <span class="checkbox">☐</span>
+                        <span class="text">Giving shape to your Moood! board</span>
+                    </div>
+                    <div class="progress-item" data-step="4">
+                        <span class="checkbox">☐</span>
+                        <span class="text">Blending colors and pixels that click</span>
+                    </div>
+                    <div class="progress-item" data-step="5">
+                        <span class="checkbox">☐</span>
+                        <span class="text">Laying out text styles that read beautifully</span>
+                    </div>
+                    <div class="progress-item" data-step="6">
+                        <span class="checkbox">☐</span>
+                        <span class="text">Selecting the patterns that truly fit</span>
+                    </div>
+                    <div class="progress-item" data-step="7">
+                        <span class="checkbox">☐</span>
+                        <span class="text">Ready to go: review and polish your Moood! board</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3.6 GENERATING STYLE GUIDE -->
+        <div id="view-generating" class="view centered">
+            <div class="container generating">
+                <div class="spinner" style="margin-bottom: 24px;"></div>
+                <p class="generating-message">Putting it all together: color palette, type scale, and a beautiful Moood!
+                    board...</p>
+            </div>
+        </div>
+
+        <!-- 4. RESULTS -->
+        <div id="view-moodboard" class="view">
+            <div class="container search-results">
+                <header>
+                    <div class="header-left">
+                        <div id="backButton" class="back-btn" title="Back">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M14.1377 12.3198L10.6963 15.7612H23.0889V16.7612H10.6973L14.1377 20.2017L13.4307 20.9087L8.7832 16.2612L9.13672 15.9077L13.4307 11.6128L14.1377 12.3198Z"
+                                    fill="black" />
+                            </svg>
+                        </div>
+                        <div class="header-text">
+                            <div class="header-title">Results</div>
+                        </div>
+                    </div>
+                    <div class="tabs">
+                        <div id="tab-moodboard" class="tab active">Mood board</div>
+                        <div id="tab-colors" class="tab">Color palette</div>
+                        <div id="tab-typography" class="tab">Type scale</div>
+                        <div id="tab-layout" class="tab">Layout</div>
+                    </div>
+                </header>
+
+                <div class="grid-scroll">
+                    <div id="searchTermsBar" class="search-terms-bar">
+                        <span class="results-label">Results for:</span>
+                        <span id="searchTermsDisplay" class="search-terms-text"></span>
+                    </div>
+                    <div id="moodboardGrid"></div>
+
+                    <!-- Color Palette -->
+                    <div id="section-colors" class="section-container" style="display: none;">
+                        <div class="palette-header">
+                            <div class="palette-title">
+                                <h3>System Colors</h3>
+                                <p>Semantic roles generated from moodboard.</p>
+                            </div>
+                        </div>
+                        <div class="palette-layout">
+                            <div class="palette-source"><span class="source-title">Source Inspiration</span>
+                                <div id="sourceImagesGrid" class="source-thumbnails"></div>
+                            </div>
+                            <div class="palette-result">
+                                <div id="paletteGrid" class="palette-grid">
+                                    <p style="grid-column:1/-1; text-align:center; color:#999; margin-top:20px;">
+                                        Analyzing pixels...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Typography -->
+                    <div id="section-typography" class="section-container" style="display: none;">
+                        <div class="palette-header" style="margin-bottom: 24px; padding: 0 16px;">
+                            <div class="palette-title">
+                                <h3 style="margin:0; font-size:18px;">Type Scale</h3>
+                                <p style="line-height: 1.5; margin: 4px 0 0 0; color: #8E8E8E; font-size: 13px;">Based
+                                    on your moodboard vibe, we suggest a <strong>functional pairing</strong> to start
+                                    your system.<br><span style="opacity: 0.7; font-size: 12px;">(Note: We can't detect
+                                        exact fonts from images yet, so we provide a solid match for the style).</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div id="typographyContent" class="type-grid">
+                            <p style="text-align:center; color:#999;">Analyzing style...</p>
+                        </div>
+                    </div>
+
+                    <!-- Layouts -->
+                    <div id="section-layout" class="dummy-content" style="display: none;">
+                        <h3>Layouts</h3>
+                        <p>Features coming soon...</p>
+                    </div>
+                </div>
+
+                <div class="bottom-bar">
+                    <div class="fab">
+                        Generate style guide
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. DETAILS -->
+        <div id="view-details" class="view">
+            <div class="container details">
+                <div class="panel">
+                    <div id="detailsCloseBtn" class="chip-close">Close</div>
+                    <img id="detailsImage" class="details-image" alt="Preview" />
+                    <div class="bottom-bar">
+                        <div id="detailsPrevBtn" class="circle-btn"><svg fill="none" viewBox="0 0 24 24">
+                                <path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg></div>
+                        <div id="detailsDeleteBtn" class="circle-btn delete"><svg fill="none" viewBox="0 0 24 24">
+                                <path
+                                    d="M4 7H20M9 3H15M10 11V17M14 11V17M6 7L7 19C7 20.1046 7.89543 21 9 21H15C16.1046 21 17 20.1046 17 19L18 7"
+                                    stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg></div>
+                        <div id="detailsNextBtn" class="circle-btn"><svg fill="none" viewBox="0 0 24 24">
+                                <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UTILS -->
+        <div id="lightbox" class="lightbox">
+            <div id="spinnerOverlay" class="spinner-overlay">
+                <div class="spinner"></div>
+            </div>
+            <span id="lightboxClose" class="lightbox-close">&times;</span>
+            <button id="lightboxPrev" class="lightbox-nav prev">&lt;</button>
+            <img id="lightboxImage" class="lightbox-content">
+            <button id="lightboxNext" class="lightbox-nav next">&gt;</button>
+            <div class="lightbox-actions"><button id="lightboxDeleteButton" class="danger">Eliminar</button></div>
+        </div>
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <p><strong>¿Quitar esta imagen del moodboard?</strong></p>
+                <div class="modal-buttons"><button id="cancelDeleteButton" class="secondary">Cancelar</button><button
+                        id="confirmDeleteButton" class="danger">Quitar</button></div>
+            </div>
+        </div>
+        <div id="toast" class="toast"></div>
+
+        <!-- DRAWER -->
+        <div id="drawerBackdrop" class="drawer-backdrop"></div>
+        <div id="styleGuideDrawer" class="drawer">
+            <div class="drawer-header">
+                <div class="drawer-title">Style guide set</div>
+                <div id="drawerCloseBtn" class="drawer-close">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="black" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </div>
+            </div>
+            <div class="drawer-content">
+                <!-- Basic Download Section -->
+                <div class="drawer-section">
+                    <div class="drawer-section-title">Basic download</div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Download mood board</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-moodboard" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Download color palette</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-palette" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Download type scale</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-typography" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Advanced Download Section -->
+                <div class="drawer-section">
+                    <div class="drawer-section-title">Advanced download</div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Create Figma styles</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-styles">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label">Create Figma variables</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-variables">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="drawer-option">
+                        <div class="drawer-option-label disabled">
+                            Create basic components
+                            <span class="chip-soon">Soon</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-components" disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="drawer-footer">
+                <button id="generateStyleGuideBtn">Get style guide</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>

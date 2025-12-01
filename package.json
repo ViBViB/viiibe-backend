@@ -1,0 +1,24 @@
+{
+    "name": "figma-plugin-refactor",
+    "version": "1.0.0",
+    "type": "module",
+    "engines": {
+        "node": "20.x"
+    },
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@vercel/node": "^3.2.29",
+        "vite": "^5.0.0",
+        "vite-plugin-singlefile": "^2.0.0"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^5.1.0",
+        "node-fetch": "^2.7.0",
+        "open": "^11.0.0"
+    }
+}
