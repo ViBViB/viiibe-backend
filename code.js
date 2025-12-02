@@ -72,13 +72,13 @@ const NLP_KEYWORDS = {
 // Board name mapping (maps NLP entities to actual Pinterest board names)
 const BOARD_MAPPING = {
   // Project Types
-  'landing page': 'Landing Pages',
+  'landing page': 'Landing page',
   'dashboard': 'Dashboard UI',
   'mobile app': 'Mobile App UI',
   'ecommerce': 'E-commerce Design',
-  'saas': 'Landing Pages', // Fallback to landing pages
-  'portfolio': 'Landing Pages',
-  'blog': 'Landing Pages',
+  'saas': 'Landing page', // Fallback to landing pages
+  'portfolio': 'Landing page',
+  'blog': 'Landing page',
 
   // Styles
   'minimalist': 'Minimalist Design',
@@ -89,43 +89,43 @@ const BOARD_MAPPING = {
   'elegant': 'Minimalist Design',
   'playful': 'Bold Design',
   'professional': 'Dashboard UI',
-  'vintage': 'Landing Pages',
+  'vintage': 'Landing page',
   'futuristic': 'Dashboard UI',
 
   // Colors
   'red': 'Red Design',
   'blue': 'Blue Design',
-  'green': 'Landing Pages',
+  'green': 'Landing page',
   'yellow': 'Bold Design',
   'orange': 'Bold Design',
-  'purple': 'Landing Pages',
-  'pink': 'Landing Pages',
+  'purple': 'Landing page',
+  'pink': 'Landing page',
   'black': 'Dark Mode Design',
   'white': 'Minimalist Design',
   'gray': 'Minimalist Design',
-  'brown': 'Landing Pages',
+  'brown': 'Landing page',
 
   // Moods
   'calm': 'Minimalist Design',
   'energetic': 'Bold Design',
-  'warm': 'Landing Pages',
+  'warm': 'Landing page',
   'cool': 'Blue Design',
 
   // Elements
   'gradient': 'Bold Design',
-  'texture': 'Landing Pages',
-  'illustration': 'Landing Pages',
-  'photography': 'Landing Pages',
-  '3d': 'Landing Pages',
+  'texture': 'Landing page',
+  'illustration': 'Landing page',
+  'photography': 'Landing page',
+  '3d': 'Landing page',
   'flat': 'Minimalist Design',
   'glassmorphism': 'Minimalist Design',
   'neumorphism': 'Minimalist Design',
 
   // Layouts
   'grid': 'Dashboard UI',
-  'asymmetric': 'Landing Pages',
+  'asymmetric': 'Landing page',
   'centered': 'Minimalist Design',
-  'fullwidth': 'Landing Pages',
+  'fullwidth': 'Landing page',
   'sidebar': 'Dashboard UI'
 };
 
@@ -136,7 +136,7 @@ let cachedBoards = null;
 // PINTEREST API HELPERS (via Vercel Proxy)
 // ==============================================================
 
-const PROXY_URL = 'https://viiibe-backend.vercel.app/api/pinterest-proxy';
+const PROXY_URL = 'https://viiibe-backend-hce5.vercel.app/api/pinterest-proxy';
 
 /**
  * Fetch all boards for the authenticated user
@@ -225,11 +225,14 @@ async function fetchBoardPins(boardId, token, pageSize) {
     });
 
     if (!response.ok) {
-      console.error("Failed to fetch pins for board " + boardId + ":", response.status);
+      console.error("❌ Failed to fetch pins for board " + boardId + ":", response.status);
+      const errorData = await response.json();
+      console.error("Error response:", JSON.stringify(errorData, null, 2));
       return [];
     }
 
     const data = await response.json();
+    console.log("📦 Pinterest API response for board " + boardId + ":", JSON.stringify(data, null, 2));
     const items = data.items || [];
 
     // Transform Pinterest API format to our format
@@ -277,6 +280,90 @@ async function fetchBoardPins(boardId, token, pageSize) {
     return pins;
   } catch (error) {
     console.error("Error fetching board pins:", error);
+    return [];
+  }
+}
+
+/**
+ * Search Pinterest globally using the search API
+ * @param {string} searchTerm - Search query
+ * @param {string} token - Pinterest access token
+ * @param {number} limit - Maximum number of results (default 50)
+ * @returns {Array} - Array of pins from global search
+ */
+async function searchPinterestGlobally(searchTerm, token, limit) {
+  if (!limit) limit = 50;
+
+  try {
+    const response = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'search-pins',
+        searchTerm: searchTerm,
+        token: token,
+        limit: limit,
+        countryCode: 'US' // TODO: Make this configurable
+      })
+    });
+
+    if (!response.ok) {
+      console.error("❌ Failed to search Pinterest globally:", response.status);
+      const errorData = await response.json();
+      console.error("Error response:", JSON.stringify(errorData, null, 2));
+      return [];
+    }
+
+    const data = await response.json();
+    console.log("📦 Global Pinterest search response:", data.items ? data.items.length + " pins found" : "0 pins");
+    const items = data.items || [];
+
+    // Transform Pinterest API format to our format
+    const pins = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      // Pinterest V5 API format: media.images contains different sizes
+      let imageUrl = '';
+      let fullsizeUrl = '';
+      let thumbnailUrl = '';
+
+      if (item.media && item.media.images) {
+        const images = item.media.images;
+
+        // Use 600x for main display
+        imageUrl = images['600x'] ? images['600x'].url : '';
+
+        // Use 1200x for fullsize/lightbox
+        fullsizeUrl = images['1200x'] ? images['1200x'].url : imageUrl;
+
+        // Use 400x300 for thumbnail
+        thumbnailUrl = images['400x300'] ? images['400x300'].url : imageUrl;
+
+        // Fallback: if none of the above exist, try any available size
+        if (!imageUrl) {
+          if (images['1200x']) imageUrl = images['1200x'].url;
+          else if (images['400x300']) imageUrl = images['400x300'].url;
+          else if (images['150x150']) imageUrl = images['150x150'].url;
+        }
+      }
+
+      pins.push({
+        id: item.id,
+        title: item.title || '',
+        description: item.description || '',
+        link: item.link || ('https://www.pinterest.com/pin/' + item.id),
+        image: imageUrl,
+        fullsizeUrl: fullsizeUrl,
+        thumbnailUrl: thumbnailUrl
+      });
+    }
+
+    return pins;
+  } catch (error) {
+    console.error("Error searching Pinterest globally:", error);
     return [];
   }
 }
@@ -452,7 +539,7 @@ function mapToBoards(intent) {
 
   // If no boards matched, return all boards with low score (fallback)
   if (boards.length === 0) {
-    const allBoardNames = ['Landing Pages', 'Dashboard UI', 'Mobile App UI', 'E-commerce Design', 'Minimalist Design', 'Bold Design', 'Dark Mode Design', 'Monochrome Design', 'Red Design', 'Blue Design'];
+    const allBoardNames = ['Landing page', 'Dashboard UI', 'Mobile App UI', 'E-commerce Design', 'Minimalist Design', 'Bold Design', 'Dark Mode Design', 'Monochrome Design', 'Red Design', 'Blue Design'];
     for (let i = 0; i < allBoardNames.length; i++) {
       boards.push({ name: allBoardNames[i], score: 0.5 });
     }
@@ -1592,7 +1679,7 @@ figma.ui.onmessage = async (msg) => {
     console.log("Opening auth window with sessionId:", sessionId);
     figma.ui.postMessage({
       type: "open-auth-window",
-      url: `https://viiibe-backend.vercel.app/api/login?email=user@viiibe.app&state=${sessionId}`,
+      url: `https://viiibe-backend-hce5.vercel.app/api/login?email=user@viiibe.app&state=${sessionId}`,
     });
     return;
   }
@@ -1889,13 +1976,52 @@ figma.ui.onmessage = async (msg) => {
   }
 
   // ------------------------------------------------------------
+  // GLOBAL SEARCH (Search all of Pinterest)
+  // ------------------------------------------------------------
+  if (msg.type === "global-search") {
+    const token = await figma.clientStorage.getAsync("pinterest_token");
+    const query = msg.query || "";
+
+    console.log("🌍 Global Pinterest search query:", query);
+
+    // Progress: Step 1 - Starting search
+    figma.ui.postMessage({
+      type: 'progress-update',
+      step: 1
+    });
+
+    // Search Pinterest globally
+    const pins = await searchPinterestGlobally(query, token, 50);
+    console.log("Found", pins.length, "pins from global search");
+
+    // Progress: Step 3 - Pins fetched
+    figma.ui.postMessage({
+      type: 'progress-update',
+      step: 3
+    });
+
+    // Send results to UI
+    figma.ui.postMessage({
+      type: "show-view",
+      view: "moodboard",
+      data: {
+        pins: pins,
+        category: query,
+        intent: { projectType: 'global search' }
+      },
+    });
+
+    return;
+  }
+
+  // ------------------------------------------------------------
   // FETCH PINS
   // ------------------------------------------------------------
   if (msg.type === "get-pins") {
     const token = await figma.clientStorage.getAsync("pinterest_token");
 
     const res = await fetch(
-      "https://viiibe-backend.vercel.app/api/get-pins",
+      "https://viiibe-backend-hce5.vercel.app/api/get-pins",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1927,7 +2053,7 @@ figma.ui.onmessage = async (msg) => {
     console.log("Fetching image:", msg.url);
     try {
       // Use Vercel image proxy to bypass Pinterest CORS restrictions
-      const proxyUrl = 'https://viiibe-backend.vercel.app/api/image-proxy?url=' + encodeURIComponent(msg.url);
+      const proxyUrl = 'https://viiibe-backend-hce5.vercel.app/api/image-proxy?url=' + encodeURIComponent(msg.url);
       const res = await fetch(proxyUrl);
       console.log("Image fetch response status:", res.status);
 

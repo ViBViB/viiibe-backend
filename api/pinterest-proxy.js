@@ -57,6 +57,19 @@ export default async function handler(req, res) {
             const size = pageSize || 50;
             url = `https://api.pinterest.com/v5/boards/${boardId}/pins?page_size=${size}`;
             console.log(`Fetching pins for board ${boardId}`);
+        } else if (action === 'search-pins') {
+            // Global Pinterest search
+            const { searchTerm, countryCode = 'US', limit = 50, bookmark } = req.body;
+            if (!searchTerm) {
+                return res.status(400).json({ error: 'searchTerm is required for search-pins' });
+            }
+
+            let searchUrl = `https://api.pinterest.com/v5/search/partner/pins?term=${encodeURIComponent(searchTerm)}&country_code=${countryCode}&limit=${limit}`;
+            if (bookmark) {
+                searchUrl += `&bookmark=${encodeURIComponent(bookmark)}`;
+            }
+            url = searchUrl;
+            console.log(`Searching Pinterest globally for: ${searchTerm}`);
         } else if (action === 'find-board') {
             if (!boardName) {
                 return res.status(400).json({ error: 'boardName is required for find-board' });
