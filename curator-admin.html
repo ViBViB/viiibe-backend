@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Curator - Admin Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .preview {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .preview.show {
+            display: block;
+        }
+
+        .preview h3 {
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .preview-value {
+            color: #333;
+        }
+
+        .status {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎨 The Curator</h1>
+        <p class="subtitle">Add high-quality Pinterest boards to Viiibe's curated collection</p>
+
+        <form id="curatorForm">
+            <div class="form-group">
+                <label for="boardUrl">Pinterest Board URL *</label>
+                <input type="url" id="boardUrl" placeholder="https://www.pinterest.com/awwwards/web-design-inspiration/"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="boardId">Board ID *</label>
+                <input type="text" id="boardId" placeholder="Will be extracted automatically or enter manually"
+                    required>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="boardName">Board Name *</label>
+                    <input type="text" id="boardName" placeholder="Web Design Inspiration" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Pinterest Username *</label>
+                    <input type="text" id="username" placeholder="awwwards" required>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" required>
+                        <option value="">Select category...</option>
+                        <option value="web-design">Web Design</option>
+                        <option value="mobile-ui">Mobile UI</option>
+                        <option value="dashboard">Dashboard</option>
+                        <option value="ecommerce">E-commerce</option>
+                        <option value="minimalist">Minimalist</option>
+                        <option value="bold">Bold/Colorful</option>
+                        <option value="dark-mode">Dark Mode</option>
+                        <option value="typography">Typography</option>
+                        <option value="illustration">Illustration</option>
+                        <option value="photography">Photography</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quality">Quality Rating *</label>
+                    <select id="quality" required>
+                        <option value="standard">Standard</option>
+                        <option value="premium">Premium ⭐</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="pinCount">Pin Count</label>
+                    <input type="number" id="pinCount" placeholder="0" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminKey">Admin Key *</label>
+                    <input type="password" id="adminKey" placeholder="Enter admin key" required>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-secondary" onclick="validateBoard()">
+                Validate Board
+            </button>
+            <button type="submit" class="btn btn-primary">
+                Add to Curated Collection
+            </button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <div id="preview" class="preview">
+            <h3>Board Preview</h3>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://viiibe-backend-hce5.vercel.app/api';
+
+        async function validateBoard() {
+            const boardUrl = document.getElementById('boardUrl').value;
+
+            if (!boardUrl) {
+                showStatus('Please enter a board URL', 'error');
+                return;
+            }
+
+            showStatus('Validating board...', 'info');
+
+            // Extract username and board slug from URL
+            const match = boardUrl.match(/pinterest\.com\/([^\/]+)\/([^\/]+)/);
+            if (!match) {
+                showStatus('Invalid Pinterest URL format', 'error');
+                return;
+            }
+
+            const [, username, boardSlug] = match;
+
+            // Auto-fill username
+            document.getElementById('username').value = username;
+
+            showStatus(`Extracted: ${username}/${boardSlug}. Please enter the Board ID manually.`, 'info');
+
+            // Show preview
+            showPreview({
+                username,
+                boardSlug,
+                url: boardUrl
+            });
+        }
+
+        document.getElementById('curatorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                boardId: document.getElementById('boardId').value,
+                name: document.getElementById('boardName').value,
+                username: document.getElementById('username').value,
+                boardSlug: document.getElementById('boardUrl').value.match(/pinterest\.com\/[^\/]+\/([^\/]+)/)?.[1] || '',
+                category: document.getElementById('category').value,
+                pinCount: parseInt(document.getElementById('pinCount').value) || 0,
+                quality: document.getElementById('quality').value,
+                adminKey: document.getElementById('adminKey').value
+            };
+
+            showStatus('Adding board to collection...', 'info');
+
+            try {
+                const response = await fetch(`${API_BASE}/curated-boards`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showStatus('✅ Board successfully added to curated collection!', 'success');
+                    document.getElementById('curatorForm').reset();
+                    document.getElementById('preview').classList.remove('show');
+                } else {
+                    showStatus(`❌ Error: ${data.error || 'Failed to add board'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Network error: ${error.message}`, 'error');
+            }
+        });
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+        }
+
+        function showPreview(data) {
+            const preview = document.getElementById('preview');
+            const content = document.getElementById('previewContent');
+
+            content.innerHTML = `
+        <div class="preview-item">
+          <span class="preview-label">Username:</span>
+          <span class="preview-value">${data.username}</span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Board Slug:</span>
+          <span class="preview-value">${data.boardSlug}</span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">URL:</span>
+          <span class="preview-value">${data.url}</span>
+        </div>
+      `;
+
+            preview.classList.add('show');
+        }
+    </script>
+</body>
+
+</html>
