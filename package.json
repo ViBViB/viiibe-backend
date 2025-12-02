@@ -7,7 +7,7 @@
     },
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "echo 'No build step for API-only project'"
     },
     "devDependencies": {
         "@vercel/node": "^3.2.29",
