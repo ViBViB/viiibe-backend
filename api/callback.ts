@@ -41,8 +41,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const tokenJson: any = await tokenRes.json();
 
         if (!tokenRes.ok) {
-            console.error('Token exchange error:', tokenJson);
-            return res.status(tokenRes.status).send("Error exchanging token: " + (tokenJson.message || tokenRes.statusText));
+            console.error('❌ Token exchange failed!');
+            console.error('Status:', tokenRes.status, tokenRes.statusText);
+            console.error('Response body:', JSON.stringify(tokenJson, null, 2));
+            console.error('Sent params:', {
+                grant_type: "authorization_code",
+                code: code ? (code.substring(0, 5) + '...') : 'missing',
+                redirect_uri: REDIRECT_URI
+            });
+            return res.status(tokenRes.status).send("Error exchanging token: " + (tokenJson.message || tokenJson.error_description || tokenRes.statusText));
         }
 
         console.log('Token received:', tokenJson.access_token ? 'present' : 'missing');
