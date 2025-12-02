@@ -2,7 +2,7 @@
 // MOOD! — BACKEND FINAL (COMPATIBLE)
 // ==============================================================
 
-figma.showUI(__html__, { width: 720, height: 760, title: "Moood!" });
+figma.showUI(__html__, { width: 720, height: 760, title: "Viiibe" });
 
 // ==============================================================
 // NLP SEARCH MODULE
@@ -136,7 +136,7 @@ let cachedBoards = null;
 // PINTEREST API HELPERS (via Vercel Proxy)
 // ==============================================================
 
-const PROXY_URL = 'https://moood-refactor.vercel.app/api/pinterest-proxy';
+const PROXY_URL = 'https://viiibe-backend.vercel.app/api/pinterest-proxy';
 
 /**
  * Fetch all boards for the authenticated user
@@ -609,7 +609,7 @@ async function createColorVariable(name, color, collectionId) {
 }
 
 async function createPrimitivesCollection(colorScales) {
-  const collection = await getOrCreateCollection("Moood! Primitives");
+  const collection = await getOrCreateCollection("Viiibe Primitives");
   const primitives = {};
 
   // 1. COLORS
@@ -784,7 +784,7 @@ async function cleanupPreviousStyleGuide() {
     });
 
     // 2. Remove Variable Collections
-    const collectionNames = ["Moood! Primitives", "Moood! Semantic"];
+    const collectionNames = ["Viiibe Primitives", "Viiibe Semantic"];
     const collections = await figma.variables.getLocalVariableCollectionsAsync();
 
     for (const collection of collections) {
@@ -808,9 +808,9 @@ async function cleanupPreviousStyleGuide() {
 
     // 3. Remove Text Styles
     const localStyles = figma.getLocalTextStyles();
-    const mooodStyles = localStyles.filter(style => style.name.startsWith("Moood!/"));
+    const viibeStyles = localStyles.filter(style => style.name.startsWith("Viiibe/"));
 
-    mooodStyles.forEach(style => {
+    viibeStyles.forEach(style => {
       console.log(`  Removing text style: ${style.name}`);
       style.remove();
     });
@@ -823,7 +823,7 @@ async function cleanupPreviousStyleGuide() {
 }
 
 async function createSemanticCollection(colorPrimitives) {
-  const collection = await getOrCreateCollection("Moood! Semantic");
+  const collection = await getOrCreateCollection("Viiibe Semantic");
 
   // Define semantic mappings
   // We map semantic roles to specific primitive shades
@@ -898,7 +898,7 @@ async function createTypographyStyles(typeSizes, typography) {
     console.log(`[createTypographyStyles] Processing category: ${category}`);
     for (const styleName in styles[category]) {
       const config = styles[category][styleName];
-      const fullName = `Moood!/${category}/${styleName}`;
+      const fullName = `Viiibe/${category}/${styleName}`;
       console.log(`[createTypographyStyles] Creating style: ${fullName}, size: ${config.size}, weight: ${config.weight}`);
 
       let style = existingStyles.find(s => s.name === fullName);
@@ -987,7 +987,7 @@ async function generateMoodboard(images) {
 
     // 3. Crear frame contenedor con autolayout
     const container = figma.createFrame();
-    container.name = "Moood! board";
+    container.name = "Viiibe board";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
@@ -1008,7 +1008,7 @@ async function generateMoodboard(images) {
     console.log("Creating moodboard title...");
     const title = figma.createText();
     title.fontName = { family: "Inter", style: "Bold" };
-    title.characters = "Moood! Board";
+    title.characters = "Viiibe Board";
     title.fontSize = 80;
     container.appendChild(title);
     console.log("Moodboard title created!");
@@ -1172,7 +1172,7 @@ async function generatePalette(colors, config = {}) {
 
     // 3. Crear frame contenedor con autolayout
     const container = figma.createFrame();
-    container.name = "Moood! Color Palette";
+    container.name = "Viiibe Color Palette";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
@@ -1194,7 +1194,7 @@ async function generatePalette(colors, config = {}) {
     // 5. Crear título
     const title = figma.createText();
     title.fontName = { family: "Inter", style: "Bold" };
-    title.characters = "Moood! Color Palette";
+    title.characters = "Viiibe Color Palette";
     title.fontSize = 64;
     container.appendChild(title);
 
@@ -1306,7 +1306,7 @@ async function generateTypography(items, config = {}) {
 
     // 3. Crear frame contenedor con autolayout
     const container = figma.createFrame();
-    container.name = "Moood! Type Scale";
+    container.name = "Viiibe Type Scale";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
@@ -1337,10 +1337,10 @@ async function generateTypography(items, config = {}) {
     headerFrame.itemSpacing = 120;
     headerFrame.fills = [];
 
-    // Título "Moood! Type Scale"
+    // Título "Viiibe Type Scale"
     const mainTitle = figma.createText();
     mainTitle.fontName = { family: "Inter", style: "Bold" };
-    mainTitle.characters = "Moood! Type Scale";
+    mainTitle.characters = "Viiibe Type Scale";
     mainTitle.fontSize = 48;
     mainTitle.resize(300, mainTitle.height);
     headerFrame.appendChild(mainTitle);
@@ -1418,7 +1418,7 @@ async function generateTypography(items, config = {}) {
         categoryFrame.fills = [];
 
         // Find styles for this category
-        const categoryStyles = localStyles.filter(s => s.name.startsWith(`Moood!/${category}/`));
+        const categoryStyles = localStyles.filter(s => s.name.startsWith(`Viiibe/${category}/`));
 
         // Sort styles by font size descending
         categoryStyles.sort((a, b) => b.fontSize - a.fontSize);
@@ -1592,7 +1592,7 @@ figma.ui.onmessage = async (msg) => {
     console.log("Opening auth window with sessionId:", sessionId);
     figma.ui.postMessage({
       type: "open-auth-window",
-      url: `https://moood-backend-test-ctui.vercel.app/api/login?email=test@moood-googleai.app&state=${sessionId}`,
+      url: `https://viiibe-backend.vercel.app/api/login?email=user@viiibe.app&state=${sessionId}`,
     });
     return;
   }
@@ -1895,7 +1895,7 @@ figma.ui.onmessage = async (msg) => {
     const token = await figma.clientStorage.getAsync("pinterest_token");
 
     const res = await fetch(
-      "https://moood-backend-test-ctui.vercel.app/api/get-pins",
+      "https://viiibe-backend.vercel.app/api/get-pins",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1927,7 +1927,7 @@ figma.ui.onmessage = async (msg) => {
     console.log("Fetching image:", msg.url);
     try {
       // Use Vercel image proxy to bypass Pinterest CORS restrictions
-      const proxyUrl = 'https://moood-refactor.vercel.app/api/image-proxy?url=' + encodeURIComponent(msg.url);
+      const proxyUrl = 'https://viiibe-backend.vercel.app/api/image-proxy?url=' + encodeURIComponent(msg.url);
       const res = await fetch(proxyUrl);
       console.log("Image fetch response status:", res.status);
 

@@ -1,5 +1,5 @@
 {
-    "name": "figma-plugin-refactor",
+    "name": "viiibe-plugin",
     "version": "1.0.0",
     "type": "module",
     "engines": {
@@ -12,9 +12,14 @@
     "devDependencies": {
         "@vercel/node": "^3.2.29",
         "vite": "^5.0.0",
-        "vite-plugin-singlefile": "^2.0.0"
+        "vite-plugin-singlefile": "^2.0.0",
+        "@figma/plugin-typings": "^1.99.0",
+        "@types/node": "^20.11.24",
+        "@types/node-fetch": "^2.6.11",
+        "typescript": "^5.3.3"
     },
     "dependencies": {
+        "@vercel/kv": "^1.0.1",
         "cors": "^2.8.5",
         "dotenv": "^17.2.3",
         "express": "^5.1.0",

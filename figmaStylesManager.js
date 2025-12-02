@@ -1,7 +1,7 @@
 // ============================================================
 // FIGMA STYLES MANAGER
 // Manages creation and updating of Figma Color and Text Styles
-// All styles use "Moood!-" prefix to avoid conflicts
+// All styles use "Viiibe-" prefix to avoid conflicts
 // ============================================================
 
 /**
@@ -24,7 +24,7 @@ function hexToFigmaRgb(hex) {
  * @returns {PaintStyle} - Created or updated Figma PaintStyle
  */
 function createColorStyle(name, hex) {
-    const fullName = `Moood!-${name}`;
+    const fullName = `Viiibe-${name}`;
 
     // Check if style already exists
     const existingStyles = figma.getLocalPaintStyles();
@@ -79,22 +79,24 @@ function createAllColorStyles(colorScales) {
 }
 
 /**
- * Get all Moood styles (for debugging/cleanup)
- * @returns {array} - Array of all Moood color styles
+ * Get all Viiibe styles (for debugging/cleanup)
+ * @returns {array} - Array of all Viiibe color styles
  */
-function getMooodColorStyles() {
+function getViiibeColorStyles() {
     const allStyles = figma.getLocalPaintStyles();
-    return allStyles.filter(s => s.name.startsWith('Moood!-'));
+    return allStyles.filter(s => s.name.startsWith('Viiibe-'));
 }
 
 /**
- * Delete all Moood color styles (use with caution!)
+ * Delete all Viiibe color styles (use with caution!)
  * Only use this for cleanup during development
+ * @returns {number} - Number of styles deleted
  */
-function deleteMooodColorStyles() {
-    const mooodStyles = getMooodColorStyles();
-    mooodStyles.forEach(style => {
+function deleteViiibeColorStyles() {
+    const viibeStyles = getViiibeColorStyles();
+    viibeStyles.forEach(style => {
         style.remove();
     });
-    console.log(`Deleted ${mooodStyles.length} Moood color styles`);
+    console.log(`Deleted ${viibeStyles.length} Viiibe color styles`);
+    return viibeStyles.length;
 }

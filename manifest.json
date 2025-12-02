@@ -1,6 +1,6 @@
 {
-  "name": "Moood! Refactored",
-  "id": "moood-refactored",
+  "name": "Viiibe!",
+  "id": "viiibe",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "dist/index.html",
@@ -10,8 +10,7 @@
   "networkAccess": {
     "allowedDomains": [
       "https://api.pinterest.com",
-      "https://moood-refactor.vercel.app",
-      "https://moood-backend-test-ctui.vercel.app"
+      "https://viiibe-backend.vercel.app"
     ]
   }
 }
