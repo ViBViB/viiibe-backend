@@ -16,7 +16,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     `client_id=${CLIENT_ID}` +
     `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
     `&response_type=code` +
-    `&scope=boards:read,pins:read` +
+    `&scope=boards:read,boards:read_secret,pins:read,pins:read_secret` +
     `&state=${encodeURIComponent(stateParam)}`;
 
   res.redirect(authUrl);
