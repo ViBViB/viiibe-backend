@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Add - The Curator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .boards-added {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .boards-added.show {
+            display: block;
+        }
+
+        .boards-added h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .board-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .board-name {
+            font-weight: 600;
+        }
+
+        .board-id {
+            color: #666;
+            font-size: 12px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>⚡ Quick Add Board</h1>
+        <p class="subtitle">Paste Pinterest board URL and go!</p>
+
+        <form id="quickAddForm">
+            <div class="form-group">
+                <label for="boardUrl">Pinterest Board URL *</label>
+                <input type="url" id="boardUrl" placeholder="https://pinterest.com/username/board-name/" required
+                    autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category *</label>
+                <select id="category" required>
+                    <option value="">Select category...</option>
+                    <option value="web-design">Web Design</option>
+                    <option value="mobile-ui">Mobile UI</option>
+                    <option value="dashboard">Dashboard</option>
+                    <option value="ecommerce">E-commerce</option>
+                    <option value="minimalist">Minimalist</option>
+                    <option value="bold">Bold/Colorful</option>
+                    <option value="dark-mode">Dark Mode</option>
+                    <option value="typography">Typography</option>
+                    <option value="illustration">Illustration</option>
+                    <option value="photography">Photography</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="quality">Quality</label>
+                <select id="quality">
+                    <option value="standard">Standard</option>
+                    <option value="premium">Premium ⭐</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="adminKey">Admin Key *</label>
+                <input type="password" id="adminKey" placeholder="Enter admin key" required>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                🚀 Auto-Add Board
+            </button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <div id="boardsAdded" class="boards-added">
+            <h3>✅ Boards Added This Session</h3>
+            <div id="boardsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://viiibe-backend-hce5.vercel.app/api';
+        const boardsAdded = [];
+
+        document.getElementById('quickAddForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const boardUrl = document.getElementById('boardUrl').value;
+            const category = document.getElementById('category').value;
+            const quality = document.getElementById('quality').value;
+            const adminKey = document.getElementById('adminKey').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '🔍 Scraping board...';
+            showStatus('Extracting board ID from Pinterest...', 'info');
+
+            try {
+                const response = await fetch(`${API_BASE}/auto-add-board`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ boardUrl, category, quality, adminKey })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showStatus(`✅ ${data.board.name} added successfully!`, 'success');
+
+                    // Add to list
+                    boardsAdded.push(data.board);
+                    updateBoardsList();
+
+                    // Clear form
+                    document.getElementById('boardUrl').value = '';
+                    document.getElementById('boardUrl').focus();
+                } else {
+                    showStatus(`❌ Error: ${data.error || 'Failed to add board'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Network error: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Auto-Add Board';
+            }
+        });
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+        }
+
+        function updateBoardsList() {
+            const container = document.getElementById('boardsAdded');
+            const list = document.getElementById('boardsList');
+
+            list.innerHTML = boardsAdded.map(board => `
+        <div class="board-item">
+          <div>
+            <div class="board-name">${board.name}</div>
+            <div class="board-id">ID: ${board.id} • ${board.category}</div>
+          </div>
+          <div style="color: #28a745; font-size: 20px;">✓</div>
+        </div>
+      `).join('');
+
+            container.classList.add('show');
+        }
+    </script>
+</body>
+
+</html>
