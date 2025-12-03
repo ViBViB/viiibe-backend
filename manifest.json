@@ -10,7 +10,7 @@
   "networkAccess": {
     "allowedDomains": [
       "https://api.pinterest.com",
-      "https://viiibe-backend.vercel.app"
+      "https://viiibe-backend-hce5.vercel.app"
     ]
   }
 }

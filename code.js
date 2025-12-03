@@ -131,6 +131,9 @@ const BOARD_MAPPING = {
 
 // Cache for user's boards (to avoid repeated API calls)
 let cachedBoards = null;
+let cachedCuratedBoards = null;
+let curatedBoardsTimestamp = null;
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 // ==============================================================
 // PINTEREST API HELPERS (via Vercel Proxy)
@@ -285,11 +288,49 @@ async function fetchBoardPins(boardId, token, pageSize) {
 }
 
 /**
- * Search Pinterest globally using the search API
+ * Fetch curated boards from The Curator API
+ * @returns {Array} - Array of curated board objects
+ */
+async function fetchCuratedBoards() {
+  // Check cache first
+  if (cachedCuratedBoards && curatedBoardsTimestamp) {
+    const now = Date.now();
+    if (now - curatedBoardsTimestamp < CACHE_DURATION) {
+      console.log("📚 Using cached curated boards");
+      return cachedCuratedBoards;
+    }
+  }
+
+  try {
+    console.log("📚 Fetching curated boards from API...");
+    const response = await fetch('https://viiibe-backend-hce5.vercel.app/api/curated-boards');
+
+    if (!response.ok) {
+      console.error("Failed to fetch curated boards:", response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    const boards = data.boards || [];
+
+    // Cache the results
+    cachedCuratedBoards = boards;
+    curatedBoardsTimestamp = Date.now();
+
+    console.log(`📚 Fetched ${boards.length} curated boards`);
+    return boards;
+  } catch (error) {
+    console.error("Error fetching curated boards:", error);
+    return [];
+  }
+}
+
+/**
+ * Search user's saved pins using the search API
  * @param {string} searchTerm - Search query
  * @param {string} token - Pinterest access token
  * @param {number} limit - Maximum number of results (default 50)
- * @returns {Array} - Array of pins from global search
+ * @returns {Array} - Array of pins from search
  */
 async function searchPinterestGlobally(searchTerm, token, limit) {
   if (!limit) limit = 50;
@@ -301,23 +342,22 @@ async function searchPinterestGlobally(searchTerm, token, limit) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        action: 'search-pins',
+        action: 'search-user-pins',
         searchTerm: searchTerm,
         token: token,
-        limit: limit,
-        countryCode: 'US' // TODO: Make this configurable
+        limit: limit
       })
     });
 
     if (!response.ok) {
-      console.error("❌ Failed to search Pinterest globally:", response.status);
+      console.error("❌ Failed to search user pins:", response.status);
       const errorData = await response.json();
       console.error("Error response:", JSON.stringify(errorData, null, 2));
       return [];
     }
 
     const data = await response.json();
-    console.log("📦 Global Pinterest search response:", data.items ? data.items.length + " pins found" : "0 pins");
+    console.log("📦 User pins search response:", data.items ? data.items.length + " pins found" : "0 pins");
     const items = data.items || [];
 
     // Transform Pinterest API format to our format
@@ -1693,486 +1733,550 @@ figma.ui.onmessage = async (msg) => {
 
     console.log("Smart search query:", query);
 
+    // TODO: Add UI toggle for this
+    const USE_GLOBAL_SEARCH = false; // Set to true to search all of Pinterest
+
+    if (USE_GLOBAL_SEARCH) {
+      console.log("🌍 Using GLOBAL Pinterest search");
+
+      // Progress: Step 1
+      figma.ui.postMessage({
+        type: 'progress-update',
+        step: 1
+      });
+
+      // Search Pinterest globally
+      const pins = await searchPinterestGlobally(query, token, 50);
+      console.log("Found", pins.length, "pins from global search");
+
+      // Progress: Step 3
+      figma.ui.postMessage({
+        type: 'progress-update',
+        step: 3
+      });
+
+      // Send results to UI
+      figma.ui.postMessage({
+        type: "show-view",
+        view: "moodboard",
+        data: {
+          pins: pins,
+          category: query,
+          intent: { projectType: 'global search' }
+        },
+      });
+
+      return;
+    }
+
     // 1. Analyze the query using NLP
     const intent = analyzeSearchIntent(query);
     console.log("Extracted intent:", intent);
 
+    // Progress: Step 2 - Mapping to boards
     // Progress: Step 2 - Mapping to boards
     figma.ui.postMessage({
       type: 'progress-update',
       step: 2
     });
 
-    // 2. Map to relevant boards
-    const relevantBoards = mapToBoards(intent);
-    console.log("Relevant boards:", relevantBoards);
-    console.log("Board names to search:", relevantBoards.map(function (b) { return b.name; }).join(", "));
+    // 2. Map to relevant boards (user boards + curated boards)
+    const userBoards = mapToBoards(intent);
+    console.log("User boards:", userBoards.map(b => b.name).join(", "));
 
-    // 3. Search across ALL relevant boards using Pinterest API
-    const allPins = [];
-    const seenPinIds = new Set();
+    // Fetch curated boards
+    const curatedBoards = await fetchCuratedBoards();
+    console.log(`📚 Found ${curatedBoards.length} curated boards`);
 
-    for (let i = 0; i < relevantBoards.length; i++) {
-      const boardConfig = relevantBoards[i];
-      const boardName = boardConfig.name;
+    // Combine user boards + curated boards
+    const allBoards = [...userBoards];
 
-      console.log("Searching board:", boardName);
+    // Add curated boards that match the category
+    for (const curatedBoard of curatedBoards) {
+      // Simple category matching - can be improved
+      const categoryMatch = intent.projectType &&
+        curatedBoard.category &&
+        curatedBoard.category.includes(intent.projectType.toLowerCase());
 
-      // Find the board by name
-      const board = await findBoardByName(boardName, token);
+      if (categoryMatch || curatedBoards.length < 10) {
+        // Add curated board to search list
+        allBoards.push({
+          id: curatedBoard.id,
+          name: curatedBoard.name,
+          isCurated: true
+        });
+        console.log(`🔍 Searching across ${allBoards.length} boards (${userBoards.length} user + ${allBoards.length - userBoards.length} curated)`);
 
-      if (!board) {
-        console.log("Board not found:", boardName);
-        continue;
+        // 3. Search across ALL relevant boards using Pinterest API
+        const allPins = [];
+        const seenPinIds = new Set();
+
+        for (let i = 0; i < allBoards.length; i++) {
+          const boardConfig = allBoards[i];
+          const boardName = boardConfig.name;
+
+          console.log("Searching board:", boardName);
+
+          // Find the board by name (skip for curated boards that already have ID)
+          let foundBoard;
+          if (boardConfig.isCurated) {
+            foundBoard = { id: boardConfig.id, name: boardConfig.name };
+          } else {
+            foundBoard = await findBoardByName(boardName, token);
+          }
+
+          if (!foundBoard) {
+            console.log("Board not found:", boardName);
+            continue;
+          }
+
+          console.log("Found board:", foundBoard.name, "ID:", foundBoard.id);
+
+          // Fetch pins from this board
+          const pins = await fetchBoardPins(foundBoard.id, token, 50);
+          console.log("Fetched", pins.length, "pins from", foundBoard.name);
+
+          // Add pins with relevance score and deduplicate
+          for (let j = 0; j < pins.length; j++) {
+            const pin = pins[j];
+            if (!seenPinIds.has(pin.id)) {
+              // Calculate dynamic score
+              let score = boardConfig.score || 1.0;
+              const text = ((pin.title || "") + " " + (pin.description || "")).toLowerCase();
+              const title = (pin.title || "").toLowerCase();
+
+              // DEBUG: Log text for first few pins to see what we are matching against
+              if (j < 3) console.log("Pin text sample:", text);
+
+              // EXACT MATCH BOOSTING (highest priority)
+              // Check if query words appear in title (not just description)
+              const queryWords = query.toLowerCase().split(' ');
+              let exactMatches = 0;
+              for (let k = 0; k < queryWords.length; k++) {
+                if (queryWords[k].length > 2 && title.indexOf(queryWords[k]) !== -1) {
+                  exactMatches++;
+                }
+              }
+              if (exactMatches > 0) {
+                score += exactMatches * 0.5; // Boost for each exact word match in title
+                console.log("EXACT MATCHES in title:", exactMatches, "for pin:", pin.id);
+              }
+
+              // Check colors (very high boost)
+              for (let k = 0; k < intent.colors.length; k++) {
+                const color = intent.colors[k];
+                if (text.indexOf(color) !== -1) {
+                  score += 2.0; // SUPER HIGH boost for color match
+                  console.log("MATCHED COLOR:", color, "in pin:", pin.id, "New Score:", score);
+                }
+              }
+
+              // Check styles (high boost)
+              for (let k = 0; k < intent.styles.length; k++) {
+                const style = intent.styles[k];
+                if (text.indexOf(style) !== -1) {
+                  score += 1.0; // High boost for style
+                }
+              }
+
+              // Check moods (medium boost)
+              for (let k = 0; k < intent.moods.length; k++) {
+                const mood = intent.moods[k];
+                if (text.indexOf(mood) !== -1) {
+                  score += 0.8;
+                }
+              }
+
+              // Check elements (medium boost)
+              for (let k = 0; k < intent.elements.length; k++) {
+                const element = intent.elements[k];
+                if (text.indexOf(element) !== -1) {
+                  score += 0.7;
+                }
+              }
+
+              // Check layouts (medium boost)
+              for (let k = 0; k < intent.layouts.length; k++) {
+                const layout = intent.layouts[k];
+                if (text.indexOf(layout) !== -1) {
+                  score += 0.6;
+                }
+              }
+
+              // Check project type (small boost)
+              if (intent.projectType) {
+                const pType = intent.projectType;
+                if (text.indexOf(pType) !== -1) {
+                  score += 0.3;
+                }
+              }
+
+              // NEGATIVE KEYWORD FILTERING (penalties)
+              // Penalize pins that contain irrelevant content types
+              const negativeKeywords = {
+                // Design artifacts (not web/app UI)
+                'poster': -3.0,
+                'mockup': -3.0,
+                'mock up': -3.0,
+                'mock-up': -3.0,
+                'flyer': -3.0,
+                'brochure': -3.0,
+                'business card': -3.0,
+                'wallpaper': -3.0,
+
+                // Branding/Identity (not UI)
+                'logo': -2.5,
+                'branding': -2.5,
+                'brand identity': -3.0,
+                'identity': -2.0,
+                'packaging': -2.5,
+
+                // Color/Typography samples (not UI)
+                'palette': -3.0,
+                'color palette': -3.0,
+                'color scheme': -2.5,
+                'typography': -2.0,
+                'typeface': -2.0,
+                'font': -1.5,
+
+                // Other non-UI content
+                'icon': -2.0,
+                'illustration': -1.5,
+                'background': -1.0,
+                'template': -1.5,
+                'pattern': -1.5,
+
+                // Product/Physical items
+                'product': -2.0,
+                'bottle': -2.5,
+                'package': -2.0,
+                'box': -2.0
+              };
+
+              // Apply penalties for negative keywords
+              const negativeKeys = Object.keys(negativeKeywords);
+              for (let k = 0; k < negativeKeys.length; k++) {
+                const keyword = negativeKeys[k];
+                if (text.indexOf(keyword) !== -1) {
+                  score += negativeKeywords[keyword]; // Add negative value (penalty)
+                  console.log("PENALTY for", keyword, "in pin:", pin.id, "Penalty:", negativeKeywords[keyword]);
+                }
+              }
+
+              // PROJECT TYPE VALIDATION (STRICT)
+              // If user specified a project type, REQUIRE positive indicators
+              if (intent.projectType) {
+                const projectType = intent.projectType;
+                let hasRequiredIndicator = false;
+
+                // For landing pages/web projects, REQUIRE web indicators
+                if (projectType === 'landing page' || projectType === 'saas' || projectType === 'portfolio' || projectType === 'blog') {
+                  const webIndicators = ['website', 'web', 'page', 'landing', 'homepage', 'ui', 'interface', 'site', 'online'];
+                  for (let k = 0; k < webIndicators.length; k++) {
+                    if (text.indexOf(webIndicators[k]) !== -1) {
+                      hasRequiredIndicator = true;
+                      break;
+                    }
+                  }
+
+                  // STRICT: If no web indicator AND has negative indicators, skip entirely
+                  if (!hasRequiredIndicator) {
+                    const strictNegatives = ['poster', 'logo', 'palette', 'color palette', 'branding', 'product', 'mockup'];
+                    for (let k = 0; k < strictNegatives.length; k++) {
+                      if (text.indexOf(strictNegatives[k]) !== -1) {
+                        console.log("SKIPPING pin (no web indicator + negative keyword):", pin.id);
+                        continue; // Skip to next pin in outer loop
+                      }
+                    }
+                    // Even without negative keywords, penalize heavily
+                    score -= 1.0;
+                  }
+                }
+
+                // For mobile app, REQUIRE mobile indicators
+                if (projectType === 'mobile app') {
+                  const mobileIndicators = ['mobile', 'app', 'ios', 'android', 'phone', 'smartphone', 'application'];
+                  for (let k = 0; k < mobileIndicators.length; k++) {
+                    if (text.indexOf(mobileIndicators[k]) !== -1) {
+                      hasRequiredIndicator = true;
+                      break;
+                    }
+                  }
+
+                  if (!hasRequiredIndicator) {
+                    const strictNegatives = ['poster', 'logo', 'palette', 'branding', 'product'];
+                    for (let k = 0; k < strictNegatives.length; k++) {
+                      if (text.indexOf(strictNegatives[k]) !== -1) {
+                        console.log("SKIPPING pin (no mobile indicator + negative keyword):", pin.id);
+                        continue;
+                      }
+                    }
+                    score -= 1.0;
+                  }
+                }
+
+                // For dashboard, REQUIRE dashboard/analytics indicators
+                if (projectType === 'dashboard') {
+                  const dashIndicators = ['dashboard', 'analytics', 'admin', 'panel', 'metrics', 'data', 'chart'];
+                  for (let k = 0; k < dashIndicators.length; k++) {
+                    if (text.indexOf(dashIndicators[k]) !== -1) {
+                      hasRequiredIndicator = true;
+                      break;
+                    }
+                  }
+
+                  if (!hasRequiredIndicator) {
+                    score -= 1.0;
+                  }
+                }
+              }
+
+              // MINIMUM SCORE THRESHOLD
+              // Don't include pins with very low scores (likely irrelevant)
+              if (score < 0.6) {
+                continue; // Skip this pin entirely
+              }
+
+              // Create new object preserving all original pin properties
+              const pinWithScore = Object.assign({}, pin);
+              pinWithScore.relevanceScore = score;
+              pinWithScore.matchedBoard = board.name;
+
+              allPins.push(pinWithScore);
+              seenPinIds.add(pin.id);
+            }
+          }
+        }
+
+        // 4. Sort by relevance score (highest first)
+        allPins.sort(function (a, b) { return b.relevanceScore - a.relevanceScore; });
+
+        // DEBUG: Log top scores
+        console.log("Top 5 scores:", allPins.slice(0, 5).map(function (p) { return p.relevanceScore; }));
+
+        // Progress: Step 3 - Pins fetched and ranked
+        figma.ui.postMessage({
+          type: 'progress-update',
+          step: 3
+        });
+
+        // 5. Take top 50 results (increased pool for visual filtering in UI)
+        const topPins = allPins.slice(0, 50);
+
+        console.log("Found " + allPins.length + " total pins, returning top " + topPins.length);
+
+        // 6. Send results to UI
+        figma.ui.postMessage({
+          type: "show-view",
+          view: "moodboard",
+          data: {
+            pins: topPins,
+            category: query, // Clean title, just the query
+            intent: intent
+          },
+        });
+
+        return;
       }
 
-      console.log("Found board:", board.name, "ID:", board.id);
+      // ------------------------------------------------------------
+      // GLOBAL SEARCH (Search all of Pinterest)
+      // ------------------------------------------------------------
+      if (msg.type === "global-search") {
+        const token = await figma.clientStorage.getAsync("pinterest_token");
+        const query = msg.query || "";
 
-      // Fetch pins from this board
-      const pins = await fetchBoardPins(board.id, token, 50);
-      console.log("Fetched", pins.length, "pins from", board.name);
+        console.log("🌍 Global Pinterest search query:", query);
 
-      // Add pins with relevance score and deduplicate
-      for (let j = 0; j < pins.length; j++) {
-        const pin = pins[j];
-        if (!seenPinIds.has(pin.id)) {
-          // Calculate dynamic score starting with board relevance
-          let score = boardConfig.score;
-          const text = ((pin.title || "") + " " + (pin.description || "")).toLowerCase();
-          const title = (pin.title || "").toLowerCase();
+        // Progress: Step 1 - Starting search
+        figma.ui.postMessage({
+          type: 'progress-update',
+          step: 1
+        });
 
-          // DEBUG: Log text for first few pins to see what we are matching against
-          if (j < 3) console.log("Pin text sample:", text);
+        // Search Pinterest globally
+        const pins = await searchPinterestGlobally(query, token, 50);
+        console.log("Found", pins.length, "pins from global search");
 
-          // EXACT MATCH BOOSTING (highest priority)
-          // Check if query words appear in title (not just description)
-          const queryWords = query.toLowerCase().split(' ');
-          let exactMatches = 0;
-          for (let k = 0; k < queryWords.length; k++) {
-            if (queryWords[k].length > 2 && title.indexOf(queryWords[k]) !== -1) {
-              exactMatches++;
-            }
+        // Progress: Step 3 - Pins fetched
+        figma.ui.postMessage({
+          type: 'progress-update',
+          step: 3
+        });
+
+        // Send results to UI
+        figma.ui.postMessage({
+          type: "show-view",
+          view: "moodboard",
+          data: {
+            pins: pins,
+            category: query,
+            intent: { projectType: 'global search' }
+          },
+        });
+
+        return;
+      }
+
+      // ------------------------------------------------------------
+      // FETCH PINS
+      // ------------------------------------------------------------
+      if (msg.type === "get-pins") {
+        const token = await figma.clientStorage.getAsync("pinterest_token");
+
+        const res = await fetch(
+          "https://viiibe-backend-hce5.vercel.app/api/get-pins",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              category: msg.category,
+              token: token || "",
+            }),
           }
-          if (exactMatches > 0) {
-            score += exactMatches * 0.5; // Boost for each exact word match in title
-            console.log("EXACT MATCHES in title:", exactMatches, "for pin:", pin.id);
+        );
+
+        if (!res.ok) return;
+
+        const json = await res.json();
+        const pins = Array.isArray(json) ? json : json.data || [];
+
+        figma.ui.postMessage({
+          type: "show-view",
+          view: "moodboard",
+          data: { pins: pins, category: msg.category },
+        });
+
+        return;
+      }
+
+      // ------------------------------------------------------------
+      // FETCH IMAGE BY PROXY
+      // ------------------------------------------------------------
+      if (msg.type === "fetch-image") {
+        console.log("Fetching image:", msg.url);
+        try {
+          // Use Vercel image proxy to bypass Pinterest CORS restrictions
+          const proxyUrl = 'https://viiibe-backend-hce5.vercel.app/api/image-proxy?url=' + encodeURIComponent(msg.url);
+          const res = await fetch(proxyUrl);
+          console.log("Image fetch response status:", res.status);
+
+          const buf = await res.arrayBuffer();
+          console.log("Image loaded, size:", buf.byteLength, "bytes");
+
+          figma.ui.postMessage({
+            type: "image-loaded",
+            target: msg.target,
+            url: msg.url,
+            imageBytes: new Uint8Array(buf),
+          });
+
+          console.log("Image message sent to UI");
+        } catch (e) {
+          console.error("Error fetching image:", msg.url, e);
+          // If direct fetch fails, send error message
+          figma.ui.postMessage({
+            type: "image-error",
+            target: msg.target,
+            url: msg.url,
+          });
+        }
+        return;
+      }
+
+      // ============================================================
+      // FAB: FULL STYLEGUIDE GENERATOR
+      // ============================================================
+      if (msg.type === "generate-full-styleguide") {
+        console.log("Starting style guide generation...");
+        console.log("Received data:", {
+          images: (msg.images && msg.images.length) || 0,
+          colors: (msg.palette && msg.palette.length) || 0,
+          typography: (msg.typography && msg.typography.length) || 0,
+          config: msg.config
+        });
+
+        const images = msg.images || [];
+        const colors = msg.palette || [];
+        const typography = msg.typography || [];
+        const config = msg.config || {
+          downloadMoodboard: true,
+          downloadColorPalette: true,
+          downloadTypeScale: true,
+          createFigmaStyles: false,
+          createFigmaVariables: false,
+          createBasicComponents: false
+        };
+
+        figma.notify("Generating style guide…");
+
+        // Clean up previous style guide artifacts
+        await cleanupPreviousStyleGuide();
+
+        // Generate Moodboard if enabled
+        if (config.downloadMoodboard) {
+          try {
+            console.log("Generating moodboard...");
+            await generateMoodboard(images);
+          } catch (error) {
+            console.error("Error generating moodboard:", error);
+            figma.notify("Error generating moodboard");
           }
+        } else {
+          console.log("Skipping moodboard (disabled in config)");
+        }
 
-          // Check colors (very high boost)
-          for (let k = 0; k < intent.colors.length; k++) {
-            const color = intent.colors[k];
-            if (text.indexOf(color) !== -1) {
-              score += 2.0; // SUPER HIGH boost for color match
-              console.log("MATCHED COLOR:", color, "in pin:", pin.id, "New Score:", score);
-            }
+        // Generate Palette if enabled
+        if (config.downloadColorPalette) {
+          try {
+            console.log("Generating palette...");
+            await generatePalette(colors, config);
+          } catch (error) {
+            console.error("Error generating palette:", error);
+            figma.notify("Error generating palette");
           }
+        } else {
+          console.log("Skipping palette (disabled in config)");
+        }
 
-          // Check styles (high boost)
-          for (let k = 0; k < intent.styles.length; k++) {
-            const style = intent.styles[k];
-            if (text.indexOf(style) !== -1) {
-              score += 1.0; // High boost for style
-            }
+        // Generate Typography if enabled
+        if (config.downloadTypeScale) {
+          try {
+            console.log("Generating typography...");
+            await generateTypography(typography, config);
+          } catch (error) {
+            console.error("Error generating typography:", error);
+            figma.notify("Error generating typography");
           }
+        } else {
+          console.log("Skipping typography (disabled in config)");
+        }
 
-          // Check moods (medium boost)
-          for (let k = 0; k < intent.moods.length; k++) {
-            const mood = intent.moods[k];
-            if (text.indexOf(mood) !== -1) {
-              score += 0.8;
-            }
-          }
-
-          // Check elements (medium boost)
-          for (let k = 0; k < intent.elements.length; k++) {
-            const element = intent.elements[k];
-            if (text.indexOf(element) !== -1) {
-              score += 0.7;
-            }
-          }
-
-          // Check layouts (medium boost)
-          for (let k = 0; k < intent.layouts.length; k++) {
-            const layout = intent.layouts[k];
-            if (text.indexOf(layout) !== -1) {
-              score += 0.6;
-            }
-          }
-
-          // Check project type (small boost)
-          if (intent.projectType) {
-            const pType = intent.projectType;
-            if (text.indexOf(pType) !== -1) {
-              score += 0.3;
-            }
-          }
-
-          // NEGATIVE KEYWORD FILTERING (penalties)
-          // Penalize pins that contain irrelevant content types
-          const negativeKeywords = {
-            // Design artifacts (not web/app UI)
-            'poster': -3.0,
-            'mockup': -3.0,
-            'mock up': -3.0,
-            'mock-up': -3.0,
-            'flyer': -3.0,
-            'brochure': -3.0,
-            'business card': -3.0,
-            'wallpaper': -3.0,
-
-            // Branding/Identity (not UI)
-            'logo': -2.5,
-            'branding': -2.5,
-            'brand identity': -3.0,
-            'identity': -2.0,
-            'packaging': -2.5,
-
-            // Color/Typography samples (not UI)
-            'palette': -3.0,
-            'color palette': -3.0,
-            'color scheme': -2.5,
-            'typography': -2.0,
-            'typeface': -2.0,
-            'font': -1.5,
-
-            // Other non-UI content
-            'icon': -2.0,
-            'illustration': -1.5,
-            'background': -1.0,
-            'template': -1.5,
-            'pattern': -1.5,
-
-            // Product/Physical items
-            'product': -2.0,
-            'bottle': -2.5,
-            'package': -2.0,
-            'box': -2.0
-          };
-
-          // Apply penalties for negative keywords
-          const negativeKeys = Object.keys(negativeKeywords);
-          for (let k = 0; k < negativeKeys.length; k++) {
-            const keyword = negativeKeys[k];
-            if (text.indexOf(keyword) !== -1) {
-              score += negativeKeywords[keyword]; // Add negative value (penalty)
-              console.log("PENALTY for", keyword, "in pin:", pin.id, "Penalty:", negativeKeywords[keyword]);
-            }
-          }
-
-          // PROJECT TYPE VALIDATION (STRICT)
-          // If user specified a project type, REQUIRE positive indicators
-          if (intent.projectType) {
-            const projectType = intent.projectType;
-            let hasRequiredIndicator = false;
-
-            // For landing pages/web projects, REQUIRE web indicators
-            if (projectType === 'landing page' || projectType === 'saas' || projectType === 'portfolio' || projectType === 'blog') {
-              const webIndicators = ['website', 'web', 'page', 'landing', 'homepage', 'ui', 'interface', 'site', 'online'];
-              for (let k = 0; k < webIndicators.length; k++) {
-                if (text.indexOf(webIndicators[k]) !== -1) {
-                  hasRequiredIndicator = true;
-                  break;
-                }
-              }
-
-              // STRICT: If no web indicator AND has negative indicators, skip entirely
-              if (!hasRequiredIndicator) {
-                const strictNegatives = ['poster', 'logo', 'palette', 'color palette', 'branding', 'product', 'mockup'];
-                for (let k = 0; k < strictNegatives.length; k++) {
-                  if (text.indexOf(strictNegatives[k]) !== -1) {
-                    console.log("SKIPPING pin (no web indicator + negative keyword):", pin.id);
-                    continue; // Skip to next pin in outer loop
-                  }
-                }
-                // Even without negative keywords, penalize heavily
-                score -= 1.0;
-              }
-            }
-
-            // For mobile app, REQUIRE mobile indicators
-            if (projectType === 'mobile app') {
-              const mobileIndicators = ['mobile', 'app', 'ios', 'android', 'phone', 'smartphone', 'application'];
-              for (let k = 0; k < mobileIndicators.length; k++) {
-                if (text.indexOf(mobileIndicators[k]) !== -1) {
-                  hasRequiredIndicator = true;
-                  break;
-                }
-              }
-
-              if (!hasRequiredIndicator) {
-                const strictNegatives = ['poster', 'logo', 'palette', 'branding', 'product'];
-                for (let k = 0; k < strictNegatives.length; k++) {
-                  if (text.indexOf(strictNegatives[k]) !== -1) {
-                    console.log("SKIPPING pin (no mobile indicator + negative keyword):", pin.id);
-                    continue;
-                  }
-                }
-                score -= 1.0;
-              }
-            }
-
-            // For dashboard, REQUIRE dashboard/analytics indicators
-            if (projectType === 'dashboard') {
-              const dashIndicators = ['dashboard', 'analytics', 'admin', 'panel', 'metrics', 'data', 'chart'];
-              for (let k = 0; k < dashIndicators.length; k++) {
-                if (text.indexOf(dashIndicators[k]) !== -1) {
-                  hasRequiredIndicator = true;
-                  break;
-                }
-              }
-
-              if (!hasRequiredIndicator) {
-                score -= 1.0;
-              }
-            }
+        try {
+          // Navigate to the first generated page
+          let targetPage = null;
+          if (config.downloadMoodboard) {
+            targetPage = figma.root.children.find((p) => p.name === "Mood board");
+          } else if (config.downloadColorPalette) {
+            targetPage = figma.root.children.find((p) => p.name === "Color palette");
+          } else if (config.downloadTypeScale) {
+            targetPage = figma.root.children.find((p) => p.name === "Type scale");
           }
 
-          // MINIMUM SCORE THRESHOLD
-          // Don't include pins with very low scores (likely irrelevant)
-          if (score < 0.6) {
-            continue; // Skip this pin entirely
+          if (targetPage) {
+            figma.currentPage = targetPage;
           }
 
-          // Create new object preserving all original pin properties
-          const pinWithScore = Object.assign({}, pin);
-          pinWithScore.relevanceScore = score;
-          pinWithScore.matchedBoard = board.name;
+          figma.notify("Style guide generated!");
+          console.log("Style guide generation complete!");
 
-          allPins.push(pinWithScore);
-          seenPinIds.add(pin.id);
+          // Close plugin after a brief delay
+          setTimeout(() => {
+            figma.closePlugin();
+          }, 1000);
+        } catch (error) {
+          console.error("Error during finalization of style guide generation:", error);
+          figma.notify("Error during finalization");
         }
       }
-    }
-
-    // 4. Sort by relevance score (highest first)
-    allPins.sort(function (a, b) { return b.relevanceScore - a.relevanceScore; });
-
-    // DEBUG: Log top scores
-    console.log("Top 5 scores:", allPins.slice(0, 5).map(function (p) { return p.relevanceScore; }));
-
-    // Progress: Step 3 - Pins fetched and ranked
-    figma.ui.postMessage({
-      type: 'progress-update',
-      step: 3
-    });
-
-    // 5. Take top 50 results (increased pool for visual filtering in UI)
-    const topPins = allPins.slice(0, 50);
-
-    console.log("Found " + allPins.length + " total pins, returning top " + topPins.length);
-
-    // 6. Send results to UI
-    figma.ui.postMessage({
-      type: "show-view",
-      view: "moodboard",
-      data: {
-        pins: topPins,
-        category: query, // Clean title, just the query
-        intent: intent
-      },
-    });
-
-    return;
-  }
-
-  // ------------------------------------------------------------
-  // GLOBAL SEARCH (Search all of Pinterest)
-  // ------------------------------------------------------------
-  if (msg.type === "global-search") {
-    const token = await figma.clientStorage.getAsync("pinterest_token");
-    const query = msg.query || "";
-
-    console.log("🌍 Global Pinterest search query:", query);
-
-    // Progress: Step 1 - Starting search
-    figma.ui.postMessage({
-      type: 'progress-update',
-      step: 1
-    });
-
-    // Search Pinterest globally
-    const pins = await searchPinterestGlobally(query, token, 50);
-    console.log("Found", pins.length, "pins from global search");
-
-    // Progress: Step 3 - Pins fetched
-    figma.ui.postMessage({
-      type: 'progress-update',
-      step: 3
-    });
-
-    // Send results to UI
-    figma.ui.postMessage({
-      type: "show-view",
-      view: "moodboard",
-      data: {
-        pins: pins,
-        category: query,
-        intent: { projectType: 'global search' }
-      },
-    });
-
-    return;
-  }
-
-  // ------------------------------------------------------------
-  // FETCH PINS
-  // ------------------------------------------------------------
-  if (msg.type === "get-pins") {
-    const token = await figma.clientStorage.getAsync("pinterest_token");
-
-    const res = await fetch(
-      "https://viiibe-backend-hce5.vercel.app/api/get-pins",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: msg.category,
-          token: token || "",
-        }),
-      }
-    );
-
-    if (!res.ok) return;
-
-    const json = await res.json();
-    const pins = Array.isArray(json) ? json : json.data || [];
-
-    figma.ui.postMessage({
-      type: "show-view",
-      view: "moodboard",
-      data: { pins: pins, category: msg.category },
-    });
-
-    return;
-  }
-
-  // ------------------------------------------------------------
-  // FETCH IMAGE BY PROXY
-  // ------------------------------------------------------------
-  if (msg.type === "fetch-image") {
-    console.log("Fetching image:", msg.url);
-    try {
-      // Use Vercel image proxy to bypass Pinterest CORS restrictions
-      const proxyUrl = 'https://viiibe-backend-hce5.vercel.app/api/image-proxy?url=' + encodeURIComponent(msg.url);
-      const res = await fetch(proxyUrl);
-      console.log("Image fetch response status:", res.status);
-
-      const buf = await res.arrayBuffer();
-      console.log("Image loaded, size:", buf.byteLength, "bytes");
-
-      figma.ui.postMessage({
-        type: "image-loaded",
-        target: msg.target,
-        url: msg.url,
-        imageBytes: new Uint8Array(buf),
-      });
-
-      console.log("Image message sent to UI");
-    } catch (e) {
-      console.error("Error fetching image:", msg.url, e);
-      // If direct fetch fails, send error message
-      figma.ui.postMessage({
-        type: "image-error",
-        target: msg.target,
-        url: msg.url,
-      });
-    }
-    return;
-  }
-
-  // ============================================================
-  // FAB: FULL STYLEGUIDE GENERATOR
-  // ============================================================
-  if (msg.type === "generate-full-styleguide") {
-    console.log("Starting style guide generation...");
-    console.log("Received data:", {
-      images: (msg.images && msg.images.length) || 0,
-      colors: (msg.palette && msg.palette.length) || 0,
-      typography: (msg.typography && msg.typography.length) || 0,
-      config: msg.config
-    });
-
-    const images = msg.images || [];
-    const colors = msg.palette || [];
-    const typography = msg.typography || [];
-    const config = msg.config || {
-      downloadMoodboard: true,
-      downloadColorPalette: true,
-      downloadTypeScale: true,
-      createFigmaStyles: false,
-      createFigmaVariables: false,
-      createBasicComponents: false
     };
-
-    figma.notify("Generating style guide…");
-
-    // Clean up previous style guide artifacts
-    await cleanupPreviousStyleGuide();
-
-    // Generate Moodboard if enabled
-    if (config.downloadMoodboard) {
-      try {
-        console.log("Generating moodboard...");
-        await generateMoodboard(images);
-      } catch (error) {
-        console.error("Error generating moodboard:", error);
-        figma.notify("Error generating moodboard");
-      }
-    } else {
-      console.log("Skipping moodboard (disabled in config)");
-    }
-
-    // Generate Palette if enabled
-    if (config.downloadColorPalette) {
-      try {
-        console.log("Generating palette...");
-        await generatePalette(colors, config);
-      } catch (error) {
-        console.error("Error generating palette:", error);
-        figma.notify("Error generating palette");
-      }
-    } else {
-      console.log("Skipping palette (disabled in config)");
-    }
-
-    // Generate Typography if enabled
-    if (config.downloadTypeScale) {
-      try {
-        console.log("Generating typography...");
-        await generateTypography(typography, config);
-      } catch (error) {
-        console.error("Error generating typography:", error);
-        figma.notify("Error generating typography");
-      }
-    } else {
-      console.log("Skipping typography (disabled in config)");
-    }
-
-    try {
-      // Navigate to the first generated page
-      let targetPage = null;
-      if (config.downloadMoodboard) {
-        targetPage = figma.root.children.find((p) => p.name === "Mood board");
-      } else if (config.downloadColorPalette) {
-        targetPage = figma.root.children.find((p) => p.name === "Color palette");
-      } else if (config.downloadTypeScale) {
-        targetPage = figma.root.children.find((p) => p.name === "Type scale");
-      }
-
-      if (targetPage) {
-        figma.currentPage = targetPage;
-      }
-
-      figma.notify("Style guide generated!");
-      console.log("Style guide generation complete!");
-
-      // Close plugin after a brief delay
-      setTimeout(() => {
-        figma.closePlugin();
-      }, 1000);
-    } catch (error) {
-      console.error("Error during finalization of style guide generation:", error);
-      figma.notify("Error during finalization");
-    }
-  }
-};
