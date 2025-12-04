@@ -221,7 +221,11 @@ Return ONLY the JSON, no other text.`;
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content || '{}';
+    let content = data.choices[0].message.content || '{}';
+
+    // Strip markdown code blocks if present
+    content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
     return JSON.parse(content);
 }
 
