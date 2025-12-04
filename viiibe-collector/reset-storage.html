@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Viiibe Collector Storage</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        button.secondary {
+            background: #2196F3;
+        }
+
+        button.secondary:hover {
+            background: #0b7dda;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .code {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔄 Reset Viiibe Collector Storage</h1>
+        <p>This will reset the Chrome extension storage to default values.</p>
+
+        <div class="code">
+            adminKey: viiibe-curator-2025<br>
+            totalPins: 0<br>
+            defaultCategory: uncategorized
+        </div>
+
+        <button onclick="resetStorage()">Reset Storage</button>
+        <button class="secondary" onclick="viewStorage()">View Current Storage</button>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        function resetStorage() {
+            // Clear ALL storage first
+            chrome.storage.sync.clear(() => {
+                chrome.storage.local.clear(() => {
+                    // Then set new values
+                    chrome.storage.sync.set({
+                        adminKey: 'viiibe-curator-2025',
+                        totalPins: 0,
+                        todayPins: 0,
+                        lastDate: new Date().toDateString(),
+                        defaultCategory: 'uncategorized'
+                    }, () => {
+                        const status = document.getElementById('status');
+                        status.className = 'status success';
+                        status.style.display = 'block';
+                        status.innerHTML = `
+                            <strong>✅ Storage Reset Complete!</strong><br>
+                            <br>
+                            Cleared:<br>
+                            • chrome.storage.sync ✓<br>
+                            • chrome.storage.local ✓<br>
+                            <br>
+                            New values:<br>
+                            • adminKey: viiibe-curator-2025<br>
+                            • totalPins: 0<br>
+                            • todayPins: 0<br>
+                            • defaultCategory: uncategorized<br>
+                            <br>
+                            <strong>IMPORTANT:</strong><br>
+                            1. Close the extension popup if it's open<br>
+                            2. Reload the extension at chrome://extensions/<br>
+                            3. Open the popup again<br>
+                            <br>
+                            Now it should show 0 pins.
+                        `;
+                    });
+                });
+            });
+        }
+
+        function viewStorage() {
+            chrome.storage.sync.get(['adminKey', 'totalPins', 'defaultCategory'], (result) => {
+                const status = document.getElementById('status');
+                status.className = 'status info';
+                status.style.display = 'block';
+                status.innerHTML = `
+                    <strong>📊 Current Storage Values:</strong><br>
+                    <br>
+                    • adminKey: ${result.adminKey || 'NOT SET'}<br>
+                    • totalPins: ${result.totalPins || 0}<br>
+                    • defaultCategory: ${result.defaultCategory || 'NOT SET'}
+                `;
+            });
+        }
+
+        // Auto-view storage on load
+        window.addEventListener('load', () => {
+            setTimeout(viewStorage, 500);
+        });
+    </script>
+</body>
+
+</html>

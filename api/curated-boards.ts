@@ -1,5 +1,6 @@
 import { kv } from '@vercel/kv';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import fetch from 'node-fetch';
 
 // CORS headers
 const corsHeaders = {
@@ -56,11 +57,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(200).json({ boards, count: boards.length });
         }
 
-        // POST - Add a new curated board
+        // POST - Add a new curated board or validate
         if (req.method === 'POST') {
-            const { boardId, name, username, boardSlug, category, pinCount, quality, adminKey } = req.body;
+            const { action, boardId, name, username, boardSlug, category, pinCount, quality, adminKey, boardUrl, token } = req.body;
 
-            // Simple admin authentication
+            // Handle validate action
+            if (action === 'validate') {
+                return await validateBoard(boardUrl, token, res);
+            }
+
+            // Simple admin authentication for add action
             const ADMIN_KEY = process.env.CURATOR_ADMIN_KEY || 'change-me-in-production';
             if (adminKey !== ADMIN_KEY) {
                 return res.status(401).json({ error: 'Unauthorized' });
@@ -102,4 +108,74 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             message: error.message
         });
     }
+}
+
+/**
+ * Validate a Pinterest board URL
+ */
+async function validateBoard(boardUrl: string, token: string, res: VercelResponse) {
+    if (!boardUrl) {
+        return res.status(400).json({ error: 'boardUrl is required' });
+    }
+
+    // Extract username and board slug from URL
+    const urlMatch = boardUrl.match(/pinterest\.com\/([^\/]+)\/([^\/]+)/);
+
+    if (!urlMatch) {
+        return res.status(400).json({
+            error: 'Invalid Pinterest board URL format',
+            expected: 'https://www.pinterest.com/{username}/{board-slug}/'
+        });
+    }
+
+    const [, username, boardSlug] = urlMatch;
+
+    console.log(`🔍 Validating board: ${username}/${boardSlug}`);
+
+    // Try to find the board using Pinterest API
+    const boardsResponse = await fetch('https://api.pinterest.com/v5/boards', {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!boardsResponse.ok) {
+        return res.status(400).json({
+            error: 'Unable to validate board. Make sure you are authenticated with Pinterest.',
+            details: await boardsResponse.text()
+        });
+    }
+
+    const boardsData: any = await boardsResponse.json();
+    const boards = boardsData.items || [];
+
+    // Try to find matching board
+    const matchingBoard = boards.find((b: any) =>
+        b.name.toLowerCase().includes(boardSlug.replace(/-/g, ' ').toLowerCase())
+    );
+
+    if (matchingBoard) {
+        return res.status(200).json({
+            valid: true,
+            board: {
+                id: matchingBoard.id,
+                name: matchingBoard.name,
+                username: username,
+                boardSlug: boardSlug,
+                pinCount: matchingBoard.pin_count || 0,
+                description: matchingBoard.description || ''
+            }
+        });
+    }
+
+    // If not found in user's boards, return info for manual entry
+    return res.status(200).json({
+        valid: false,
+        message: 'Board not found in your accessible boards. You can still add it manually.',
+        extracted: {
+            username,
+            boardSlug
+        }
+    });
 }

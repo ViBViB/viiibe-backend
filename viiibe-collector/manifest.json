@@ -1,0 +1,34 @@
+{
+    "manifest_version": 3,
+    "name": "Viiibe Collector",
+    "version": "1.0.2",
+    "description": "Quickly save Pinterest pins to Viiibe for design inspiration curation",
+    "permissions": [
+        "activeTab",
+        "contextMenus",
+        "storage"
+    ],
+    "host_permissions": [
+        "*://*.pinterest.com/*",
+        "*://*.pinterest.cl/*",
+        "https://*.vercel.app/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.pinterest.com/*",
+                "*://*.pinterest.cl/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    }
+}
