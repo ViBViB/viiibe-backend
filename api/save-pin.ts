@@ -47,6 +47,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         console.log(`💾 Saving pin: ${pinId} - ${title}`);
 
+        // Check if pin already exists
+        const existingPin = await kv.get(`saved-pin:${pinId}`);
+        if (existingPin) {
+            console.log(`ℹ️  Pin ${pinId} already exists, skipping save`);
+            return res.status(200).json({
+                success: true,
+                pin: existingPin,
+                message: 'Pin already saved',
+                duplicate: true
+            });
+        }
+
         // Create pin object
         const pin: SavedPin = {
             id: pinId,

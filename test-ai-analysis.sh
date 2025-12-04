@@ -5,7 +5,7 @@
 
 set -e
 
-BASE_URL="https://viiibe-backend-iugr7fwmo-alberto-contreras-projects-101c33ba.vercel.app"
+BASE_URL="https://viiibe-backend-hce5.vercel.app"
 
 echo "🤖 Testing AI Pin Analysis"
 echo "=========================="

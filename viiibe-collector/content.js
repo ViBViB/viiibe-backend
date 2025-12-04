@@ -101,6 +101,13 @@ async function savePinToViiibe(pinData, category = 'uncategorized') {
         }
 
         const result = await response.json();
+
+        // Check if pin was a duplicate
+        if (result.duplicate) {
+            showNotification('Pin already saved!', 'info');
+            return 'duplicate';
+        }
+
         return true;
     } catch (error) {
         console.error('Error saving pin:', error);
@@ -118,7 +125,7 @@ function showNotification(message, type = 'success') {
     top: 20px;
     right: 20px;
     padding: 16px 24px;
-    background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+    background: ${type === 'success' ? '#4CAF50' : type === 'info' ? '#2196F3' : '#f44336'};
     color: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
