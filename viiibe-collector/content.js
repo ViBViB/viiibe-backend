@@ -176,9 +176,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 chrome.runtime.sendMessage({ action: 'pin-saved' });
 
                 // Update stats
-                chrome.storage.sync.get(['totalPins'], (result) => {
+                chrome.storage.sync.get(['totalPins', 'todayPins', 'lastDate'], (result) => {
+                    const today = new Date().toDateString();
+                    const lastDate = result.lastDate || '';
+
+                    // Reset today count if it's a new day
+                    let todayPins = result.todayPins || 0;
+                    if (lastDate !== today) {
+                        todayPins = 0;
+                    }
+
                     const totalPins = (result.totalPins || 0) + 1;
-                    chrome.storage.sync.set({ totalPins });
+                    todayPins = todayPins + 1;
+
+                    chrome.storage.sync.set({
+                        totalPins,
+                        todayPins,
+                        lastDate: today
+                    });
                 });
             } else {
                 chrome.runtime.sendMessage({ action: 'pin-error' });
