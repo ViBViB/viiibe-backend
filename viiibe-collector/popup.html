@@ -13,128 +13,171 @@
         }
 
         body {
-            width: 320px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            width: 400px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', Roboto, sans-serif;
+            padding: 32px 24px;
+            background: white;
+            color: #000;
         }
 
-        h1 {
-            font-size: 20px;
+        .logo {
+            display: flex;
+            justify-content: center;
             margin-bottom: 16px;
         }
 
-        .stats {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            border-radius: 8px;
+        .logo svg {
+            width: 48px;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 32px;
+        }
+
+        .stats-card {
+            background: #f8f8f8;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 16px;
         }
 
         .stat {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
         .stat:last-child {
             margin-bottom: 0;
         }
 
-        .stat-value {
-            font-weight: 600;
-            font-size: 18px;
+        .stat-label {
+            font-size: 16px;
+            font-weight: 400;
+            color: #000;
         }
 
-        .settings {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            border-radius: 8px;
+        .stat-value {
+            font-size: 32px;
+            font-weight: 400;
+            color: #000;
+        }
+
+        .settings-card {
+            background: #f8f8f8;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-bottom: 6px;
-            font-size: 12px;
+            margin-bottom: 8px;
+            font-size: 16px;
             font-weight: 500;
-            opacity: 0.9;
+            color: #000;
         }
 
-        input,
-        select {
+        input {
             width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 4px;
-            margin-bottom: 12px;
-            font-size: 14px;
+            padding: 12px 16px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00D9A3;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
         button {
-            width: 100%;
-            padding: 10px;
+            padding: 14px 24px;
             border: none;
-            border-radius: 4px;
-            background: white;
-            color: #667eea;
-            font-weight: 600;
+            border-radius: 8px;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
+            transition: all 0.2s;
         }
 
-        button:hover {
-            background: #f0f0f0;
+        #resetStats {
+            background: #FF3B30;
+            color: white;
         }
 
-        .footer {
-            margin-top: 16px;
-            text-align: center;
-            font-size: 11px;
-            opacity: 0.7;
+        #resetStats:hover {
+            background: #E02D22;
+        }
+
+        #saveSettings {
+            background: white;
+            color: #00D9A3;
+            border: 2px solid #00D9A3;
+        }
+
+        #saveSettings:hover {
+            background: #00D9A3;
+            color: white;
         }
     </style>
 </head>
 
 <body>
-    <h1>📚 Viiibe Collector</h1>
+    <div class="logo">
+        <svg width="66" height="57" viewBox="0 0 66 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M62 5.4935L46.3438 38.8314L53.25 45.5335C56.5208 48.7079 62 46.3903 62 41.8324V5.4935ZM22.8408 39.4769L28.1533 50.2718C30.0623 54.1516 35.6109 54.1015 37.4492 50.1878L42.4482 39.5433L32.6104 29.9955L22.8408 39.4769ZM34.9248 27.7494L43.8975 36.4574L58.9248 4.45639L34.9248 27.7494ZM21.3447 36.4369L30.2969 27.7494L5.41016 3.59604C5.30396 3.49305 5.18797 3.41429 5.06738 3.35581L21.3447 36.4369ZM3.22266 41.8324C3.22266 46.3903 8.70187 48.7079 11.9727 45.5335L18.9131 38.7962L3.22266 6.90659V41.8324ZM65.2227 41.8324C65.2227 49.239 56.3199 53.0053 51.0049 47.847L44.8945 41.9173L40.3672 51.558C37.3802 57.9179 28.3632 58 25.2607 51.6957L20.4092 41.8373L14.2178 47.847C8.90275 53.0053 0 49.239 0 41.8324V4.52182C0 0.533622 4.79335 -1.49407 7.65527 1.28354L32.6113 25.5033L57.5674 1.28354C60.4293 -1.49406 65.2227 0.53362 65.2227 4.52182V41.8324Z"
+                fill="black" />
+        </svg>
+    </div>
 
-    <div class="stats">
+    <h1>Moood! Collector</h1>
+    <p class="subtitle">Right-click on any image → "Add to Viiibe"</p>
+
+    <div class="stats-card">
         <div class="stat">
-            <span>Pins Saved Today:</span>
+            <span class="stat-label">Pins saved today:</span>
             <span class="stat-value" id="todayCount">0</span>
         </div>
         <div class="stat">
-            <span>Total Pins:</span>
+            <span class="stat-label">Total saved pins:</span>
             <span class="stat-value" id="totalCount">0</span>
         </div>
     </div>
 
-    <div class="settings">
-        <label for="adminKey">Admin Key</label>
-        <input type="password" id="adminKey" placeholder="Enter your admin key">
-
-        <label for="defaultCategory">Default Category</label>
-        <select id="defaultCategory">
-            <option value="uncategorized">Uncategorized</option>
-            <option value="web-design">Web Design</option>
-            <option value="mobile-ui">Mobile UI</option>
-            <option value="dashboard">Dashboard</option>
-            <option value="ecommerce">E-commerce</option>
-            <option value="minimalist">Minimalist</option>
-            <option value="bold">Bold/Colorful</option>
-            <option value="dark-mode">Dark Mode</option>
-            <option value="typography">Typography</option>
-            <option value="illustration">Illustration</option>
-            <option value="photography">Photography</option>
-        </select>
-
-        <button id="saveSettings">Save Settings</button>
-        <button id="resetStats" style="margin-top: 8px; background: #ff4444; color: white;">Reset Stats</button>
+    <div class="settings-card">
+        <label for="adminKey">Admin key</label>
+        <input type="password" id="adminKey" placeholder="••••••••••••••••••">
     </div>
 
-    <div class="footer">
-        Right-click on any Pinterest pin → "Add to Viiibe"
+    <div class="button-group">
+        <button id="resetStats">Reset stats</button>
+        <button id="saveSettings">Save settings</button>
     </div>
 
     <script src="popup.js"></script>

@@ -8,12 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Load settings from storage
 function loadSettings() {
-    chrome.storage.sync.get(['adminKey', 'defaultCategory'], (result) => {
+    chrome.storage.sync.get(['adminKey'], (result) => {
         if (result.adminKey) {
             document.getElementById('adminKey').value = result.adminKey;
-        }
-        if (result.defaultCategory) {
-            document.getElementById('defaultCategory').value = result.defaultCategory;
         }
     });
 }
@@ -39,24 +36,26 @@ function loadStats() {
 // Save settings
 document.getElementById('saveSettings').addEventListener('click', () => {
     const adminKey = document.getElementById('adminKey').value;
-    const defaultCategory = document.getElementById('defaultCategory').value;
 
     if (!adminKey) {
         alert('Please enter your admin key');
         return;
     }
 
-    chrome.storage.sync.set({ adminKey, defaultCategory }, () => {
+    chrome.storage.sync.set({ adminKey }, () => {
         // Show success feedback
         const button = document.getElementById('saveSettings');
+        const originalText = button.textContent;
         button.textContent = '✓ Saved!';
-        button.style.background = '#4CAF50';
+        button.style.background = '#00D9A3';
         button.style.color = 'white';
+        button.style.border = '2px solid #00D9A3';
 
         setTimeout(() => {
-            button.textContent = 'Save Settings';
+            button.textContent = originalText;
             button.style.background = 'white';
-            button.style.color = '#667eea';
+            button.style.color = '#00D9A3';
+            button.style.border = '2px solid #00D9A3';
         }, 2000);
     });
 });
