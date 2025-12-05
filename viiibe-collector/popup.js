@@ -17,7 +17,7 @@ function loadSettings() {
 
 // Load stats from storage
 function loadStats() {
-    chrome.storage.sync.get(['totalPins', 'todayPins', 'lastDate'], (result) => {
+    chrome.storage.sync.get(['todayPins', 'lastDate'], (result) => {
         const today = new Date().toDateString();
         const lastDate = result.lastDate || '';
 
@@ -29,8 +29,19 @@ function loadStats() {
         }
 
         document.getElementById('todayCount').textContent = todayPins;
-        document.getElementById('totalCount').textContent = result.totalPins || 0;
     });
+
+    // Fetch total pins from backend
+    fetch('https://viiibe-backend-hce5.vercel.app/api/get-saved-pins')
+        .then(res => res.json())
+        .then(data => {
+            const totalPins = data.pins ? data.pins.length : 0;
+            document.getElementById('totalCount').textContent = totalPins;
+        })
+        .catch(err => {
+            console.error('Failed to fetch total pins:', err);
+            document.getElementById('totalCount').textContent = '?';
+        });
 }
 
 // Save settings
