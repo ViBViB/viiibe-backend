@@ -63,7 +63,11 @@ echo "$ALL_PINS" | jq -r '.pins[] | .id' | while read -r PIN_ID; do
         
         # Show generated tags
         STYLE=$(echo "$RESPONSE" | jq -r '.tags.style | join(", ")')
+        COLORS=$(echo "$RESPONSE" | jq -r '.tags.color | join(", ")')
+        INDUSTRY=$(echo "$RESPONSE" | jq -r '.tags.industry | join(", ")')
         echo "   📊 Style: $STYLE"
+        echo "   🎨 Colors: $COLORS"
+        echo "   🏢 Industry: $INDUSTRY"
     else
         ERROR_MSG=$(echo "$RESPONSE" | jq -r '.message // .error')
         echo "   ❌ Failed: $ERROR_MSG"

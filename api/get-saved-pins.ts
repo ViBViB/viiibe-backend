@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const keys = await kv.keys('saved-pin:*');
         const pins = [];
 
-        for (const key of keys.slice(0, 100)) {
+        for (const key of keys.slice(0, 200)) {
             const pin = await kv.get(key);
             if (pin) pins.push(pin);
         }
