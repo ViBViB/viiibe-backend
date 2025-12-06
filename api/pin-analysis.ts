@@ -233,9 +233,10 @@ Return ONLY the JSON, no other text.`;
  * Combine tags from both AI analyses
  */
 function combineTags(visionData: any, gptData: any, pinMetadata: any) {
-    // Filter colors by dominance score (only keep colors with >10% presence)
+    // Filter colors by dominance score (only keep colors with >5% presence)
+    // Lowered from 10% to capture important secondary colors
     const dominantColors = visionData.colors
-        .filter((c: any) => c.score > 0.1)  // Only colors that are actually dominant
+        .filter((c: any) => c.score > 0.05)  // Colors with at least 5% presence
         .map((c: any) => c.color);
 
     // Remove duplicates (e.g., multiple shades of red all mapping to "red")
