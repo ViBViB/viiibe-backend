@@ -83,13 +83,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         console.log(`✅ Pin saved: ${pinId} in category ${category}`);
 
-        // Trigger AI analysis in the background (non-blocking)
+        // Trigger AI analysis (wait for it to complete, with timeout)
+        let aiAnalysisCompleted = false;
         if (imageUrl) {
-            // Don't await - let it run in background
-            triggerAIAnalysis(pinId).catch(err => {
-                console.error(`⚠️  Background AI analysis failed for pin ${pinId}:`, err.message);
-            });
-            console.log(`🤖 AI analysis queued for pin ${pinId}`);
+            try {
+                // Wait for analysis with a timeout (25s to stay under Vercel's 30s limit)
+                const analysisPromise = triggerAIAnalysis(pinId);
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Analysis timeout')), 25000)
+                );
+                await Promise.race([analysisPromise, timeoutPromise]);
+                aiAnalysisCompleted = true;
+                console.log(`✅ AI analysis completed for pin ${pinId}`);
+            } catch (err: any) {
+                console.error(`⚠️  AI analysis failed/timed out for pin ${pinId}:`, err.message);
+            }
         } else {
             console.log(`⏭️  Skipping AI analysis for pin ${pinId} (no imageUrl)`);
         }
@@ -98,7 +106,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             success: true,
             pin,
             message: 'Pin saved successfully',
-            aiAnalysisQueued: !!imageUrl
+            aiAnalysisQueued: !!imageUrl,
+            aiAnalysisCompleted
         });
 
     } catch (error: any) {
