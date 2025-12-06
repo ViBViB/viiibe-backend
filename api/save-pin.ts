@@ -118,7 +118,11 @@ async function triggerAIAnalysis(pinId: string): Promise<void> {
         console.log(`🔍 Triggering AI analysis for pin ${pinId}...`);
 
         // Call the pin-analysis endpoint
-        const response = await fetch(`${process.env.VERCEL_URL || 'https://viiibe-backend-hce5.vercel.app'}/api/pin-analysis`, {
+        // Use VERCEL_URL for same-deployment calls, or fallback to current production URL
+        const baseUrl = process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : 'https://viiibe-backend-jyh4i7hg4-alberto-contreras-projects-101c33ba.vercel.app';
+        const response = await fetch(`${baseUrl}/api/pin-analysis`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
