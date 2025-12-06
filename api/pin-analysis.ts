@@ -233,9 +233,17 @@ Return ONLY the JSON, no other text.`;
  * Combine tags from both AI analyses
  */
 function combineTags(visionData: any, gptData: any, pinMetadata: any) {
+    // Filter colors by dominance score (only keep colors with >10% presence)
+    const dominantColors = visionData.colors
+        .filter((c: any) => c.score > 0.1)  // Only colors that are actually dominant
+        .map((c: any) => c.color);
+
+    // Remove duplicates (e.g., multiple shades of red all mapping to "red")
+    const uniqueColors = [...new Set(dominantColors)];
+
     return {
         style: gptData.style || ['modern'],
-        color: visionData.colors.map((c: any) => c.color).slice(0, 3),
+        color: uniqueColors.slice(0, 3),  // Top 3 unique dominant colors
         type: extractTypeTags(visionData.labels, pinMetadata.title),
         typography: gptData.typography || 'sans-serif',
         imagery: extractImageryTags(visionData.labels),
@@ -298,26 +306,73 @@ function rgbToColorName(r: number, g: number, b: number): string {
     const min = Math.min(r, g, b);
     const diff = max - min;
 
+    // Grayscale detection
     if (diff < 30) {
         if (max < 50) return 'black';
         if (max > 200) return 'white';
         return 'gray';
     }
 
+    // Calculate lightness and saturation for better color detection
+    const l = (max + min) / 2 / 255;
+    const s = diff / (255 - Math.abs(2 * l * 255 - 255));
+
+    // Low saturation = neutral/muted tones
+    if (s < 0.25) {
+        if (l > 0.75) return 'white';
+        if (l < 0.25) return 'black';
+        // Warm neutrals (beige, tan, cream)
+        if (r > g && r > b && r - b > 20) return 'beige';
+        return 'gray';
+    }
+
+    // Warm tones (red/orange/brown family)
     if (r > g && r > b) {
-        if (g > 100) return 'orange';
+        // Pure red (high saturation, red dominant)
+        if (r > 200 && g < 100 && b < 100) return 'red';
+
+        // Orange/brown/beige spectrum
+        if (g > b + 20) {
+            // Light warm tones
+            if (l > 0.65) return 'beige';
+            // Medium saturation warm
+            if (s > 0.4 && l > 0.45) return 'orange';
+            // Dark warm tones
+            if (l < 0.4) return 'brown';
+            return 'orange';
+        }
+
+        // Pink/rose tones
+        if (b > g + 15 && l > 0.6) return 'pink';
+
+        // Default to red for other red-dominant colors
         return 'red';
     }
+
+    // Green tones
     if (g > r && g > b) {
-        if (b > 100) return 'cyan';
+        // Cyan (blue-green)
+        if (b > r + 30) return 'cyan';
+        // Lime (yellow-green)
+        if (r > b + 30 && l > 0.5) return 'lime';
         return 'green';
     }
+
+    // Blue tones
     if (b > r && b > g) {
-        if (r > 100) return 'purple';
+        // Purple (red-blue)
+        if (r > g + 30) return 'purple';
+        // Cyan (green-blue)
+        if (g > r + 30) return 'cyan';
         return 'blue';
     }
-    if (r > 150 && g > 150) return 'yellow';
-    if (r > 150 && b > 150) return 'pink';
+
+    // Yellow (high red and green, low blue)
+    if (r > 150 && g > 150 && b < 120) return 'yellow';
+
+    // Pink (high red and blue)
+    if (r > 150 && b > 150 && g < 150) return 'pink';
 
     return 'colorful';
 }
+
