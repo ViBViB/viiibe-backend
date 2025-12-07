@@ -180,19 +180,23 @@ function renderPaletteUI(palette: any[]) {
 }
 
 const COLOR_RANGES: { [key: string]: any } = {
-    'red': { hMin: 330, hMax: 20 }, // Wrap around 360
+    'red': { hMin: 345, hMax: 15 }, // Wrap around 360
     'blue': { hMin: 190, hMax: 260 },
     'green': { hMin: 70, hMax: 160 },
+    'lime': { hMin: 60, hMax: 100 }, // Yellow-green, bright greens
     'yellow': { hMin: 40, hMax: 70 },
-    'orange': { hMin: 20, hMax: 40 },
-    'purple': { hMin: 260, hMax: 310 },
-    'pink': { hMin: 310, hMax: 330 },
+    'orange': { hMin: 15, hMax: 40 },
+    'purple': { hMin: 260, hMax: 300 },
+    'pink': { hMin: 300, hMax: 345 }, // Expanded: includes magenta and rose
     'cyan': { hMin: 160, hMax: 190 },
     'black': { lMax: 25 },
     'white': { lMin: 80 },
     'gray': { sMax: 15 },
     'dark': { lMax: 30 },
-    'light': { lMin: 70 }
+    'light': { lMin: 70 },
+    'beige': { hMin: 20, hMax: 50, sMax: 40, lMin: 50 }, // Warm, low sat, light (relaxed lMin)
+    'brown': { hMin: 15, hMax: 45, lMax: 50 }, // Warm, darker
+    'colorful': { sMin: 35 } // Lowered threshold for more matches
 };
 
 export async function scoreImageForColor(imgEl: HTMLImageElement, colorName: string): Promise<number> {
@@ -206,24 +210,31 @@ export async function scoreImageForColor(imgEl: HTMLImageElement, colorName: str
     let totalWeight = 0;
 
     pixels.forEach((p: any) => {
-        let isMatch = false;
-        const weight = (p.s / 100) * (1 - Math.abs(p.l - 50) / 50); // Give more weight to vibrant colors
+        let isMatch = true; // Start as true and check all conditions
+        const weight = Math.max(0.1, (p.s / 100) * (1 - Math.abs(p.l - 50) / 50));
 
-        if (target.lMax !== undefined) { // Black/Dark
-            if (p.l <= target.lMax) isMatch = true;
-        } else if (target.lMin !== undefined) { // White/Light
-            if (p.l >= target.lMin) isMatch = true;
-        } else if (target.sMax !== undefined) { // Gray
-            if (p.s <= target.sMax) isMatch = true;
-        } else {
-            // Color match (Hue)
-            // Filter out low saturation/extreme lightness for color matching
-            if (p.s > 15 && p.l > 10 && p.l < 90) {
-                if (target.hMin > target.hMax) { // Wrap around (Red)
-                    if (p.h >= target.hMin || p.h <= target.hMax) isMatch = true;
-                } else {
-                    if (p.h >= target.hMin && p.h <= target.hMax) isMatch = true;
-                }
+        // Check saturation minimum (colorful)
+        if (target.sMin !== undefined && p.s < target.sMin) isMatch = false;
+
+        // Check saturation maximum (gray, beige)
+        if (target.sMax !== undefined && p.s > target.sMax) isMatch = false;
+
+        // Check lightness minimum (white, light, beige)
+        if (target.lMin !== undefined && p.l < target.lMin) isMatch = false;
+
+        // Check lightness maximum (black, dark, brown)
+        if (target.lMax !== undefined && p.l > target.lMax) isMatch = false;
+
+        // Check hue range (colors with hMin and hMax)
+        if (target.hMin !== undefined && target.hMax !== undefined) {
+            // For hue-based colors, also need minimum saturation
+            if (p.s < 10) {
+                isMatch = false;
+            } else if (target.hMin > target.hMax) {
+                // Wrap around (like red: 330-20)
+                if (!(p.h >= target.hMin || p.h <= target.hMax)) isMatch = false;
+            } else {
+                if (!(p.h >= target.hMin && p.h <= target.hMax)) isMatch = false;
             }
         }
 

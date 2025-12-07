@@ -83,8 +83,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         console.log(`✅ Pin saved: ${pinId} in category ${category}`);
 
+
         // Trigger AI analysis (wait for it to complete, with timeout)
-        let aiAnalysisCompleted = false;
+        let aiAnalysisStatus: 'completed' | 'timeout' | 'failed' | 'skipped' = 'skipped';
+        let aiAnalysisMessage = '';
+        let aiAnalysisDuration = 0;
+        const startTime = Date.now();
+
         if (imageUrl) {
             try {
                 // Wait for analysis with a timeout (25s to stay under Vercel's 30s limit)
@@ -93,12 +98,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     setTimeout(() => reject(new Error('Analysis timeout')), 25000)
                 );
                 await Promise.race([analysisPromise, timeoutPromise]);
-                aiAnalysisCompleted = true;
-                console.log(`✅ AI analysis completed for pin ${pinId}`);
+                aiAnalysisDuration = Date.now() - startTime;
+                aiAnalysisStatus = 'completed';
+                aiAnalysisMessage = `Analysis completed in ${(aiAnalysisDuration / 1000).toFixed(1)}s`;
+                console.log(`✅ AI analysis completed for pin ${pinId} in ${aiAnalysisDuration}ms`);
             } catch (err: any) {
-                console.error(`⚠️  AI analysis failed/timed out for pin ${pinId}:`, err.message);
+                aiAnalysisDuration = Date.now() - startTime;
+                if (err.message === 'Analysis timeout') {
+                    aiAnalysisStatus = 'timeout';
+                    aiAnalysisMessage = 'Analysis queued for background processing';
+                } else {
+                    aiAnalysisStatus = 'failed';
+                    aiAnalysisMessage = `Analysis failed: ${err.message}`;
+                }
+                console.error(`⚠️  AI analysis ${aiAnalysisStatus} for pin ${pinId}:`, err.message);
             }
         } else {
+            aiAnalysisStatus = 'skipped';
+            aiAnalysisMessage = 'No image URL provided';
             console.log(`⏭️  Skipping AI analysis for pin ${pinId} (no imageUrl)`);
         }
 
@@ -106,8 +123,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             success: true,
             pin,
             message: 'Pin saved successfully',
-            aiAnalysisQueued: !!imageUrl,
-            aiAnalysisCompleted
+            aiAnalysis: {
+                status: aiAnalysisStatus,
+                message: aiAnalysisMessage,
+                duration: aiAnalysisDuration
+            }
         });
 
     } catch (error: any) {

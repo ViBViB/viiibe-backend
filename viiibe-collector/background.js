@@ -15,10 +15,13 @@ chrome.runtime.onInstalled.addListener(() => {
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'add-to-viiibe') {
-        // Send message to content script
+        // Send message to content script (may fail if not on Pinterest)
         chrome.tabs.sendMessage(tab.id, {
             action: 'save-pin',
             url: info.pageUrl || info.linkUrl
+        }).catch(err => {
+            // Content script not loaded (not on Pinterest)
+            console.log('Content script not available:', err.message);
         });
     }
 });

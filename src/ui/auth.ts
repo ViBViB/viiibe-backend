@@ -38,7 +38,7 @@ function pollForToken(sessionId: string) {
   const pollInterval = setInterval(async () => {
     try {
       const response = await fetch(
-        `https://viiibe-backend-hce5.vercel.app/api/check-auth?state=${sessionId}`
+        `https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api/check-auth?state=${sessionId}`
       );
 
       const data = await response.json();

@@ -1,7 +1,6 @@
 import './styles/main.css';
 import { showView, showToast, tabs } from './ui/views';
 import { switchTab, startSearch, applyVisualFilter, updateProgress } from './ui/moodboard';
-import { startAuthFlow } from './ui/auth';
 
 // ==============================================================
 // STYLE GUIDE DATA COLLECTION
@@ -61,23 +60,34 @@ async function collectAllData(): Promise<{ images: any[], colors: any[], typogra
     const imagePromises: Promise<any>[] = [];
 
     imageElements.forEach((img: any) => {
-        if (img.src && img.src.startsWith('blob:')) {
+        // Accept both blob: URLs and proxy URLs
+        if (img.src && (img.src.startsWith('blob:') || img.src.includes('image-proxy'))) {
             const originalUrl = img.getAttribute('data-url');
 
-            const promise = fetch(img.src)
-                .then(res => res.arrayBuffer())
-                .then(buffer => ({
-                    url: originalUrl,
-                    bytes: Array.from(new Uint8Array(buffer)),
-                    width: img.naturalWidth,
-                    height: img.naturalHeight
-                }));
+            // Only proceed if image is loaded (has naturalWidth)
+            if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                const promise = fetch(img.src)
+                    .then(res => res.arrayBuffer())
+                    .then(buffer => ({
+                        url: originalUrl,
+                        bytes: Array.from(new Uint8Array(buffer)),
+                        width: img.naturalWidth,
+                        height: img.naturalHeight
+                    }))
+                    .catch(err => {
+                        console.warn('Failed to fetch image:', originalUrl, err);
+                        return null; // Return null for failed images
+                    });
 
-            imagePromises.push(promise);
+                imagePromises.push(promise);
+            }
         }
     });
 
-    const images = await Promise.all(imagePromises);
+    const allImages = await Promise.all(imagePromises);
+    // Filter out failed images (null values)
+    const images = allImages.filter(img => img !== null);
+    console.log(`🎨 [collectAllData] Collected ${images.length} images (${allImages.length - images.length} failed)`);
 
     // Collect colors
     let colors: any[] = [];
@@ -126,8 +136,7 @@ async function collectAllData(): Promise<{ images: any[], colors: any[], typogra
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // INIT CHECK
-    parent.postMessage({ pluginMessage: { type: 'check-auth-status' } }, '*');
+    // Plugin always starts on search view - no auth needed
 
     // TABS
     if (tabs.moodboard) tabs.moodboard.onclick = () => switchTab('moodboard');
@@ -152,20 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    const connectButton = document.getElementById('connectButton');
-    const confirmButton = document.getElementById('confirmButton');
-
-    if (connectButton) connectButton.onclick = () => {
-        startAuthFlow();
-    };
-
-    if (confirmButton) confirmButton.onclick = () => {
-        const t = (document.getElementById('tokenInput') as HTMLInputElement).value;
-        if (t) {
-            parent.postMessage({ pluginMessage: { type: 'token-received', token: t } }, '*');
-            setTimeout(() => showView('search'), 500);
-        }
-    };
+    // Auth handlers removed - plugin now uses saved pins from Vercel KV
 
     const backButton = document.getElementById('backButton');
     if (backButton) backButton.onclick = () => {
@@ -227,39 +223,100 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (grid) {
                     grid.innerHTML = '';
                     if (msg.data.pins && msg.data.pins.length > 0) {
-                        msg.data.pins.forEach((pin: any) => {
+                        let loadedCount = 0;
+                        const totalImages = msg.data.pins.length;
+
+                        msg.data.pins.forEach((pin: any, index: number) => {
                             const srcUrl = pin.fullsizeUrl || pin.thumbnailUrl;
                             if (!srcUrl) return;
+
+                            // Use image proxy to avoid CORS issues
+                            const API_BASE = 'https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api';
+                            const proxyUrl = `${API_BASE}/image-proxy?url=${encodeURIComponent(srcUrl)}`;
+
                             imgUrls.push(srcUrl);
                             const div = document.createElement('div');
                             div.className = 'pin-container';
-                            div.innerHTML = `<img class="pin-image" data-url="${srcUrl}" src="" crossOrigin="Anonymous"/><div class="pin-overlay"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></div>`;
-                            // @ts-ignore
-                            div.querySelector('.pin-overlay').onclick = () => {
+
+                            // Create img element with loading and error handlers
+                            const img = document.createElement('img');
+                            img.className = 'pin-image';
+                            img.setAttribute('data-url', srcUrl);
+                            img.crossOrigin = 'Anonymous';
+
+                            // Handle successful load
+                            img.onload = () => {
+                                loadedCount++;
+                                console.log(`Image ${loadedCount}/${totalImages} loaded`);
+
+                                // Continue to next step when most images are loaded (80%)
+                                if (loadedCount >= Math.ceil(totalImages * 0.8)) {
+                                    updateProgress(4);
+                                    // Apply Visual Filtering if color intent exists
+                                    if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
+                                        updateProgress(5);
+                                        applyVisualFilter(msg.data.intent.colors[0]);
+                                    } else {
+                                        updateProgress(5);
+                                        updateProgress(6);
+                                        updateProgress(7);
+                                    }
+                                }
+                            };
+
+                            // Handle error - don't block progress
+                            img.onerror = () => {
+                                loadedCount++;
+                                console.warn(`Image ${loadedCount}/${totalImages} failed to load:`, srcUrl);
+
+                                // Still continue if enough images loaded
+                                if (loadedCount >= Math.ceil(totalImages * 0.8)) {
+                                    updateProgress(4);
+                                    if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
+                                        updateProgress(5);
+                                        applyVisualFilter(msg.data.intent.colors[0]);
+                                    } else {
+                                        updateProgress(5);
+                                        updateProgress(6);
+                                        updateProgress(7);
+                                    }
+                                }
+                            };
+
+                            // Set src to start loading
+                            img.src = proxyUrl;
+
+                            // Create overlay
+                            const overlay = document.createElement('div');
+                            overlay.className = 'pin-overlay';
+                            overlay.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`;
+                            overlay.onclick = () => {
                                 currIdx = imgUrls.indexOf(srcUrl);
                                 showView('details');
-                                dImg.src = '';
-                                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: srcUrl, target: 'lightbox' } }, '*');
+                                const lightboxProxyUrl = `https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api/image-proxy?url=${encodeURIComponent(srcUrl)}`;
+                                dImg.src = lightboxProxyUrl;
                             };
+
+                            div.appendChild(img);
+                            div.appendChild(overlay);
                             grid.appendChild(div);
-                            parent.postMessage({ pluginMessage: { type: 'fetch-image', url: srcUrl, target: 'grid' } }, '*');
                         });
 
-                        // Progress: Step 4 - Images loading
-                        updateProgress(4);
-
-                        // Apply Visual Filtering if color intent exists
-                        if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
-                            // Progress: Step 5 - Color analysis
-                            updateProgress(5);
-                            applyVisualFilter(msg.data.intent.colors[0]);
-                        } else {
-                            // No color filtering, skip to step 7
-                            updateProgress(5);
-                            updateProgress(6);
-                            updateProgress(7);
-                            // View switch handled in updateProgress
-                        }
+                        // Fallback: if no images load after 10 seconds, continue anyway
+                        setTimeout(() => {
+                            if (loadedCount < Math.ceil(totalImages * 0.8)) {
+                                console.warn(`Timeout: Only ${loadedCount}/${totalImages} images loaded, continuing anyway`);
+                                updateProgress(4);
+                                if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
+                                    updateProgress(5);
+                                    applyVisualFilter(msg.data.intent.colors[0]);
+                                } else {
+                                    updateProgress(5);
+                                    updateProgress(6);
+                                    updateProgress(7);
+                                }
+                            }
+                        }, 10000);
                     } else {
                         grid.innerHTML = '<p style="text-align:center; width:100%;">No pins found.</p>';
                     }
@@ -277,14 +334,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }, 50);
         }
-        else if (msg.type === 'open-auth-window') {
-            window.open(msg.url);
-        }
+        // Auth window handler removed - no longer needed
         else if (msg.type === 'image-loaded') {
             const url = URL.createObjectURL(new Blob([msg.imageBytes]));
             if (msg.target === 'lightbox') dImg.src = url;
             else {
-                const i = document.querySelector(`img[data-url="${msg.url}"]`) as HTMLImageElement;
+                // Use querySelectorAll and filter to avoid CSS selector injection
+                const images = Array.from(document.querySelectorAll('img[data-pinterest-url]')) as HTMLImageElement[];
+                const i = images.find(img => img.dataset.pinterestUrl === msg.url);
                 if (i) i.src = url;
             }
         }
@@ -356,14 +413,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (detailsNextBtn) detailsNextBtn.onclick = () => {
         currIdx = (currIdx + 1) % imgUrls.length;
         dImg.src = '';
-        parent.postMessage({ pluginMessage: { type: 'fetch-image', url: imgUrls[currIdx], target: 'lightbox' } }, '*');
+        const fullResUrl = imgUrls[currIdx].replace('/736x/', '/originals/');
+        parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
     };
 
     const detailsPrevBtn = document.getElementById('detailsPrevBtn');
     if (detailsPrevBtn) detailsPrevBtn.onclick = () => {
         currIdx = (currIdx - 1 + imgUrls.length) % imgUrls.length;
         dImg.src = '';
-        parent.postMessage({ pluginMessage: { type: 'fetch-image', url: imgUrls[currIdx], target: 'lightbox' } }, '*');
+        const fullResUrl = imgUrls[currIdx].replace('/736x/', '/originals/');
+        parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
     };
 
     const detailsDeleteBtn = document.getElementById('detailsDeleteBtn');
@@ -395,7 +454,8 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 if (currIdx >= imgUrls.length) currIdx = 0;
                 dImg.src = '';
-                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: imgUrls[currIdx], target: 'lightbox' } }, '*');
+                const fullResUrl = imgUrls[currIdx].replace('/736x/', '/originals/');
+                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
             }
         }
     };

@@ -140,9 +140,74 @@
             border: 2px solid #00D9A3;
         }
 
+
         #saveSettings:hover {
             background: #00D9A3;
             color: white;
+        }
+
+        .ai-status-card {
+            background: #f8f8f8;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .status-item {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .status-label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .status-value {
+            display: block;
+            font-size: 24px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .last-status {
+            font-size: 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .last-status.success {
+            background: #d4f4dd;
+            color: #0d5520;
+        }
+
+        .last-status.timeout {
+            background: #fff4cc;
+            color: #7a5c00;
+        }
+
+        .last-status.failed {
+            background: #ffe5e5;
+            color: #c41e3a;
+        }
+
+        .last-status:empty {
+            display: none;
         }
     </style>
 </head>
@@ -168,6 +233,24 @@
             <span class="stat-label">Total saved pins:</span>
             <span class="stat-value" id="totalCount">0</span>
         </div>
+    </div>
+
+    <div class="ai-status-card">
+        <h3
+            style="font-size: 16px; font-weight: 500; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            🤖 AI Analysis Status
+        </h3>
+        <div class="status-grid">
+            <div class="status-item">
+                <span class="status-label">✅ Analyzed</span>
+                <span class="status-value" id="analyzedCount">-</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">❌ Failed</span>
+                <span class="status-value" id="failedCount">-</span>
+            </div>
+        </div>
+        <div id="lastAnalysisStatus" class="last-status"></div>
     </div>
 
     <div class="settings-card">

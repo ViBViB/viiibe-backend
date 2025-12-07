@@ -16,14 +16,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-        const { category, pinId } = req.query;
+        const { category, pinId, color } = req.query;
 
         // If pinId is provided, get specific pin
         if (pinId && typeof pinId === 'string') {
-            const pin = await kv.get(`saved-pin:${pinId}`);
+            const pin: any = await kv.get(`saved-pin:${pinId}`);
             if (!pin) {
                 return res.status(404).json({ error: 'Pin not found' });
             }
+
+            // Fetch AI analysis tags from separate key
+            const tags = await kv.get(`pin-tags:${pinId}`);
+            if (tags) {
+                pin.aiAnalysis = tags;
+            }
+
             return res.status(200).json({ pin });
         }
 
@@ -33,8 +40,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const pins = [];
 
             for (const id of pinIds) {
-                const pin = await kv.get(`saved-pin:${id}`);
-                if (pin) pins.push(pin);
+                const pin: any = await kv.get(`saved-pin:${id}`);
+                if (pin) {
+                    // Fetch AI analysis tags
+                    const tags = await kv.get(`pin-tags:${id}`);
+                    if (tags) {
+                        pin.aiAnalysis = tags;
+                    }
+                    pins.push(pin);
+                }
             }
 
             return res.status(200).json({
@@ -44,17 +58,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
         }
 
-        // Get all saved pins (limit to 100)
-        const keys = await kv.keys('saved-pin:*');
-        const pins = [];
 
-        for (const key of keys.slice(0, 200)) {
-            const pin = await kv.get(key);
-            if (pin) pins.push(pin);
+        // Get all saved pins with optional limit
+        const keys = await kv.keys('saved-pin:*');
+        const totalPins = keys.length; // Actual count in KV
+
+        // Parse limit from query params (default 500, max 500)
+        const limitParam = req.query.limit;
+        const limit = limitParam ? Math.min(parseInt(limitParam as string, 10), 500) : 500;
+
+        let pins = [];
+
+        for (const key of keys.slice(0, limit)) {
+            const pin: any = await kv.get(key);
+            if (pin) {
+                // Extract pin ID from key (saved-pin:123456)
+                const pinId = key.toString().replace('saved-pin:', '');
+
+                // Fetch AI analysis tags from separate key
+                const tags = await kv.get(`pin-tags:${pinId}`);
+                if (tags) {
+                    pin.aiAnalysis = tags;
+                }
+
+                pins.push(pin);
+            }
+        }
+
+        // If color filter is provided, filter by dominant color
+        if (color && typeof color === 'string') {
+            const colorLower = color.toLowerCase();
+            pins = pins.filter((pin: any) => {
+                // Check if pin has AI analysis with color tags
+                if (pin.aiAnalysis && pin.aiAnalysis.color) {
+                    // Check if any of the color tags match
+                    return pin.aiAnalysis.color.some((c: string) =>
+                        c.toLowerCase() === colorLower
+                    );
+                }
+                return false;
+            });
         }
 
         return res.status(200).json({
-            total: pins.length,
+            total: totalPins, // Total pins in KV
+            returned: pins.length, // Pins actually returned
+            limit,
+            ...(color && { filteredBy: `color: ${color}` }),
             pins
         });
 

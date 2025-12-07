@@ -182,7 +182,8 @@ export function showMoodboard(data: any) {
             const img = document.createElement('img');
             img.className = 'pin-image';
             img.alt = pin.title || 'Pin';
-            img.dataset.url = pin.image; // Store original URL
+            img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"%3E%3C/svg%3E'; // Placeholder to prevent CSP errors
+            img.dataset.pinterestUrl = pin.image; // Store original URL with custom attribute name
 
             // Add to global list for lightbox
             imgUrls.push(pin.image);
@@ -194,8 +195,9 @@ export function showMoodboard(data: any) {
                 if (dImg) {
                     dImg.src = ''; // Clear previous
                     showView('details');
-                    // Use proxy for lightbox too
-                    parent.postMessage({ pluginMessage: { type: 'fetch-image', url: pin.image, target: 'lightbox' } }, '*');
+                    // Upgrade to full resolution for lightbox (736x -> originals)
+                    const fullResUrl = pin.image.replace('/736x/', '/originals/');
+                    parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
                 }
             };
 
@@ -239,7 +241,7 @@ export async function applyVisualFilter(colorName: string) {
                 if (!img.src) return { container, score: -1, url: '' };
 
                 const score = await scoreImageForColor(img, colorName);
-                const url = img.getAttribute('data-url') || '';
+                const url = img.getAttribute('data-pinterest-url') || '';
                 return { container, score, url };
             }));
 

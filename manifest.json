@@ -9,8 +9,7 @@
   ],
   "networkAccess": {
     "allowedDomains": [
-      "https://api.pinterest.com",
-      "https://viiibe-backend-hce5.vercel.app"
+      "https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app"
     ]
   }
 }
