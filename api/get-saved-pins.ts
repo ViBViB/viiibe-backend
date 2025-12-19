@@ -60,16 +60,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 
         // Get all saved pins with optional limit
-        const keys = await kv.keys('saved-pin:*');
-        const totalPins = keys.length; // Actual count in KV
+        // Use SCAN instead of KEYS to avoid "too many keys" error
+        const allKeys: string[] = [];
+        let cursor = 0;
+
+        do {
+            const result = await kv.scan(cursor, {
+                match: 'saved-pin:*',
+                count: 100
+            });
+
+            cursor = result[0];
+            allKeys.push(...result[1]);
+        } while (cursor !== 0);
+
+        const totalPins = allKeys.length; // Actual count in KV
 
         // Parse limit from query params (default 500, max 500)
         const limitParam = req.query.limit;
         const limit = limitParam ? Math.min(parseInt(limitParam as string, 10), 500) : 500;
 
+        // Only fetch the pins we need (up to limit)
+        const keysToFetch = allKeys.slice(0, limit);
         let pins = [];
 
-        for (const key of keys.slice(0, limit)) {
+        for (const key of keysToFetch) {
             const pin: any = await kv.get(key);
             if (pin) {
                 // Extract pin ID from key (saved-pin:123456)
