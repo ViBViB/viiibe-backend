@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moood! Collector PRO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="popup-v2.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <svg class="logo" width="32" height="27" viewBox="0 0 32 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M29.6925 2.63217L22.1951 18.5961L25.502 21.8063C27.0683 23.3265 29.6924 22.217 29.6925 20.0343V2.63217ZM10.9397 18.9059L13.4832 24.076C14.3975 25.9339 17.0554 25.9099 17.9357 24.0356L20.3296 18.9373L15.6182 14.3651L10.9397 18.9059ZM16.7264 13.289L21.0233 17.4594L28.2199 2.13379L16.7264 13.289ZM10.2235 17.4496L14.5099 13.2897L2.59143 1.72221C2.54043 1.67277 2.48473 1.63499 2.4268 1.60697L10.2235 17.4496ZM1.54453 20.0343C1.54471 22.217 4.16802 23.3265 5.73437 21.8063L9.0584 18.5803L1.54453 3.30865V20.0343ZM31.2363 20.0343C31.2361 23.5812 26.9727 25.3846 24.4274 22.9146L21.5007 20.074L19.3328 24.6919C17.9023 27.7375 13.5839 27.7768 12.0981 24.7577L9.77529 20.0358L6.8097 22.9146C4.26435 25.3848 0.000181527 23.5812 0 20.0343V2.16522C0.000253306 0.255459 2.29623 -0.715403 3.66676 0.614701L15.6182 12.2136L27.5696 0.614701C28.9401 -0.715445 31.2361 0.255443 31.2363 2.16522V20.0343Z"
+                    fill="black" />
+            </svg>
+            <div class="header-text">
+                <div class="brand">moood!</div>
+                <div class="product">COLLECTOR</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="edition">PRO EDITION</div>
+            <div class="version">V2.0</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <button class="nav-item active" data-screen="dashboard">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M16.8 16.8V10.8M12 16.8V7.19999M7.19999 16.8V14.4M4.79999 21.6C3.47451 21.6 2.39999 20.5255 2.39999 19.2V4.79999C2.39999 3.47451 3.47451 2.39999 4.79999 2.39999H19.2C20.5255 2.39999 21.6 3.47451 21.6 4.79999V19.2C21.6 20.5255 20.5255 21.6 19.2 21.6H4.79999Z"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+            <button class="nav-item" data-screen="batch">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M8.16002 15.6L12 12L14.56 13.8L18.1867 10.2L21.3867 13.2M2.40002 9V19.8H15.2M10.08 7.8V7.70976M21.6 15.2V5.2C21.6 4.64771 21.1523 4.2 20.6 4.2H7.24002C6.68774 4.2 6.24002 4.64771 6.24002 5.2V15.2C6.24002 15.7523 6.68774 16.2 7.24003 16.2H20.6C21.1523 16.2 21.6 15.7523 21.6 15.2Z"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+            <div class="sidebar-spacer"></div>
+            <button class="nav-item" data-screen="settings">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M13.6763 4.31627C13.2488 2.56124 10.7512 2.56124 10.3237 4.31627C10.2599 4.57999 10.1347 4.82492 9.95831 5.03112C9.78194 5.23732 9.55938 5.39897 9.30874 5.50291C9.0581 5.60684 8.78646 5.65014 8.51592 5.62927C8.24538 5.60839 7.9836 5.52394 7.75187 5.38279C6.20832 4.44227 4.44201 6.20855 5.38254 7.75207C5.99006 8.74884 5.45117 10.0494 4.31713 10.325C2.56096 10.7514 2.56096 13.25 4.31713 13.6753C4.58093 13.7392 4.8259 13.8645 5.03211 14.041C5.23831 14.2175 5.39991 14.4402 5.50375 14.691C5.6076 14.9418 5.65074 15.2135 5.62968 15.4841C5.60862 15.7547 5.52394 16.0165 5.38254 16.2482C4.44201 17.7917 6.20832 19.558 7.75187 18.6175C7.98356 18.4761 8.24536 18.3914 8.51597 18.3704C8.78658 18.3493 9.05834 18.3924 9.30912 18.4963C9.5599 18.6001 9.7826 18.7617 9.95911 18.9679C10.1356 19.1741 10.2609 19.4191 10.3248 19.6829C10.7512 21.439 13.2499 21.439 13.6752 19.6829C13.7393 19.4192 13.8647 19.1744 14.0413 18.9684C14.2178 18.7623 14.4405 18.6008 14.6912 18.497C14.9419 18.3932 15.2135 18.35 15.4841 18.3709C15.7546 18.3919 16.0164 18.4764 16.2481 18.6175C17.7917 19.558 19.558 17.7917 18.6175 16.2482C18.4763 16.0165 18.3918 15.7547 18.3709 15.4842C18.35 15.2136 18.3932 14.942 18.497 14.6913C18.6008 14.4406 18.7623 14.2179 18.9683 14.0414C19.1744 13.8648 19.4192 13.7394 19.6829 13.6753C21.439 13.2489 21.439 10.7502 19.6829 10.325C19.4191 10.2611 19.1741 10.1358 18.9679 9.95928C18.7617 9.78278 18.6001 9.56007 18.4962 9.3093C18.3924 9.05853 18.3493 8.78677 18.3703 8.51617C18.3914 8.24556 18.4761 7.98376 18.6175 7.75207C19.558 6.20855 17.7917 4.44227 16.2481 5.38279C16.0164 5.52418 15.7546 5.60886 15.484 5.62992C15.2134 5.65098 14.9417 5.60784 14.6909 5.504C14.4401 5.40016 14.2174 5.23856 14.0409 5.03236C13.8644 4.82616 13.7391 4.58119 13.6752 4.3174L13.6763 4.31627Z"
+                        stroke="currentColor" stroke-width="2" />
+                    <path
+                        d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z"
+                        stroke="currentColor" stroke-width="2" />
+                </svg>
+            </button>
+        </nav>
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Dashboard Screen -->
+            <div class="screen active" id="dashboard">
+                <h1 class="screen-title">Dashboard</h1>
+
+                <div class="stat-card">
+                    <div class="stat-label">Saved designs today</div>
+                    <div class="stat-value" id="todayCount">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Total saved designs</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+            </div>
+
+            <!-- Batch Screen -->
+            <div class="screen" id="batch">
+                <h1 class="screen-title">Batch curation</h1>
+
+                <!-- Initial State -->
+                <div class="batch-state" id="batch-initial">
+                    <p class="batch-description">To start the curation process, please, scan the page first</p>
+                </div>
+
+                <!-- After Scan State -->
+                <div class="batch-state hidden" id="batch-scanned">
+                    <div class="selection-counter" id="selectionCounter">20 Designs Selected</div>
+                    <div class="grid" id="thumbnailGrid"></div>
+                </div>
+
+                <!-- Processing State -->
+                <div class="batch-state hidden" id="batch-processing">
+                    <div class="progress-label" id="progressLabel">Processing 0/20 images</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <!-- Results State -->
+                <div class="batch-state hidden" id="batch-results">
+                    <div class="result-card">
+                        <div class="result-label">Saved</div>
+                        <div class="result-value" id="savedCount">0</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Duplicates</div>
+                        <div class="result-value" id="duplicatesCount">0</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Failed</div>
+                        <div class="result-value" id="failedCount">0</div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="actions">
+                    <button class="btn btn-secondary" id="scanBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M8.80002 2.39999H4.53336C3.35515 2.39999 2.40002 3.35512 2.40002 4.53333V8.79999M8.80002 21.6H4.53336C3.35515 21.6 2.40002 20.6449 2.40002 19.4667V15.2M15.2 2.39999H19.4667C20.6449 2.39999 21.6 3.35512 21.6 4.53333V8.79999M21.6 15.2V19.4667C21.6 20.6449 20.6449 21.6 19.4667 21.6H15.2M2.40002 12.0003H21.6"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        <span id="scanBtnText">Smart Scan</span>
+                    </button>
+                    <button class="btn btn-primary" id="processBtn" disabled>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M6.30609 20.6325L15.6733 11.8162L20.0815 16.2244M6.30609 20.6325H17.3264C19.1523 20.6325 20.6325 19.1523 20.6325 17.3264V9.61218M6.30609 20.6325C4.48019 20.6325 3 19.1523 3 17.3264V6.30609C3 4.48019 4.48019 3 6.30609 3H14.5713M15.4902 5.75507L17.1427 7.4083L21 3.55101M9.61218 7.95913C9.61218 8.87208 8.87208 9.61218 7.95913 9.61218C7.04618 9.61218 6.30609 8.87208 6.30609 7.95913C6.30609 7.04618 7.04618 6.30609 7.95913 6.30609C8.87208 6.30609 9.61218 7.04618 9.61218 7.95913Z"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span id="processBtnText">Process designs</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Screen -->
+            <div class="screen" id="settings">
+                <h1 class="screen-title">Settings</h1>
+
+                <div class="form-group">
+                    <label for="adminKey">Admin Key</label>
+                    <input type="password" id="adminKey" placeholder="Enter admin key">
+                </div>
+
+                <div class="form-group">
+                    <label for="defaultCategory">Default Category</label>
+                    <select id="defaultCategory">
+                        <option value="uncategorized">Uncategorized</option>
+                        <option value="inspiration">Inspiration</option>
+                        <option value="ui-design">UI Design</option>
+                        <option value="branding">Branding</option>
+                        <option value="typography">Typography</option>
+                        <option value="colors">Colors</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary full-width" id="saveSettings">Save Settings</button>
+
+                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Sync your stats with the backend to get the accurate total count.
+                    </p>
+                    <button class="btn btn-secondary full-width" id="syncStats">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M21 10C21 10 18.995 7.26822 17.3662 5.63824C15.7373 4.00827 13.4864 3 11 3C6.02944 3 2 7.02944 2 12C2 16.9706 6.02944 21 11 21C15.1031 21 18.5649 18.2543 19.6482 14.5M21 10V4M21 10H15"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span>Sync Stats</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="popup-v2.js"></script>
+</body>
+
+</html>
