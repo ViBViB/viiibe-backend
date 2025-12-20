@@ -12,19 +12,20 @@ const API_BASE = 'https://moood-refactor.vercel.app/api';
 // ============================================
 
 /**
- * Upgrade Pinterest URL to highest resolution (/originals/)
- * Converts /236x/, /474x/, /564x/, /736x/ → /originals/
+ * Upgrade Pinterest URL to high resolution (/736x/)
+ * Converts /236x/, /474x/, /564x/ → /736x/
+ * Note: We use /736x/ instead of /originals/ because Pinterest blocks many /originals/ URLs
  */
 function upgradeToOriginals(url) {
     if (!url || typeof url !== 'string') return url;
 
-    // If already originals, return as is
-    if (url.includes('/originals/')) {
+    // If already 736x or originals, return as is
+    if (url.includes('/736x/') || url.includes('/originals/')) {
         return url;
     }
 
-    // Replace any resolution path with /originals/
-    return url.replace(/\/(236x|474x|564x|736x)\//, '/originals/');
+    // Replace any lower resolution path with /736x/
+    return url.replace(/\/(236x|474x|564x)\//, '/736x/');
 }
 
 /**
@@ -423,7 +424,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         (async () => {
             try {
                 console.log('🔍 Starting SMART SCAN for images (popup mode)');
-                console.log('📋 Target: 20 valid images with /originals/ URLs, no duplicates');
+                console.log('📋 Target: 20 valid images with /736x/ URLs, no duplicates');
 
                 // Get all Pinterest images
                 const allImages = Array.from(document.querySelectorAll('img'));
@@ -438,7 +439,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                 console.log(`📊 Found ${pinImages.length} Pinterest images on page`);
 
-                // Phase 1: Filter by quality gate and verify /originals/
+                // Phase 1: Filter by quality gate and upgrade to /736x/
                 const validImages = [];
                 const TARGET_COUNT = 20;
                 const MAX_TO_SCAN = Math.min(pinImages.length, 100); // Limit to prevent infinite loop
@@ -481,20 +482,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         continue; // No pin ID found
                     }
 
-                    // Try to upgrade to /originals/
+                    // Try to upgrade to /736x/
                     const originalUrl = img.src;
                     const upgradedUrl = upgradeToOriginals(originalUrl);
 
-                    // Verify /originals/ exists (currently always returns true)
+                    // Verify URL exists (currently always returns true)
                     const hasOriginals = await verifyOriginalExists(upgradedUrl);
                     if (!hasOriginals) {
-                        console.log(`❌ Skipped pin ${pinId}: no /originals/ available`);
+                        console.log(`❌ Skipped pin ${pinId}: no high-res URL available`);
                         continue;
                     }
 
                     // Add to valid list (duplicate check happens in batch later)
                     validImages.push({
-                        src: upgradedUrl, // Use /originals/ URL
+                        src: upgradedUrl, // Use /736x/ URL
                         alt: img.alt || '',
                         score: score,
                         pinId: pinId,
@@ -507,7 +508,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     }
                 }
 
-                console.log(`📊 Phase 1 complete: ${validImages.length} images with /originals/ verified`);
+                console.log(`📊 Phase 1 complete: ${validImages.length} images upgraded to /736x/`);
 
                 // Phase 2: Check for duplicates
                 if (validImages.length > 0) {
@@ -524,8 +525,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     const topImages = uniqueImages.slice(0, TARGET_COUNT);
 
                     // Return image data (without DOM elements)
+                    // Use thumbnail for popup preview, but keep original URL for saving
                     const imageData = topImages.map((img, index) => ({
-                        src: img.src,
+                        src: img.element.src, // Thumbnail URL for popup preview
+                        originalSrc: img.src, // /736x/ URL for saving to database
                         alt: img.alt,
                         selected: true, // Auto-select all
                         index: index,
@@ -533,7 +536,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     }));
 
                     console.log(`✅ SMART SCAN COMPLETE: Returning ${imageData.length} valid images`);
-                    console.log(`📊 Summary: ${imageData.length} images ready to save (all /originals/, all unique)`);
+                    console.log(`📊 Summary: ${imageData.length} images ready to save (all /736x/, all unique)`);
 
                     sendResponse({ images: imageData });
                 } else {
@@ -573,6 +576,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     console.error('❌ Could not extract pin data');
                     sendResponse({ success: false, error: 'Could not extract pin data' });
                     return;
+                }
+
+                // Override imageUrl with /736x/ URL from smart scan
+                if (request.imageData.originalSrc) {
+                    pinData.imageUrl = request.imageData.originalSrc;
+                    console.log(`✅ Using /736x/ URL for saving: ${pinData.imageUrl}`);
                 }
 
                 // Get admin key and category

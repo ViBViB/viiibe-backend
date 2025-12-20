@@ -2,6 +2,12 @@
 // MOOD! — BACKEND FINAL (COMPATIBLE)
 // ==============================================================
 
+// Import centralized configuration
+const API_BASE_URL = 'https://moood-refactor.vercel.app/api';
+const PROXY_URL = `${API_BASE_URL}/pinterest-proxy`;
+const CURATED_BOARDS_URL = `${API_BASE_URL}/curated-boards`;
+const SAVED_PINS_URL = `${API_BASE_URL}/get-saved-pins`;
+
 figma.showUI(__html__, { width: 720, height: 760, title: "Viiibe" });
 
 // ==============================================================
@@ -143,7 +149,7 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 // PINTEREST API HELPERS (via Vercel Proxy)
 // ==============================================================
 
-const PROXY_URL = 'https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api/pinterest-proxy';
+
 
 /**
  * Fetch all boards for the authenticated user
@@ -307,7 +313,7 @@ async function fetchCuratedBoards() {
 
   try {
     console.log("📚 Fetching curated boards from API...");
-    const response = await fetch('https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api/curated-boards');
+    const response = await fetch(CURATED_BOARDS_URL);
 
     if (!response.ok) {
       console.error("Failed to fetch curated boards:", response.status);
@@ -422,7 +428,7 @@ async function searchSavedPins(query, intent) {
   try {
     console.log("🔍 Searching saved pins for:", query);
 
-    const response = await fetch('https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api/get-saved-pins');
+    const response = await fetch(SAVED_PINS_URL);
 
     if (!response.ok) {
       console.error("❌ Failed to fetch saved pins:", response.status);
