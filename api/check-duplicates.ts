@@ -5,6 +5,7 @@ import { kv } from '@vercel/kv';
  * Check Duplicates API
  * Checks if pin IDs already exist in database
  * Used by Chrome extension to filter out duplicates during scanning
+ * Last updated: 2025-12-19 22:05 - Force redeploy
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // CORS headers
