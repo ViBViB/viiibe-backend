@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             // Handle successful load
                             img.onload = () => {
                                 loadedCount++;
-                                console.log(`Image ${loadedCount}/${totalImages} loaded`);
+                                console.log(`✅ Image ${loadedCount}/${totalImages} loaded: ${srcUrl.substring(0, 80)}...`);
 
                                 // Continue to next step when most images are loaded (80%)
                                 if (loadedCount >= Math.ceil(totalImages * 0.8)) {
@@ -269,7 +269,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             // Handle load errors
                             img.onerror = () => {
-                                console.warn(`Failed to load image: ${proxyUrl}`);
+                                console.error(`❌ FAILED to load image:`);
+                                console.error(`   Original URL: ${srcUrl}`);
+                                console.error(`   Proxy URL: ${proxyUrl}`);
+                                console.error(`   Pin ID: ${pin.id || pin.pinId || 'unknown'}`);
                                 loadedCount++;
 
                                 // Still continue if enough images loaded
