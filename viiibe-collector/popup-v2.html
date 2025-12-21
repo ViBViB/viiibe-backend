@@ -27,7 +27,7 @@
         </div>
         <div class="header-right">
             <div class="edition">PRO EDITION</div>
-            <div class="version">v1.0</div>
+            <div class="version">v1.1</div>
         </div>
     </header>
 
@@ -76,6 +76,56 @@
                 <div class="stat-card">
                     <div class="stat-label">Total saved designs</div>
                     <div class="stat-value" id="totalCount">0</div>
+                </div>
+
+                <!-- Collection Balance Section -->
+                <div class="collection-balance">
+                    <div class="balance-header">
+                        <h2 class="balance-title">📊 Collection Balance</h2>
+                        <button class="btn-refresh" id="refreshAnalysis" title="Refresh analysis">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M21 10C21 10 18.995 7.26822 17.3662 5.63824C15.7373 4.00827 13.4864 3 11 3C6.02944 3 2 7.02944 2 12C2 16.9706 6.02944 21 11 21C15.1031 21 18.5649 18.2543 19.6482 14.5M21 10V4M21 10H15"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="balance-updated" id="balanceUpdated">Loading...</div>
+
+                    <!-- Urgent Gaps -->
+                    <div class="gap-section">
+                        <div class="gap-section-header urgent">
+                            <span class="gap-icon">🔴</span>
+                            <span class="gap-section-title">URGENT (&lt; 20 pins)</span>
+                        </div>
+                        <div class="gap-list" id="urgentGaps">
+                            <div class="gap-loading">Analyzing collection...</div>
+                        </div>
+                    </div>
+
+                    <!-- Low Coverage -->
+                    <div class="gap-section">
+                        <div class="gap-section-header low">
+                            <span class="gap-icon">⚠️</span>
+                            <span class="gap-section-title">LOW (20-50 pins)</span>
+                        </div>
+                        <div class="gap-list" id="lowGaps">
+                            <div class="gap-loading">Analyzing collection...</div>
+                        </div>
+                    </div>
+
+                    <!-- Balanced -->
+                    <div class="gap-section">
+                        <div class="gap-section-header balanced">
+                            <span class="gap-icon">✅</span>
+                            <span class="gap-section-title">BALANCED (50+ pins)</span>
+                        </div>
+                        <div class="gap-list" id="balancedGaps">
+                            <div class="gap-loading">Analyzing collection...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -219,6 +219,104 @@ document.getElementById('syncStats').addEventListener('click', async () => {
 });
 
 // ============================================
+// COLLECTION GAPS ANALYSIS
+// ============================================
+
+// Load collection gaps on dashboard load
+document.addEventListener('DOMContentLoaded', () => {
+    // ... existing initialization code ...
+    loadCollectionGaps();
+});
+
+// Refresh button handler
+document.getElementById('refreshAnalysis')?.addEventListener('click', () => {
+    loadCollectionGaps(true);
+});
+
+async function loadCollectionGaps(forceRefresh = false) {
+    try {
+        const url = `${API_BASE}/collection-gaps${forceRefresh ? '?refresh=true' : ''}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        displayCollectionGaps(data);
+    } catch (error) {
+        console.error('Failed to load collection gaps:', error);
+        displayCollectionGapsError();
+    }
+}
+
+function displayCollectionGaps(data) {
+    // Update timestamp
+    const updatedEl = document.getElementById('balanceUpdated');
+    if (updatedEl) {
+        const date = new Date(data.lastUpdated);
+        updatedEl.textContent = `Last updated: ${date.toLocaleString()}`;
+    }
+
+    // Display urgent gaps
+    displayGapList('urgentGaps', data.urgent);
+
+    // Display low coverage
+    displayGapList('lowGaps', data.low);
+
+    // Display balanced
+    displayGapList('balancedGaps', data.balanced);
+}
+
+function displayGapList(elementId, gaps) {
+    const container = document.getElementById(elementId);
+    if (!container) return;
+
+    if (!gaps || gaps.length === 0) {
+        container.innerHTML = '<div class="gap-empty">All balanced ✓</div>';
+        return;
+    }
+
+    container.innerHTML = gaps.map(gap => `
+        <div class="gap-item">
+            <div class="gap-info">
+                <div class="gap-combination">${gap.category} + ${gap.attribute}</div>
+                <div class="gap-query">"${gap.suggestedQuery}"</div>
+            </div>
+            <span class="gap-count">${gap.count}</span>
+            <button class="btn-copy" data-query="${gap.suggestedQuery}">Copy</button>
+        </div>
+    `).join('');
+
+    // Add copy button handlers
+    container.querySelectorAll('.btn-copy').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const query = btn.dataset.query;
+            copyToClipboard(query);
+            btn.textContent = '✓';
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+            }, 2000);
+        });
+    });
+}
+
+function displayCollectionGapsError() {
+    ['urgentGaps', 'lowGaps', 'balancedGaps'].forEach(id => {
+        const container = document.getElementById(id);
+        if (container) {
+            container.innerHTML = '<div class="gap-loading">Failed to load. Try refreshing.</div>';
+        }
+    });
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).catch(err => {
+        console.error('Failed to copy:', err);
+    });
+}
+
+// ============================================
 // BATCH PROCESSING
 // ============================================
 
