@@ -267,8 +267,20 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             };
 
-                            // Handle load errors
+                            // Handle load errors with fallback
                             img.onerror = () => {
+                                // If /originals/ URL failed, try downgrading to /736x/
+                                if (srcUrl.includes('/originals/') && !img.getAttribute('data-fallback-tried')) {
+                                    const fallbackUrl = srcUrl.replace('/originals/', '/736x/');
+                                    console.warn(`⚠️ /originals/ failed (403), trying /736x/ fallback...`);
+                                    console.warn(`   Original: ${srcUrl}`);
+                                    console.warn(`   Fallback: ${fallbackUrl}`);
+
+                                    img.setAttribute('data-fallback-tried', 'true');
+                                    img.src = getImageProxyUrl(fallbackUrl);
+                                    return;
+                                }
+
                                 console.error(`❌ FAILED to load image:`);
                                 console.error(`   Original URL: ${srcUrl}`);
                                 console.error(`   Proxy URL: ${proxyUrl}`);
