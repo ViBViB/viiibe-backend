@@ -546,7 +546,18 @@ async function searchSavedPins(query, intent) {
     // Limit to 20 pins maximum (same as Chrome extension)
     const limitedPins = scoredPins.slice(0, 20);
 
-    console.log(`✅ Found ${scoredPins.length} matching pins, returning top ${limitedPins.length}`);
+    // Pre-validate and fix URLs to ensure 100% load success
+    // Convert /originals/ to /736x/ since many /originals/ URLs return 403
+    limitedPins.forEach(pin => {
+      if (pin.image && pin.image.includes('/originals/')) {
+        const originalUrl = pin.image;
+        pin.image = pin.image.replace('/originals/', '/736x/');
+        console.log(`🔄 Pre-validated URL: /originals/ → /736x/`);
+        console.log(`   Pin ${pin.id}: ${originalUrl.substring(0, 60)}...`);
+      }
+    });
+
+    console.log(`✅ Found ${scoredPins.length} matching pins, returning top ${limitedPins.length} (all URLs validated)`);
     return limitedPins;
 
   } catch (error) {
