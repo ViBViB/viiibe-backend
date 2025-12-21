@@ -236,6 +236,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const proxyUrl = getImageProxyUrl(srcUrl);
 
                             // Store proxy URL for lightbox navigation
+                            const urlIndex = imgUrls.length;
                             imgUrls.push(proxyUrl);
 
                             const div = document.createElement('div');
@@ -272,12 +273,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // If /originals/ URL failed, try downgrading to /736x/
                                 if (srcUrl.includes('/originals/') && !img.getAttribute('data-fallback-tried')) {
                                     const fallbackUrl = srcUrl.replace('/originals/', '/736x/');
+                                    const fallbackProxyUrl = getImageProxyUrl(fallbackUrl);
+
                                     console.warn(`⚠️ /originals/ failed (403), trying /736x/ fallback...`);
                                     console.warn(`   Original: ${srcUrl}`);
                                     console.warn(`   Fallback: ${fallbackUrl}`);
 
+                                    // Update imgUrls array for lightbox
+                                    imgUrls[urlIndex] = fallbackProxyUrl;
+
                                     img.setAttribute('data-fallback-tried', 'true');
-                                    img.src = getImageProxyUrl(fallbackUrl);
+                                    img.src = fallbackProxyUrl;
                                     return;
                                 }
 
