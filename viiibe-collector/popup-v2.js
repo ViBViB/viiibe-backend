@@ -61,7 +61,7 @@ function switchScreen(screenName) {
 // ============================================
 
 function loadStats() {
-    chrome.storage.sync.get(['todayPins', 'totalPins', 'lastDate'], (result) => {
+    chrome.storage.sync.get(['todayPins', 'totalPins', 'lastDate', 'adminKey'], (result) => {
         const today = new Date().toDateString();
         const lastDate = result.lastDate || '';
 
@@ -72,11 +72,44 @@ function loadStats() {
             chrome.storage.sync.set({ todayPins: 0, lastDate: today });
         }
 
-        // Update UI
+        // Update UI with cached values immediately
         document.getElementById('todayCount').textContent = todayPins;
         document.getElementById('totalCount').textContent = result.totalPins || 0;
+
+        // Auto-sync with backend in background (if adminKey is set)
+        if (result.adminKey) {
+            syncTotalPinsFromBackend(result.adminKey);
+        }
     });
 }
+
+// Import centralized configuration
+const API_BASE = 'https://moood-refactor.vercel.app/api';
+
+// Auto-sync total pins from backend (silent, non-blocking)
+async function syncTotalPinsFromBackend(adminKey) {
+    try {
+        const response = await fetch(`${API_BASE}/get-pins-count?adminKey=${adminKey}`);
+
+        if (!response.ok) {
+            console.warn('Failed to sync total pins:', response.status);
+            return;
+        }
+
+        const data = await response.json();
+        const realTotal = data.count; // Note: get-pins-count returns 'count' not 'exactCount'
+
+        // Update cache and UI
+        await chrome.storage.sync.set({ totalPins: realTotal });
+        document.getElementById('totalCount').textContent = realTotal;
+
+        console.log(`✅ Auto-synced: ${realTotal} pins`);
+    } catch (error) {
+        console.warn('Auto-sync failed (using cached value):', error.message);
+        // Silently fail - user still sees cached value
+    }
+}
+
 
 // Auto-refresh stats when storage changes
 function setupStorageListener() {
@@ -147,8 +180,7 @@ document.getElementById('syncStats').addEventListener('click', async () => {
             return;
         }
 
-        // Call optimized count endpoint
-        const API_BASE = 'https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api';
+        // Use get-pins-count endpoint for precise financial tracking
         const response = await fetch(`${API_BASE}/get-pins-count?adminKey=${adminKey}`);
 
         if (!response.ok) {
@@ -156,13 +188,15 @@ document.getElementById('syncStats').addEventListener('click', async () => {
         }
 
         const data = await response.json();
-        const realTotal = data.count;
+        const realTotal = data.count; // Exact count from KV
+        const remaining = 1000 - realTotal;
+        const percentage = ((realTotal / 1000) * 100).toFixed(1);
 
         // Update local cache
         await chrome.storage.sync.set({ totalPins: realTotal });
 
-        // Show success
-        button.innerHTML = `<span>✓ Synced! Total: ${realTotal}</span>`;
+        // Show success with details
+        button.innerHTML = `<span>✓ ${realTotal} pins (${remaining} left, ${percentage}% used)</span>`;
         button.style.background = '#00D9A3';
         button.style.color = '#fff';
 

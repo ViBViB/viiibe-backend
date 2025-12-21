@@ -422,9 +422,10 @@ async function searchPinterestGlobally(searchTerm, token, limit) {
  * Search saved pins from Vercel KV database
  * @param {string} query - Search query
  * @param {Object} intent - Parsed search intent from NLP
+ * @param {boolean} randomize - Whether to randomize results (for reload)
  * @returns {Array} - Array of matching pins with scores
  */
-async function searchSavedPins(query, intent) {
+async function searchSavedPins(query, intent, randomize = false) {
   try {
     console.log("🔍 Searching saved pins for:", query);
 
@@ -543,6 +544,16 @@ async function searchSavedPins(query, intent) {
     // Sort by score (highest first)
     scoredPins.sort((a, b) => b.score - a.score);
 
+    // If randomize flag is true, shuffle the results before limiting
+    if (randomize && scoredPins.length > 20) {
+      console.log('🎲 Randomizing results for variety...');
+      // Fisher-Yates shuffle
+      for (let i = scoredPins.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [scoredPins[i], scoredPins[j]] = [scoredPins[j], scoredPins[i]];
+      }
+    }
+
     // Limit to 20 pins maximum (same as Chrome extension)
     const limitedPins = scoredPins.slice(0, 20);
 
@@ -557,7 +568,8 @@ async function searchSavedPins(query, intent) {
       }
     });
 
-    console.log(`✅ Found ${scoredPins.length} matching pins, returning top ${limitedPins.length} (all URLs validated)`);
+
+    console.log(`✅ Found ${scoredPins.length} matching pins, returning top ${limitedPins.length} (all URLs validated${randomize ? ', randomized' : ''})`);
     return limitedPins;
 
   } catch (error) {
@@ -1846,8 +1858,9 @@ figma.ui.onmessage = async (msg) => {
   // ------------------------------------------------------------
   if (msg.type === "smart-search") {
     const query = msg.query || "";
+    const reload = msg.reload || false; // Get reload flag from message
 
-    console.log("🔍 Smart search query:", query);
+    console.log(`🔍 Smart search query: "${query}"${reload ? ' (reload)' : ''}`);
 
     // Progress: Step 1 - Analyzing query
     figma.ui.postMessage({
@@ -1865,8 +1878,8 @@ figma.ui.onmessage = async (msg) => {
       step: 2
     });
 
-    // 2. Search saved pins from Vercel KV
-    const pins = await searchSavedPins(query, intent);
+    // 2. Search saved pins from Vercel KV (with optional randomization)
+    const pins = await searchSavedPins(query, intent, reload);
     console.log(`✅ Found ${pins.length} matching pins from saved collection`);
 
     // Progress: Step 3 - Pins fetched and ranked

@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Viiibe Collector",
-    "version": "1.0.2",
-    "description": "Quickly save Pinterest pins to Viiibe for design inspiration curation",
+    "name": "Moood! Collector",
+    "version": "2.0.0",
+    "description": "Save designs from Pinterest, Behance, Dribbble to your personal Moood! library",
     "permissions": [
         "activeTab",
         "contextMenus",
@@ -11,6 +11,8 @@
     "host_permissions": [
         "*://*.pinterest.com/*",
         "*://*.pinterest.cl/*",
+        "*://*.behance.net/*",
+        "*://*.dribbble.com/*",
         "https://*.vercel.app/*"
     ],
     "background": {
@@ -20,15 +22,19 @@
         {
             "matches": [
                 "*://*.pinterest.com/*",
-                "*://*.pinterest.cl/*"
+                "*://*.pinterest.cl/*",
+                "*://*.behance.net/*",
+                "*://*.dribbble.com/*"
             ],
             "js": [
-                "content.js"
+                "platform-extractors.js",
+                "content.js",
+                "batch-processing.js"
             ],
             "run_at": "document_idle"
         }
     ],
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup-v2.html"
     }
 }

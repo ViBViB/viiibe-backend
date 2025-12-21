@@ -120,7 +120,7 @@ export function resetProgress() {
     });
 }
 
-export function startSearch(query: string) {
+export function startSearch(query: string, reload: boolean = false) {
     const val = (query || '').trim();
     if (!val) return;
 
@@ -138,7 +138,7 @@ export function startSearch(query: string) {
     }
 
     // Use smart-search for NLP-based intelligent search
-    parent.postMessage({ pluginMessage: { type: 'smart-search', query: val } }, '*');
+    parent.postMessage({ pluginMessage: { type: 'smart-search', query: val, reload } }, '*');
 }
 
 export async function getImagesData() {

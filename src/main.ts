@@ -173,11 +173,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Search terms bar click handler - goes back to search with query preloaded
     const searchTermsBar = document.getElementById('searchTermsBar');
-    if (searchTermsBar) searchTermsBar.onclick = () => {
+    if (searchTermsBar) searchTermsBar.onclick = (e) => {
+        // Don't trigger if clicking reload button
+        if ((e.target as HTMLElement).closest('#reloadButton')) return;
+
         const searchTermsText = document.getElementById('searchTermsDisplay');
         const query = searchTermsText?.getAttribute('data-original-query') || '';
         if (searchInput && query) searchInput.value = query;
         showView('search');
+    };
+
+    // Reload button - get different results for same search
+    const reloadButton = document.getElementById('reloadButton');
+    if (reloadButton) reloadButton.onclick = (e) => {
+        e.stopPropagation(); // Prevent searchTermsBar click
+        const searchTermsText = document.getElementById('searchTermsDisplay');
+        const query = searchTermsText?.getAttribute('data-original-query') || '';
+        if (query) {
+            console.log('🔄 Reloading search with different results...');
+            startSearch(query, true); // Pass true to indicate reload
+        }
     };
 
     // DETAILS & LIGHTBOX LOGIC

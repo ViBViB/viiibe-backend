@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { adminKey } = req.query;
 
         // Verify admin key
-        if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
+        if (!adminKey || adminKey !== process.env.CURATOR_ADMIN_KEY) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 

@@ -9,7 +9,8 @@
   ],
   "networkAccess": {
     "allowedDomains": [
-      "https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app"
-    ]
+      "https://moood-refactor.vercel.app"
+    ],
+    "reasoning": "All API calls go through our Vercel backend. Pinterest images are proxied through /api/image-proxy to avoid CORS."
   }
 }

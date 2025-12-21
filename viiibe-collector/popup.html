@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viiibe Collector</title>
+    <title>Moood! Collector PRO</title>
     <style>
         * {
             margin: 0;
@@ -13,52 +13,109 @@
         }
 
         body {
-            width: 400px;
+            width: 450px;
+            min-height: 600px;
+            max-height: 600px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', Roboto, sans-serif;
-            padding: 32px 24px;
             background: white;
             color: #000;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 20px 12px;
+            border-bottom: 1px solid #e5e5e5;
         }
 
         .logo {
             display: flex;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
         }
 
         .logo svg {
-            width: 48px;
+            width: 36px;
             height: auto;
         }
 
         h1 {
-            font-size: 32px;
-            font-weight: 400;
+            font-size: 20px;
+            font-weight: 600;
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
             letter-spacing: -0.5px;
         }
 
         .subtitle {
             text-align: center;
-            font-size: 14px;
+            font-size: 11px;
             color: #666;
-            margin-bottom: 32px;
+            font-weight: 500;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e5e5;
+            background: #f8f8f8;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 14px;
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            color: #000;
+            background: #f0f0f0;
+        }
+
+        .tab.active {
+            color: #00D9A3;
+            background: white;
+            border-bottom-color: #00D9A3;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            height: calc(600px - 120px);
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dashboard Tab */
+        .dashboard-scroll {
+            padding: 16px 20px;
+            overflow-y: auto;
         }
 
         .stats-card {
             background: #f8f8f8;
             border: 1px solid #e5e5e5;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
         }
 
         .stat {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
 
         .stat:last-child {
@@ -66,45 +123,58 @@
         }
 
         .stat-label {
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 400;
-            color: #000;
+            color: #666;
         }
 
         .stat-value {
-            font-size: 32px;
-            font-weight: 400;
+            font-size: 24px;
+            font-weight: 600;
             color: #000;
         }
 
         .settings-card {
             background: #f8f8f8;
             border: 1px solid #e5e5e5;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .settings-card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #000;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 16px;
+            margin-bottom: 5px;
+            font-size: 12px;
             font-weight: 500;
-            color: #000;
+            color: #666;
         }
 
-        input {
+        input,
+        select {
             width: 100%;
-            padding: 12px 16px;
+            padding: 9px 11px;
             border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 7px;
+            font-size: 13px;
             background: white;
+            margin-bottom: 10px;
+        }
+
+        input[type="password"] {
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
         }
 
-        input:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #00D9A3;
         }
@@ -112,157 +182,398 @@
         .button-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 8px;
         }
 
         button {
-            padding: 14px 24px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 7px;
             font-weight: 500;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 13px;
             transition: all 0.2s;
         }
 
-        #resetStats {
-            background: #FF3B30;
+        .btn-primary {
+            background: #00D9A3;
             color: white;
         }
 
-        #resetStats:hover {
-            background: #E02D22;
+        .btn-primary:hover {
+            background: #00C090;
         }
 
-        #saveSettings {
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
             background: white;
             color: #00D9A3;
             border: 2px solid #00D9A3;
         }
 
-
-        #saveSettings:hover {
+        .btn-secondary:hover {
             background: #00D9A3;
             color: white;
         }
 
-        .ai-status-card {
-            background: #f8f8f8;
-            border: 1px solid #e5e5e5;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
+        .btn-danger {
+            background: #FF3B30;
+            color: white;
         }
 
-        .status-grid {
+        .btn-danger:hover {
+            background: #E02D22;
+        }
+
+        .link-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: white;
+            border: 2px solid #e5e5e5;
+            border-radius: 7px;
+            text-align: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .link-button:hover {
+            border-color: #00D9A3;
+            color: #00D9A3;
+        }
+
+        /* Batch Mode Tab */
+        .batch-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .batch-header {
+            padding: 14px 16px;
+            background: #f8f8f8;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .batch-count {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .batch-count-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .batch-count-value {
+            font-size: 22px;
+            font-weight: 600;
+            color: #00D9A3;
+        }
+
+        .scan-button {
+            width: 100%;
+        }
+
+        .thumbnail-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            align-content: start;
+        }
+
+        .thumbnail {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .thumbnail:hover {
+            border-color: #e5e5e5;
+        }
+
+        .thumbnail.selected {
+            border-color: #00D9A3;
+            background: rgba(0, 217, 163, 0.1);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-checkbox {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border: 2px solid #00D9A3;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #00D9A3;
+        }
+
+        .thumbnail.selected .thumbnail-checkbox {
+            background: #00D9A3;
+            color: white;
+        }
+
+        .batch-actions {
+            padding: 12px 16px;
+            border-top: 1px solid #e5e5e5;
+            background: white;
+        }
+
+        .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
-        .status-item {
-            background: white;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            padding: 12px;
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px 20px;
             text-align: center;
         }
 
-        .status-label {
-            display: block;
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #000;
+        }
+
+        .empty-state-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Progress */
+        .progress-container {
+            padding: 16px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-bg {
+            background: #e5e5e5;
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            background: #00D9A3;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
             font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        /* Results */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .result-item {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 11px;
             color: #666;
             margin-bottom: 4px;
         }
 
-        .status-value {
-            display: block;
-            font-size: 24px;
-            font-weight: 500;
-            color: #000;
+        .result-value {
+            font-size: 20px;
+            font-weight: 600;
         }
 
-        .last-status {
-            font-size: 12px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            text-align: center;
-            margin-top: 8px;
+        .result-value.success {
+            color: #00D9A3;
         }
 
-        .last-status.success {
-            background: #d4f4dd;
-            color: #0d5520;
+        .result-value.warning {
+            color: #FF9500;
         }
 
-        .last-status.timeout {
-            background: #fff4cc;
-            color: #7a5c00;
-        }
-
-        .last-status.failed {
-            background: #ffe5e5;
-            color: #c41e3a;
-        }
-
-        .last-status:empty {
-            display: none;
+        .result-value.error {
+            color: #FF3B30;
         }
     </style>
 </head>
 
 <body>
-    <div class="logo">
-        <svg width="66" height="57" viewBox="0 0 66 57" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M62 5.4935L46.3438 38.8314L53.25 45.5335C56.5208 48.7079 62 46.3903 62 41.8324V5.4935ZM22.8408 39.4769L28.1533 50.2718C30.0623 54.1516 35.6109 54.1015 37.4492 50.1878L42.4482 39.5433L32.6104 29.9955L22.8408 39.4769ZM34.9248 27.7494L43.8975 36.4574L58.9248 4.45639L34.9248 27.7494ZM21.3447 36.4369L30.2969 27.7494L5.41016 3.59604C5.30396 3.49305 5.18797 3.41429 5.06738 3.35581L21.3447 36.4369ZM3.22266 41.8324C3.22266 46.3903 8.70187 48.7079 11.9727 45.5335L18.9131 38.7962L3.22266 6.90659V41.8324ZM65.2227 41.8324C65.2227 49.239 56.3199 53.0053 51.0049 47.847L44.8945 41.9173L40.3672 51.558C37.3802 57.9179 28.3632 58 25.2607 51.6957L20.4092 41.8373L14.2178 47.847C8.90275 53.0053 0 49.239 0 41.8324V4.52182C0 0.533622 4.79335 -1.49407 7.65527 1.28354L32.6113 25.5033L57.5674 1.28354C60.4293 -1.49406 65.2227 0.53362 65.2227 4.52182V41.8324Z"
-                fill="black" />
-        </svg>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <svg width="66" height="57" viewBox="0 0 66 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M62 5.4935L46.3438 38.8314L53.25 45.5335C56.5208 48.7079 62 46.3903 62 41.8324V5.4935ZM22.8408 39.4769L28.1533 50.2718C30.0623 54.1516 35.6109 54.1015 37.4492 50.1878L42.4482 39.5433L32.6104 29.9955L22.8408 39.4769ZM34.9248 27.7494L43.8975 36.4574L58.9248 4.45639L34.9248 27.7494ZM21.3447 36.4369L30.2969 27.7494L5.41016 3.59604C5.30396 3.49305 5.18797 3.41429 5.06738 3.35581L21.3447 36.4369ZM3.22266 41.8324C3.22266 46.3903 8.70187 48.7079 11.9727 45.5335L18.9131 38.7962L3.22266 6.90659V41.8324ZM65.2227 41.8324C65.2227 49.239 56.3199 53.0053 51.0049 47.847L44.8945 41.9173L40.3672 51.558C37.3802 57.9179 28.3632 58 25.2607 51.6957L20.4092 41.8373L14.2178 47.847C8.90275 53.0053 0 49.239 0 41.8324V4.52182C0 0.533622 4.79335 -1.49407 7.65527 1.28354L32.6113 25.5033L57.5674 1.28354C60.4293 -1.49406 65.2227 0.53362 65.2227 4.52182V41.8324Z"
+                    fill="black" />
+            </svg>
+        </div>
+        <h1>Moood! Collector</h1>
+        <p class="subtitle">PRO EDITION</p>
     </div>
 
-    <h1>Moood! Collector</h1>
-    <p class="subtitle">Right-click on any image → "Add to Viiibe"</p>
-
-    <div class="stats-card">
-        <div class="stat">
-            <span class="stat-label">Pins saved today:</span>
-            <span class="stat-value" id="todayCount">0</span>
-        </div>
-        <div class="stat">
-            <span class="stat-label">Total saved pins:</span>
-            <span class="stat-value" id="totalCount">0</span>
-        </div>
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab" data-tab="dashboard">📊 Dashboard</button>
+        <button class="tab active" data-tab="batch">🖼️ Batch Mode</button>
     </div>
 
-    <div class="ai-status-card">
-        <h3
-            style="font-size: 16px; font-weight: 500; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            🤖 AI Analysis Status
-        </h3>
-        <div class="status-grid">
-            <div class="status-item">
-                <span class="status-label">✅ Analyzed</span>
-                <span class="status-value" id="analyzedCount">-</span>
+    <!-- Dashboard Tab -->
+    <div class="tab-content" id="dashboard">
+        <div class="dashboard-scroll">
+            <div class="stats-card">
+                <div class="stat">
+                    <span class="stat-label">Saved today</span>
+                    <span class="stat-value" id="todayCount">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Total saved</span>
+                    <span class="stat-value" id="totalCount">0</span>
+                </div>
             </div>
-            <div class="status-item">
-                <span class="status-label">❌ Failed</span>
-                <span class="status-value" id="failedCount">-</span>
+
+            <div class="settings-card">
+                <h3>⚙️ Admin Settings</h3>
+                <label for="adminKey">Admin Key</label>
+                <input type="password" id="adminKey" placeholder="••••••••••••••••••">
+
+                <label for="defaultCategory">Default Category</label>
+                <select id="defaultCategory">
+                    <option value="uncategorized">Uncategorized</option>
+                    <option value="inspiration">Inspiration</option>
+                    <option value="ui-design">UI Design</option>
+                    <option value="branding">Branding</option>
+                    <option value="typography">Typography</option>
+                    <option value="colors">Colors</option>
+                </select>
+            </div>
+
+            <button class="btn-primary" id="saveSettings" style="width: 100%;">Save Settings</button>
+        </div>
+    </div>
+
+    <!-- Batch Mode Tab -->
+    <div class="tab-content active" id="batch">
+        <div class="batch-container">
+            <!-- Header with count and scan button -->
+            <div class="batch-header">
+                <div class="batch-count">
+                    <span class="batch-count-label">Selected:</span>
+                    <span class="batch-count-value" id="selectedCount">0</span>
+                </div>
+                <button class="btn-primary scan-button" id="scanButton">
+                    🔍 Scan Page for Images
+                </button>
+            </div>
+
+            <!-- Thumbnail Grid or Empty State -->
+            <div id="thumbnailContainer" class="thumbnail-grid" style="display: none;">
+                <!-- Thumbnails will be inserted here -->
+            </div>
+
+            <div id="emptyState" class="empty-state">
+                <div class="empty-state-icon">🖼️</div>
+                <div class="empty-state-title">No Images Scanned</div>
+                <div class="empty-state-text">
+                    Go to Pinterest search or board, then click "Scan Page for Images" to select and save multiple pins
+                    at once.
+                </div>
+            </div>
+
+            <!-- Progress (hidden by default) -->
+            <div id="progressContainer" style="display: none; padding: 16px;">
+                <div class="progress-container">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0 / 0</div>
+                </div>
+            </div>
+
+            <!-- Results (hidden by default) -->
+            <div id="resultsContainer" style="display: none; padding: 16px;">
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-label">✅ Saved</div>
+                        <div class="result-value success" id="savedCount">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">⚠️ Duplicates</div>
+                        <div class="result-value warning" id="duplicatesCount">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">❌ Failed</div>
+                        <div class="result-value error" id="failedCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions (hidden until images scanned) -->
+            <div class="batch-actions" id="batchActions" style="display: none;">
+                <div class="action-buttons">
+                    <button class="btn-secondary" id="selectAllButton">Select All</button>
+                    <button class="btn-secondary" id="deselectAllButton">Deselect All</button>
+                </div>
+                <button class="btn-primary" id="saveSelectedButton" style="width: 100%;" disabled>
+                    Save Selected
+                </button>
             </div>
         </div>
-        <div id="lastAnalysisStatus" class="last-status"></div>
     </div>
 
-    <div class="settings-card">
-        <label for="adminKey">Admin key</label>
-        <input type="password" id="adminKey" placeholder="••••••••••••••••••">
-    </div>
-
-    <div class="button-group">
-        <button id="resetStats">Reset stats</button>
-        <button id="saveSettings">Save settings</button>
-    </div>
-
+    <script src="popup-batch.js"></script>
     <script src="popup.js"></script>
 </body>
 

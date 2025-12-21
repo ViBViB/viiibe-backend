@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { kv } from '@vercel/kv';
 
-// Updated: 2025-12-19 - Using SCAN instead of KEYS for large datasets
+// v2.0 - Using SCAN instead of KEYS for large datasets (2025-12-19)
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
