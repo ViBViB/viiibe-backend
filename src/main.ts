@@ -1,6 +1,7 @@
 import './styles/main.css';
 import { showView, showToast, tabs } from './ui/views';
 import { switchTab, startSearch, applyVisualFilter, updateProgress } from './ui/moodboard';
+import { getImageProxyUrl, upgradeToOriginals } from './config';
 
 // ==============================================================
 // STYLE GUIDE DATA COLLECTION
@@ -227,21 +228,23 @@ document.addEventListener('DOMContentLoaded', function () {
                         const totalImages = msg.data.pins.length;
 
                         msg.data.pins.forEach((pin: any, index: number) => {
-                            const srcUrl = pin.fullsizeUrl || pin.thumbnailUrl;
+                            const srcUrl = pin.imageUrl || pin.image;
                             if (!srcUrl) return;
 
-                            // Use image proxy to avoid CORS issues
-                            const API_BASE = 'https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api';
-                            const proxyUrl = `${API_BASE}/image-proxy?url=${encodeURIComponent(srcUrl)}`;
+                            // Use URL as-is from database (don't upgrade to /originals/)
+                            // The URLs in database already work - upgrading breaks them
+                            const proxyUrl = getImageProxyUrl(srcUrl);
 
-                            imgUrls.push(srcUrl);
+                            // Store proxy URL for lightbox navigation
+                            imgUrls.push(proxyUrl);
+
                             const div = document.createElement('div');
                             div.className = 'pin-container';
 
                             // Create img element with loading and error handlers
                             const img = document.createElement('img');
                             img.className = 'pin-image';
-                            img.setAttribute('data-url', srcUrl);
+                            img.setAttribute('data-url', srcUrl); // Store original URL
                             img.crossOrigin = 'Anonymous';
 
                             // Handle successful load
@@ -264,10 +267,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             };
 
-                            // Handle error - don't block progress
+                            // Handle load errors
                             img.onerror = () => {
+                                console.warn(`Failed to load image: ${proxyUrl}`);
                                 loadedCount++;
-                                console.warn(`Image ${loadedCount}/${totalImages} failed to load:`, srcUrl);
 
                                 // Still continue if enough images loaded
                                 if (loadedCount >= Math.ceil(totalImages * 0.8)) {
@@ -283,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             };
 
-                            // Set src to start loading
+                            // Set image source (same for grid and lightbox)
                             img.src = proxyUrl;
 
                             // Create overlay
@@ -291,10 +294,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             overlay.className = 'pin-overlay';
                             overlay.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`;
                             overlay.onclick = () => {
-                                currIdx = imgUrls.indexOf(srcUrl);
+                                currIdx = imgUrls.indexOf(proxyUrl);
                                 showView('details');
-                                const lightboxProxyUrl = `https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api/image-proxy?url=${encodeURIComponent(srcUrl)}`;
-                                dImg.src = lightboxProxyUrl;
+                                dImg.src = proxyUrl;
                             };
 
                             div.appendChild(img);
@@ -412,17 +414,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const detailsNextBtn = document.getElementById('detailsNextBtn');
     if (detailsNextBtn) detailsNextBtn.onclick = () => {
         currIdx = (currIdx + 1) % imgUrls.length;
-        dImg.src = '';
-        const fullResUrl = imgUrls[currIdx].replace('/736x/', '/originals/');
-        parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
+        dImg.src = imgUrls[currIdx];
     };
 
     const detailsPrevBtn = document.getElementById('detailsPrevBtn');
     if (detailsPrevBtn) detailsPrevBtn.onclick = () => {
         currIdx = (currIdx - 1 + imgUrls.length) % imgUrls.length;
-        dImg.src = '';
-        const fullResUrl = imgUrls[currIdx].replace('/736x/', '/originals/');
-        parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
+        dImg.src = imgUrls[currIdx];
     };
 
     const detailsDeleteBtn = document.getElementById('detailsDeleteBtn');
@@ -430,13 +428,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (currIdx > -1 && imgUrls[currIdx]) {
             const urlToDelete = imgUrls[currIdx];
 
-            // Find the pin-container by matching the data-url attribute
+            // Find the pin-container by matching the img src (which has proxy URL)
             const allContainers = document.querySelectorAll('.pin-container');
             let containerToRemove: Element | null = null;
 
             allContainers.forEach(container => {
-                const img = container.querySelector('img[data-url]') as HTMLImageElement;
-                if (img && img.dataset.url === urlToDelete) {
+                const img = container.querySelector('img.pin-image') as HTMLImageElement;
+                if (img && img.src === urlToDelete) {
                     containerToRemove = container;
                 }
             });
@@ -452,10 +450,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (imgUrls.length === 0) {
                 showView('moodboard');
             } else {
+                // Adjust index if we deleted the last image
                 if (currIdx >= imgUrls.length) currIdx = 0;
-                dImg.src = '';
-                const fullResUrl = imgUrls[currIdx].replace('/736x/', '/originals/');
-                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
+                // Load the next image directly
+                dImg.src = imgUrls[currIdx];
             }
         }
     };

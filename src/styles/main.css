@@ -279,6 +279,8 @@ header {
   display: block;
   width: 100%;
   height: auto !important;
+  max-height: 500px;
+  /* Crop very tall images like Pinterest does */
   min-height: 100px;
   object-fit: cover;
   object-position: top;
@@ -645,7 +647,8 @@ header {
   max-height: 100vh;
   width: auto;
   height: auto;
-  object-fit: none;
+  object-fit: contain;
+  /* Scale to fit, showing full image */
   margin: auto;
   padding: 0;
 }

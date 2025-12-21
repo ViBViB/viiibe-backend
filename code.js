@@ -543,8 +543,11 @@ async function searchSavedPins(query, intent) {
     // Sort by score (highest first)
     scoredPins.sort((a, b) => b.score - a.score);
 
-    console.log(`✅ Found ${scoredPins.length} matching pins`);
-    return scoredPins;
+    // Limit to 20 pins maximum (same as Chrome extension)
+    const limitedPins = scoredPins.slice(0, 20);
+
+    console.log(`✅ Found ${scoredPins.length} matching pins, returning top ${limitedPins.length}`);
+    return limitedPins;
 
   } catch (error) {
     console.error("❌ Error searching saved pins:", error);
