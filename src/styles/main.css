@@ -643,13 +643,12 @@ header {
 
 #detailsImage {
   display: block;
-  max-width: 100%;
-  max-height: 100vh;
-  width: auto;
+  width: 100%;
+  /* Always full width */
   height: auto;
+  /* Height grows with image aspect ratio */
   object-fit: contain;
-  /* Scale to fit, showing full image */
-  margin: auto;
+  margin: 0;
   padding: 0;
 }
 
