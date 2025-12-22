@@ -325,7 +325,8 @@ function createThumbnail(img, index) {
     container.dataset.index = index;
     container.style.cssText = `
         position: relative;
-        aspect-ratio: 1;
+        width: 90px;
+        height: 90px;
         border-radius: 8px;
         overflow: hidden;
         cursor: pointer;
@@ -337,11 +338,13 @@ function createThumbnail(img, index) {
     thumbnail.src = img.src;
     thumbnail.alt = img.alt || '';
     thumbnail.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        min-height: 100%;
         object-fit: cover;
-        display: block;
+        object-position: center;
     `;
 
     const checkbox = document.createElement('div');
