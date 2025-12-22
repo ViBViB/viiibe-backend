@@ -95,11 +95,16 @@ export default async function handler(req: any, res: any) {
 async function analyzeCollection(pins: any[]): Promise<CollectionAnalysis> {
     const industryCounts = new Map<string, number>();
 
-    // Count pins by industry
+    // Count pins by industry from AI analysis
     for (const pin of pins) {
-        // Use category field from pin (always present when saving)
-        const category = pin.category || 'uncategorized';
-        industryCounts.set(category, (industryCounts.get(category) || 0) + 1);
+        // Try to get industry from AI analysis first
+        let industry = 'uncategorized';
+
+        if (pin.aiAnalysis && pin.aiAnalysis.industry && Array.isArray(pin.aiAnalysis.industry) && pin.aiAnalysis.industry.length > 0) {
+            industry = pin.aiAnalysis.industry[0];
+        }
+
+        industryCounts.set(industry, (industryCounts.get(industry) || 0) + 1);
     }
 
     // Classify industries by pin count
