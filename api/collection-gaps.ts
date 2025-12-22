@@ -97,12 +97,9 @@ async function analyzeCollection(pins: any[]): Promise<CollectionAnalysis> {
 
     // Count pins by industry
     for (const pin of pins) {
-        // Skip pins without AI analysis
-        if (!pin.aiAnalysis || !pin.aiAnalysis.industry) continue;
-
-        // Get primary industry (first one in array)
-        const industry = pin.aiAnalysis.industry[0] || 'uncategorized';
-        industryCounts.set(industry, (industryCounts.get(industry) || 0) + 1);
+        // Use category field from pin (always present when saving)
+        const category = pin.category || 'uncategorized';
+        industryCounts.set(category, (industryCounts.get(category) || 0) + 1);
     }
 
     // Classify industries by pin count
