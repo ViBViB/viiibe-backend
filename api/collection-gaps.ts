@@ -93,44 +93,36 @@ export default async function handler(req: any, res: any) {
 }
 
 async function analyzeCollection(pins: any[]): Promise<CollectionAnalysis> {
-    const combinations = new Map<string, number>();
+    const industryCounts = new Map<string, number>();
 
-    // Analyze each pin
+    // Count pins by industry
     for (const pin of pins) {
         // Skip pins without AI analysis
-        if (!pin.aiAnalysis) continue;
+        if (!pin.aiAnalysis || !pin.aiAnalysis.industry) continue;
 
         // Get primary industry (first one in array)
-        const industry = pin.aiAnalysis.industry?.[0] || 'uncategorized';
-
-        // Extract colors from AI analysis
-        const colors = pin.aiAnalysis.color || [];
-        for (const color of colors) {
-            const key = `${industry}|color|${color}`;
-            combinations.set(key, (combinations.get(key) || 0) + 1);
-        }
+        const industry = pin.aiAnalysis.industry[0] || 'uncategorized';
+        industryCounts.set(industry, (industryCounts.get(industry) || 0) + 1);
     }
 
-    // Classify combinations
+    // Classify industries by pin count
     const urgent: GapItem[] = [];
     const low: GapItem[] = [];
     const balanced: GapItem[] = [];
 
-    for (const [key, count] of combinations.entries()) {
-        const [industry, attributeType, attribute] = key.split('|');
-
+    for (const [industry, count] of industryCounts.entries()) {
         const item: GapItem = {
             category: formatCategory(industry),
-            attribute: formatAttribute(attribute),
-            attributeType: attributeType as 'color' | 'style',
+            attribute: '', // Not used for industry-only view
+            attributeType: 'color', // Dummy value
             count,
-            suggestedQuery: generateQuery(industry, attribute, attributeType),
-            priority: count < 5 ? 'urgent' : count < 15 ? 'low' : 'balanced'
+            suggestedQuery: `${formatCategory(industry).toLowerCase()} website design`,
+            priority: count < 20 ? 'urgent' : count < 50 ? 'low' : 'balanced'
         };
 
-        if (count < 5) {
+        if (count < 20) {
             urgent.push(item);
-        } else if (count < 15) {
+        } else if (count < 50) {
             low.push(item);
         } else {
             balanced.push(item);

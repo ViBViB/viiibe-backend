@@ -280,10 +280,10 @@ function displayGapList(elementId, gaps) {
     container.innerHTML = gaps.map(gap => `
         <div class="gap-item">
             <div class="gap-info">
-                <div class="gap-combination">${gap.category} + ${gap.attribute}</div>
+                <div class="gap-combination">${gap.category}</div>
                 <div class="gap-query">"${gap.suggestedQuery}"</div>
             </div>
-            <span class="gap-count">${gap.count}</span>
+            <span class="gap-count">${gap.count} pins</span>
             <button class="btn-copy" data-query="${gap.suggestedQuery}">Copy</button>
         </div>
     `).join('');
