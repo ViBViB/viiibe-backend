@@ -101,19 +101,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Build complete list with counts (0 for missing industries) - case insensitive
         const allIndustryCounts = allIndustries.map(industry => {
-            // Find count with case-insensitive match
+            // Find count with case-insensitive match and return original industry name
             let count = 0;
-            console.log(`\nLooking for: "${industry}"`);
-            console.log('Available keys:', Array.from(industryCounts.keys()));
+            let originalIndustry = industry; // Default to lowercase
             for (const [key, value] of industryCounts.entries()) {
-                console.log(`  Comparing "${key.toLowerCase()}" === "${industry.toLowerCase()}"`, key.toLowerCase() === industry.toLowerCase());
                 if (key.toLowerCase() === industry.toLowerCase()) {
                     count = value;
-                    console.log(`  ✓ Match found! Count: ${count}`);
+                    originalIndustry = key; // Use the original capitalized name
                     break;
                 }
             }
-            return [industry, count] as [string, number];
+            return [originalIndustry, count] as [string, number];
         });
 
         // Add any industries found in data but not in our list
