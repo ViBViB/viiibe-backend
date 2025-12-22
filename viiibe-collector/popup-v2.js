@@ -54,6 +54,11 @@ function switchScreen(screenName) {
     });
 
     currentScreen = screenName;
+
+    // Refresh curator mode when returning to dashboard
+    if (screenName === 'dashboard') {
+        loadCuratorMode();
+    }
 }
 
 // ============================================
