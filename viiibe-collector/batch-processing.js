@@ -339,7 +339,9 @@ function createThumbnail(img, index) {
     thumbnail.style.cssText = `
         width: 100%;
         height: 100%;
+        min-height: 100%;
         object-fit: cover;
+        display: block;
     `;
 
     const checkbox = document.createElement('div');
