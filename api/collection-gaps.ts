@@ -36,15 +36,18 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
+        // Check for force refresh parameter
+        const forceRefresh = req.query?.refresh === 'true';
+
         // Check if we have cached analysis
-        const cached = await kv.get<CollectionAnalysis>(CACHE_KEY);
+        const cached = forceRefresh ? null : await kv.get<CollectionAnalysis>(CACHE_KEY);
 
         // Get all saved pins by scanning for saved-pin:* keys
         const pinKeys = await kv.keys('saved-pin:*');
         const currentPinCount = pinKeys.length;
 
         // Determine if we need to update
-        const shouldUpdate = !cached ||
+        const shouldUpdate = forceRefresh || !cached ||
             (currentPinCount - (cached.totalPins || 0)) >= UPDATE_THRESHOLD ||
             (Date.now() - new Date(cached.lastUpdated).getTime()) > (CACHE_TTL * 1000);
 
