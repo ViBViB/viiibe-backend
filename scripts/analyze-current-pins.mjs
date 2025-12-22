@@ -1,83 +1,62 @@
-// Quick script to analyze current pins in Vercel KV
 import { kv } from '@vercel/kv';
 
-async function analyzeCurrentPins() {
-    console.log('📊 Analyzing 171 pins...\n');
+async function analyzeAllIndustries() {
+    console.log('🔍 Scanning all pins for industry distribution...\n');
 
-    // Get all saved pins
-    const pinKeys = await kv.keys('saved-pin:*');
-    console.log(`Total pins found: ${pinKeys.length}\n`);
+    // Use SCAN to get all pins
+    const pinKeys = [];
+    let cursor = 0;
 
-    const industries = new Map();
-    const colors = new Map();
-    const styles = new Map();
+    do {
+        const result = await kv.scan(cursor, {
+            match: 'saved-pin:*',
+            count: 100
+        });
+        cursor = result[0];
+        pinKeys.push(...result[1]);
+    } while (cursor !== 0);
 
-    let pinsWithAnalysis = 0;
-    let pinsWithoutAnalysis = 0;
+    console.log(`📊 Total pins found: ${pinKeys.length}\n`);
+
+    // Count by industry
+    const industryCounts = new Map();
+    let withIndustry = 0;
+    let withoutIndustry = 0;
 
     for (const key of pinKeys) {
         const pin = await kv.get(key);
+        if (!pin) continue;
 
-        // Check if pin has AI analysis
-        const analysis = await kv.get(`pin-tags:${pin.id}`);
+        const pinId = pin.id;
+        const aiTags = await kv.get(`pin-tags:${pinId}`);
 
-        if (analysis) {
-            pinsWithAnalysis++;
-
-            // Count industries
-            if (analysis.industry && Array.isArray(analysis.industry)) {
-                analysis.industry.forEach(ind => {
-                    industries.set(ind, (industries.get(ind) || 0) + 1);
-                });
-            }
-
-            // Count colors
-            if (analysis.color && Array.isArray(analysis.color)) {
-                analysis.color.forEach(col => {
-                    colors.set(col, (colors.get(col) || 0) + 1);
-                });
-            }
-
-            // Count styles
-            if (analysis.style && Array.isArray(analysis.style)) {
-                analysis.style.forEach(sty => {
-                    styles.set(sty, (styles.get(sty) || 0) + 1);
-                });
-            }
+        if (aiTags && aiTags.industry && Array.isArray(aiTags.industry) && aiTags.industry.length > 0) {
+            const industry = aiTags.industry[0];
+            industryCounts.set(industry, (industryCounts.get(industry) || 0) + 1);
+            withIndustry++;
         } else {
-            pinsWithoutAnalysis++;
+            withoutIndustry++;
         }
     }
 
-    console.log('📈 ANALYSIS STATUS:');
-    console.log(`✅ Pins with AI analysis: ${pinsWithAnalysis}`);
-    console.log(`❌ Pins without AI analysis: ${pinsWithoutAnalysis}\n`);
-
-    console.log('🏢 INDUSTRIES:');
-    const sortedIndustries = Array.from(industries.entries())
+    // Sort by count
+    const sorted = Array.from(industryCounts.entries())
         .sort((a, b) => b[1] - a[1]);
-    sortedIndustries.forEach(([industry, count]) => {
-        console.log(`  ${industry}: ${count} pins`);
-    });
 
-    console.log('\n🎨 COLORS:');
-    const sortedColors = Array.from(colors.entries())
-        .sort((a, b) => b[1] - a[1]);
-    sortedColors.forEach(([color, count]) => {
-        console.log(`  ${color}: ${count} pins`);
-    });
+    console.log('📈 Industry Distribution:\n');
+    console.log('Industry'.padEnd(25) + 'Count');
+    console.log('─'.repeat(35));
 
-    console.log('\n✨ STYLES:');
-    const sortedStyles = Array.from(styles.entries())
-        .sort((a, b) => b[1] - a[1]);
-    sortedStyles.forEach(([style, count]) => {
-        console.log(`  ${style}: ${count} pins`);
-    });
+    for (const [industry, count] of sorted) {
+        console.log(industry.padEnd(25) + count);
+    }
 
-    console.log('\n📊 SUMMARY:');
-    console.log(`Total unique industries: ${industries.size}`);
-    console.log(`Total unique colors: ${colors.size}`);
-    console.log(`Total unique styles: ${styles.size}`);
+    console.log('─'.repeat(35));
+    console.log('Uncategorized'.padEnd(25) + withoutIndustry);
+    console.log('\n');
+    console.log(`✅ With industry: ${withIndustry}`);
+    console.log(`❌ Without industry: ${withoutIndustry}`);
+    console.log(`📊 Total industries: ${industryCounts.size}`);
 }
 
-analyzeCurrentPins().catch(console.error);
+analyzeAllIndustries().catch(console.error);

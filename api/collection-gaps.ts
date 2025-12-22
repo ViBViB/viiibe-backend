@@ -153,9 +153,9 @@ async function analyzeCollection(pins: any[]): Promise<CollectionAnalysis> {
     return {
         lastUpdated: new Date().toISOString(),
         totalPins: pins.length,
-        urgent: urgent.slice(0, 10), // Top 10 most urgent
-        low: low.slice(0, 10),
-        balanced: balanced.slice(0, 10)
+        urgent: req.query?.debug ? urgent : urgent.slice(0, 10),
+        low: req.query?.debug ? low : low.slice(0, 10),
+        balanced: req.query?.debug ? balanced : balanced.slice(0, 10)
     };
 }
 
