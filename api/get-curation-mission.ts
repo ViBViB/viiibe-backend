@@ -86,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const aiTags = await kv.get(`pin-tags:${pinId}`);
 
             if (aiTags && (aiTags as any).industry && Array.isArray((aiTags as any).industry) && (aiTags as any).industry.length > 0) {
-                const industry = (aiTags as any).industry[0].toLowerCase(); // Normalize to lowercase
+                const industry = (aiTags as any).industry[0];
                 industryCounts.set(industry, (industryCounts.get(industry) || 0) + 1);
             }
         }
@@ -99,9 +99,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             'construction', 'business', 'legal'
         ];
 
-        // Build complete list with counts (0 for missing industries)
+        // Build complete list with counts (0 for missing industries) - case insensitive
         const allIndustryCounts = allIndustries.map(industry => {
-            const count = industryCounts.get(industry) || 0;
+            // Find count with case-insensitive match
+            let count = 0;
+            for (const [key, value] of industryCounts.entries()) {
+                if (key.toLowerCase() === industry.toLowerCase()) {
+                    count = value;
+                    break;
+                }
+            }
             return [industry, count] as [string, number];
         });
 
