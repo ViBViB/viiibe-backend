@@ -75,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             pinKeys.push(...result[1]);
         } while (cursor !== 0);
 
-        // Count by industry (use AI's exact categorization)
+        // Count by industry
         const industryCounts = new Map<string, number>();
 
         for (const key of pinKeys) {
@@ -86,13 +86,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const aiTags = await kv.get(`pin-tags:${pinId}`);
 
             if (aiTags && (aiTags as any).industry && Array.isArray((aiTags as any).industry) && (aiTags as any).industry.length > 0) {
-                const industry = (aiTags as any).industry[0]; // Use AI's exact categorization
+                const industry = (aiTags as any).industry[0];
                 industryCounts.set(industry, (industryCounts.get(industry) || 0) + 1);
             }
         }
 
+        // Define all expected industries (from queryMap)
+        const allIndustries = [
+            'real estate', 'tech', 'finance', 'fitness', 'healthcare', 'saas',
+            'ecommerce', 'education', 'travel', 'food', 'fashion', 'logistics',
+            'furniture', 'beauty', 'transport', 'transportation', 'consulting',
+            'construction', 'business', 'legal'
+        ];
+
+        // Build complete list with counts (0 for missing industries) - case insensitive
+        const allIndustryCounts = allIndustries.map(industry => {
+            // Find count with case-insensitive match and return original industry name
+            let count = 0;
+            let originalIndustry = industry; // Default to lowercase
+            for (const [key, value] of industryCounts.entries()) {
+                if (key.toLowerCase() === industry.toLowerCase()) {
+                    count = value;
+                    originalIndustry = key; // Use the original capitalized name
+                    break;
+                }
+            }
+            return [originalIndustry, count] as [string, number];
+        });
+
+        // Add any industries found in data but not in our list
+        for (const [industry, count] of industryCounts.entries()) {
+            if (!allIndustries.includes(industry.toLowerCase())) {
+                allIndustryCounts.push([industry, count]);
+            }
+        }
+
         // Find industries that need curation (< 100 pins)
-        const needsCuration = Array.from(industryCounts.entries())
+        const needsCuration = allIndustryCounts
             .filter(([_, count]) => count < 100)
             .sort((a, b) => a[1] - b[1]); // Sort by count (lowest first)
 
