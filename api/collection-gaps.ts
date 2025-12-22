@@ -36,14 +36,25 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
-        // Check for force refresh parameter
         const forceRefresh = req.query?.refresh === 'true';
 
         // Check if we have cached analysis
         const cached = forceRefresh ? null : await kv.get<CollectionAnalysis>(CACHE_KEY);
 
-        // Get all saved pins by scanning for saved-pin:* keys
-        const pinKeys = await kv.keys('saved-pin:*');
+        // Use SCAN instead of KEYS to avoid "too many keys" error with 500+ pins
+        const pinKeys: string[] = [];
+        let cursor = 0;
+
+        do {
+            const result = await kv.scan(cursor, {
+                match: 'saved-pin:*',
+                count: 100
+            });
+
+            cursor = result[0];
+            pinKeys.push(...result[1]);
+        } while (cursor !== 0);
+
         const currentPinCount = pinKeys.length;
 
         // Determine if we need to update
@@ -63,7 +74,7 @@ export default async function handler(req: any, res: any) {
             const pin = await kv.get(key);
             if (pin) {
                 // Also fetch AI analysis tags (stored separately)
-                const pinId = pin.id;
+                const pinId = (pin as any).id;
                 const aiTags = await kv.get(`pin-tags:${pinId}`);
 
                 // Merge pin data with AI analysis
