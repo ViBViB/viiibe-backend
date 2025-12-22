@@ -107,6 +107,44 @@ export default async function handler(req: any, res: any) {
     }
 }
 
+// Generate specific, actionable search queries based on industry
+function generateSearchQuery(industry: string, count: number): string {
+    const industryLower = industry.toLowerCase();
+
+    // Map of industry-specific search terms (more specific than generic)
+    const specificQueries: Record<string, string[]> = {
+        'real estate': ['luxury real estate', 'property listing', 'real estate agency'],
+        'tech': ['tech startup', 'software company', 'tech platform'],
+        'finance': ['fintech', 'banking', 'investment platform'],
+        'fitness': ['gym', 'fitness app', 'wellness center'],
+        'healthcare': ['hospital', 'clinic', 'medical practice'],
+        'saas': ['saas platform', 'software dashboard', 'cloud app'],
+        'ecommerce': ['online store', 'ecommerce shop', 'product catalog'],
+        'education': ['online course', 'university', 'learning platform'],
+        'travel': ['travel agency', 'hotel booking', 'tourism'],
+        'food': ['restaurant', 'food delivery', 'cafe'],
+        'fashion': ['fashion brand', 'clothing store', 'boutique'],
+        'logistics': ['logistics company', 'shipping service', 'delivery'],
+        'furniture': ['furniture store', 'interior design shop', 'home decor'],
+        'beauty': ['beauty salon', 'spa', 'cosmetics'],
+        'transport': ['transportation service', 'fleet management', 'mobility'],
+        'transportation': ['logistics company', 'shipping service', 'delivery'],
+        'consulting': ['consulting agency', 'professional services', 'business consulting'],
+        'construction': ['construction company', 'architecture firm', 'contractor'],
+        'business': ['corporate website', 'business agency', 'professional services'],
+        'legal': ['law firm', 'legal services', 'attorney'],
+    };
+
+    // Get specific terms or fallback to generic
+    const terms = specificQueries[industryLower] || [industryLower];
+
+    // Rotate through terms based on count (so you get variety)
+    const termIndex = Math.floor(count / 20) % terms.length;
+    const selectedTerm = terms[termIndex];
+
+    return `${selectedTerm} website design`;
+}
+
 async function analyzeCollection(pins: any[], debugMode: boolean = false): Promise<CollectionAnalysis> {
     const industryCounts = new Map<string, number>();
 
@@ -133,7 +171,7 @@ async function analyzeCollection(pins: any[], debugMode: boolean = false): Promi
             attribute: '', // Not used for industry-only view
             attributeType: 'color', // Dummy value
             count,
-            suggestedQuery: `${formatCategory(industry).toLowerCase()} website design`,
+            suggestedQuery: generateSearchQuery(industry, count),
             priority: count < 20 ? 'urgent' : count < 50 ? 'low' : 'balanced'
         };
 
