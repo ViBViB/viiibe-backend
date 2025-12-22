@@ -38,8 +38,10 @@ export default async function handler(req: any, res: any) {
     try {
         // Check if we have cached analysis
         const cached = await kv.get<CollectionAnalysis>(CACHE_KEY);
-        const pins = await kv.get<any[]>('pins') || [];
-        const currentPinCount = pins.length;
+
+        // Get all saved pins by scanning for saved-pin:* keys
+        const pinKeys = await kv.keys('saved-pin:*');
+        const currentPinCount = pinKeys.length;
 
         // Determine if we need to update
         const shouldUpdate = !cached ||
@@ -49,6 +51,14 @@ export default async function handler(req: any, res: any) {
         if (cached && !shouldUpdate) {
             console.log('✅ Returning cached analysis');
             return res.status(200).json(cached);
+        }
+
+        // Fetch all pins
+        console.log(`🔄 Fetching ${currentPinCount} pins...`);
+        const pins = [];
+        for (const key of pinKeys) {
+            const pin = await kv.get(key);
+            if (pin) pins.push(pin);
         }
 
         // Perform analysis
