@@ -91,14 +91,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
 
+        // Define all expected industries (from queryMap)
+        const allIndustries = [
+            'real estate', 'tech', 'finance', 'fitness', 'healthcare', 'saas',
+            'ecommerce', 'education', 'travel', 'food', 'fashion', 'logistics',
+            'furniture', 'beauty', 'transport', 'transportation', 'consulting',
+            'construction', 'business', 'legal'
+        ];
+
+        // Build complete list with counts (0 for missing industries)
+        const allIndustryCounts = allIndustries.map(industry => {
+            const count = industryCounts.get(industry) || 0;
+            return [industry, count] as [string, number];
+        });
+
+        // Add any industries found in data but not in our list
+        for (const [industry, count] of industryCounts.entries()) {
+            if (!allIndustries.includes(industry.toLowerCase())) {
+                allIndustryCounts.push([industry, count]);
+            }
+        }
+
         // Find industries that need curation (< 100 pins)
-        const needsCuration = Array.from(industryCounts.entries())
+        const needsCuration = allIndustryCounts
             .filter(([_, count]) => count < 100)
             .sort((a, b) => a[1] - b[1]); // Sort by count (lowest first)
 
         const totalPins = pinKeys.length;
         const targetPins = 2100; // 21 industries × 100 pins
-        const totalProgress = Math.round((totalPins / targetPins) * 100);
 
         // If all industries are balanced
         if (needsCuration.length === 0) {
