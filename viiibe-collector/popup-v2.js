@@ -219,96 +219,116 @@ document.getElementById('syncStats').addEventListener('click', async () => {
 });
 
 // ============================================
-// COLLECTION GAPS ANALYSIS
+// CURATOR MODE
 // ============================================
 
-// Load collection gaps on dashboard load
+// Load curator mode on dashboard load
 document.addEventListener('DOMContentLoaded', () => {
     // ... existing initialization code ...
-    loadCollectionGaps();
+    loadCuratorMode();
 });
 
-// Refresh button handler
-document.getElementById('refreshAnalysis')?.addEventListener('click', () => {
-    loadCollectionGaps(true);
-});
-
-async function loadCollectionGaps(forceRefresh = false) {
+async function loadCuratorMode() {
     try {
-        const url = `${API_BASE}/collection-gaps${forceRefresh ? '?refresh=true' : ''}`;
-        const response = await fetch(url);
+        const response = await fetch(`${API_BASE}/get-curation-mission`);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
 
-        const data = await response.json();
-        displayCollectionGaps(data);
-    } catch (error) {
-        console.error('Failed to load collection gaps:', error);
-        displayCollectionGapsError();
-    }
-}
+        const mission = await response.json();
 
-function displayCollectionGaps(data) {
-    // Update timestamp
-    const updatedEl = document.getElementById('balanceUpdated');
-    if (updatedEl) {
-        const date = new Date(data.lastUpdated);
-        updatedEl.textContent = `Last updated: ${date.toLocaleString()}`;
-    }
-
-    // Display urgent gaps
-    displayGapList('urgentGaps', data.urgent);
-
-    // Display low coverage
-    displayGapList('lowGaps', data.low);
-
-    // Display balanced
-    displayGapList('balancedGaps', data.balanced);
-}
-
-function displayGapList(elementId, gaps) {
-    const container = document.getElementById(elementId);
-    if (!container) return;
-
-    if (!gaps || gaps.length === 0) {
-        container.innerHTML = '<div class="gap-empty">All balanced ✓</div>';
-        return;
-    }
-
-    container.innerHTML = gaps.map(gap => `
-        <div class="gap-item">
-            <div class="gap-info">
-                <div class="gap-combination">${gap.category}</div>
-                <div class="gap-query">"${gap.suggestedQuery}"</div>
-            </div>
-            <span class="gap-count">${gap.count} pins</span>
-            <button class="btn-copy" data-query="${gap.suggestedQuery}">Copy</button>
-        </div>
-    `).join('');
-
-    // Add copy button handlers
-    container.querySelectorAll('.btn-copy').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const query = btn.dataset.query;
-            copyToClipboard(query);
-            btn.textContent = '✓';
-            setTimeout(() => {
-                btn.textContent = 'Copy';
-            }, 2000);
-        });
-    });
-}
-
-function displayCollectionGapsError() {
-    ['urgentGaps', 'lowGaps', 'balancedGaps'].forEach(id => {
-        const container = document.getElementById(id);
-        if (container) {
-            container.innerHTML = '<div class="gap-loading">Failed to load. Try refreshing.</div>';
+        if (mission.isComplete) {
+            showAllComplete(mission);
+        } else {
+            showMission(mission);
         }
-    });
+    } catch (error) {
+        console.error('Error loading curator mode:', error);
+        showCuratorError();
+    }
 }
+
+function showMission(mission) {
+    // Hide completion states
+    document.getElementById('missionComplete').style.display = 'none';
+    document.getElementById('allComplete').style.display = 'none';
+
+    // Show mission details
+    document.getElementById('missionIndustry').textContent = mission.industry.toUpperCase();
+    document.getElementById('progressCurrent').textContent = mission.currentCount;
+    document.getElementById('progressTarget').textContent = mission.targetCount;
+    document.getElementById('progressPercentage').textContent = `${mission.progress}%`;
+    document.getElementById('missionProgressBar').style.width = `${mission.progress}%`;
+
+    // Render queries
+    const queryList = document.getElementById('queryList');
+    queryList.innerHTML = '';
+
+    mission.queries.forEach((query, index) => {
+        const card = document.createElement('div');
+        card.className = 'query-card';
+        card.innerHTML = `
+            <span class="query-text">${index + 1}. ${query}</span>
+            <button class="btn-copy-query" data-query="${query}">📋 Copy</button>
+        `;
+        queryList.appendChild(card);
+    });
+
+    // Add copy listeners
+    document.querySelectorAll('.btn-copy-query').forEach(btn => {
+        btn.addEventListener('click', () => copyQuery(btn));
+    });
+
+    // Check if mission is complete
+    if (mission.currentCount >= mission.targetCount) {
+        showMissionComplete(mission);
+    }
+}
+
+function copyQuery(btn) {
+    const query = btn.dataset.query;
+    navigator.clipboard.writeText(query);
+
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+
+    setTimeout(() => {
+        btn.textContent = '📋 Copy';
+        btn.classList.remove('copied');
+    }, 2000);
+}
+
+function showMissionComplete(mission) {
+    document.getElementById('missionComplete').style.display = 'block';
+    document.getElementById('nextIndustry').textContent = mission.nextIndustry || 'None';
+
+    const btnNext = document.getElementById('btnNextMission');
+    btnNext.onclick = () => {
+        loadCuratorMode(); // Reload to get next mission
+    };
+}
+
+function showAllComplete(mission) {
+    document.getElementById('allComplete').style.display = 'block';
+    document.getElementById('totalPinsComplete').textContent = mission.totalProgress.current;
+}
+
+function showCuratorError() {
+    const industry = document.getElementById('missionIndustry');
+    if (industry) {
+        industry.textContent = 'ERROR';
+        industry.style.color = '#ff6b6b';
+    }
+}
+
+// Auto-refresh after batch save
+chrome.storage.onChanged.addListener((changes) => {
+    if (changes.totalPins) {
+        // Batch save completed, refresh mission
+        setTimeout(() => loadCuratorMode(), 1000);
+    }
+});
 
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).catch(err => {

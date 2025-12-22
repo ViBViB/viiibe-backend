@@ -1,0 +1,44 @@
+<!-- Curator Mode Section -->
+<div class="curator-mode" id="curatorMode">
+    <div class="mission-header">
+        <h3>🎯 Today's Curation Mission</h3>
+        <div class="mission-industry" id="missionIndustry">Loading...</div>
+    </div>
+
+    <div class="mission-progress">
+        <div class="progress-label">
+            <span id="progressCurrent">0</span> / <span id="progressTarget">100</span> pins
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="missionProgressBar"></div>
+        </div>
+        <div class="progress-percentage" id="progressPercentage">0%</div>
+    </div>
+
+    <div class="mission-queries">
+        <div class="queries-label">📋 Search Queries (copy & paste):</div>
+        <div class="query-list" id="queryList">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <div class="mission-tip">
+        💡 Tip: Use Batch Mode for faster curation
+    </div>
+
+    <div class="mission-complete" id="missionComplete" style="display: none;">
+        <div class="complete-icon">✅</div>
+        <div class="complete-message">Mission Complete!</div>
+        <div class="complete-next">Next: <span id="nextIndustry"></span></div>
+        <button class="btn-next-mission" id="btnNextMission">🚀 Start Next Mission</button>
+    </div>
+
+    <div class="all-complete" id="allComplete" style="display: none;">
+        <div class="complete-icon">🏆</div>
+        <div class="complete-message">All Industries Balanced!</div>
+        <div class="complete-stats">
+            <span id="totalPinsComplete">0</span> pins curated across 21 industries
+        </div>
+        <div class="complete-cta">You're ready for PUBLIC BETA! 🚀</div>
+    </div>
+</div>
