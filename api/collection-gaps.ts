@@ -58,8 +58,20 @@ export default async function handler(req: any, res: any) {
         const pins = [];
         for (const key of pinKeys) {
             const pin = await kv.get(key);
-            if (pin) pins.push(pin);
+            if (pin) {
+                // Also fetch AI analysis tags (stored separately)
+                const pinId = pin.id;
+                const aiTags = await kv.get(`pin-tags:${pinId}`);
+
+                // Merge pin data with AI analysis
+                pins.push({
+                    ...pin,
+                    aiAnalysis: aiTags || null
+                });
+            }
         }
+
+        console.log(`✅ Fetched ${pins.length} pins with AI analysis`);
 
         // Perform analysis
         console.log('🔄 Performing fresh analysis...');
