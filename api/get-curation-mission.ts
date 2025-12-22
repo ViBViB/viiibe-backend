@@ -86,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const aiTags = await kv.get(`pin-tags:${pinId}`);
 
             if (aiTags && (aiTags as any).industry && Array.isArray((aiTags as any).industry) && (aiTags as any).industry.length > 0) {
-                const industry = (aiTags as any).industry[0];
+                const industry = (aiTags as any).industry[0].toLowerCase(); // Normalize to lowercase
                 industryCounts.set(industry, (industryCounts.get(industry) || 0) + 1);
             }
         }
