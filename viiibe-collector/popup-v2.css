@@ -665,142 +665,147 @@ body {
 .content::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary);
 }
+
 /* ============================================
    CURATOR MODE
    ============================================ */
 
 .curator-mode {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #F5F5F5;
+    border: 1px solid #E5E5E5;
     border-radius: 12px;
-    padding: 24px;
-    color: white;
+    padding: 32px;
+    color: #000;
     margin-top: 24px;
 }
 
 .mission-header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .mission-header h3 {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 400;
     margin: 0 0 8px 0;
-    opacity: 0.9;
+    color: #999;
+}
+
+.mission-header h3::before {
+    content: "Today's Curation Mission: ";
 }
 
 .mission-industry {
-    font-size: 32px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    display: inline;
 }
 
 .mission-progress {
-    background: rgba(255, 255, 255, 0.1);
+    background: #ECECEC;
     border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 20px;
+    padding: 20px;
+    margin-bottom: 32px;
 }
 
 .progress-label {
     font-size: 14px;
-    font-weight: 600;
-    text-align: center;
+    font-weight: 400;
+    color: #000;
     margin-bottom: 12px;
 }
 
+.progress-label::before {
+    content: "Complexion: ";
+}
+
 .progress-bar-container {
-    height: 12px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
+    height: 8px;
+    background: #D9D9D9;
+    border-radius: 4px;
     overflow: hidden;
-    margin: 12px 0;
+    margin-top: 12px;
 }
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #00D9A3, #00F5A0);
-    border-radius: 6px;
+    background: #00A67E;
+    border-radius: 4px;
     transition: width 0.5s ease;
     width: 0%;
 }
 
 .progress-percentage {
-    font-size: 18px;
-    font-weight: 700;
-    text-align: center;
-    margin-top: 8px;
+    display: none;
 }
 
 .mission-queries {
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .queries-label {
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    opacity: 0.9;
+    font-size: 14px;
+    font-weight: 400;
+    color: #999;
+    margin-bottom: 16px;
 }
 
 .query-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .query-card {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    padding: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.2s;
-    cursor: pointer;
+    transition: none;
+    cursor: default;
 }
 
 .query-card:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateX(4px);
+    background: transparent;
+    transform: none;
 }
 
 .query-text {
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
+    color: #000;
     flex: 1;
 }
 
 .btn-copy-query {
-    background: rgba(255, 255, 255, 0.2);
+    background: transparent;
     border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
-    color: white;
+    padding: 4px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    transition: all 0.2s;
-    white-space: nowrap;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-copy-query:hover {
-    background: rgba(255, 255, 255, 0.3);
+    opacity: 0.6;
+}
+
+.btn-copy-query svg {
+    width: 14px;
+    height: 14px;
 }
 
 .btn-copy-query.copied {
-    background: #00D9A3;
+    opacity: 0.4;
 }
 
 .mission-tip {
-    font-size: 12px;
-    text-align: center;
-    opacity: 0.8;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
+    display: none;
 }
 
 .mission-complete,
@@ -838,7 +843,7 @@ body {
 }
 
 .btn-next-mission {
-    background: #00D9A3;
+    background: #00A67E;
     color: white;
     border: none;
     border-radius: 8px;
@@ -851,7 +856,7 @@ body {
 }
 
 .btn-next-mission:hover {
-    background: #00F5A0;
+    background: #00C794;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 217, 163, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 166, 126, 0.3);
 }

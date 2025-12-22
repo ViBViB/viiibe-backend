@@ -270,7 +270,11 @@ function showMission(mission) {
         card.className = 'query-card';
         card.innerHTML = `
             <span class="query-text">${index + 1}. ${query}</span>
-            <button class="btn-copy-query" data-query="${query}">📋 Copy</button>
+            <button class="btn-copy-query" data-query="${query}">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.6667 7.65624L11.6667 4.74996C11.6667 3.09309 10.3236 1.74994 8.66671 1.74996L5.7605 1.74999M8.16675 12.25L4.22925 12.25C3.50438 12.25 2.91675 11.6624 2.91675 10.9375L2.91675 5.24999C2.91675 4.52512 3.50437 3.93749 4.22925 3.93749L8.16675 3.93749C8.89162 3.93749 9.47925 4.52512 9.47925 5.24999L9.47925 10.9375C9.47925 11.6624 8.89162 12.25 8.16675 12.25Z" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+            </button>
         `;
         queryList.appendChild(card);
     });
@@ -290,11 +294,9 @@ function copyQuery(btn) {
     const query = btn.dataset.query;
     navigator.clipboard.writeText(query);
 
-    btn.textContent = '✓ Copied!';
     btn.classList.add('copied');
 
     setTimeout(() => {
-        btn.textContent = '📋 Copy';
         btn.classList.remove('copied');
     }, 2000);
 }
