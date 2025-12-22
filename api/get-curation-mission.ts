@@ -119,6 +119,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const totalPins = pinKeys.length;
         const targetPins = 2100; // 21 industries × 100 pins
+        const totalProgress = Math.round((totalPins / targetPins) * 100);
 
         // If all industries are balanced
         if (needsCuration.length === 0) {
