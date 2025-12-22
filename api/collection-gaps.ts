@@ -89,7 +89,8 @@ export default async function handler(req: any, res: any) {
 
         // Perform analysis
         console.log('🔄 Performing fresh analysis...');
-        const analysis = await analyzeCollection(pins);
+        const debugMode = req.query?.debug === 'true';
+        const analysis = await analyzeCollection(pins, debugMode);
 
         // Cache the result
         await kv.set(CACHE_KEY, analysis, { ex: CACHE_TTL * 24 }); // 24 hour TTL
@@ -106,7 +107,7 @@ export default async function handler(req: any, res: any) {
     }
 }
 
-async function analyzeCollection(pins: any[]): Promise<CollectionAnalysis> {
+async function analyzeCollection(pins: any[], debugMode: boolean = false): Promise<CollectionAnalysis> {
     const industryCounts = new Map<string, number>();
 
     // Count pins by industry from AI analysis
@@ -153,9 +154,9 @@ async function analyzeCollection(pins: any[]): Promise<CollectionAnalysis> {
     return {
         lastUpdated: new Date().toISOString(),
         totalPins: pins.length,
-        urgent: req.query?.debug ? urgent : urgent.slice(0, 10),
-        low: req.query?.debug ? low : low.slice(0, 10),
-        balanced: req.query?.debug ? balanced : balanced.slice(0, 10)
+        urgent: debugMode ? urgent : urgent.slice(0, 10),
+        low: debugMode ? low : low.slice(0, 10),
+        balanced: debugMode ? balanced : balanced.slice(0, 10)
     };
 }
 
