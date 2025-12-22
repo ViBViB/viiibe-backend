@@ -103,9 +103,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const allIndustryCounts = allIndustries.map(industry => {
             // Find count with case-insensitive match
             let count = 0;
+            console.log(`\nLooking for: "${industry}"`);
+            console.log('Available keys:', Array.from(industryCounts.keys()));
             for (const [key, value] of industryCounts.entries()) {
+                console.log(`  Comparing "${key.toLowerCase()}" === "${industry.toLowerCase()}"`, key.toLowerCase() === industry.toLowerCase());
                 if (key.toLowerCase() === industry.toLowerCase()) {
                     count = value;
+                    console.log(`  ✓ Match found! Count: ${count}`);
                     break;
                 }
             }
