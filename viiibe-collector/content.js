@@ -449,18 +449,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 for (let i = 0; i < MAX_TO_SCAN && validImages.length < TARGET_COUNT; i++) {
                     const img = pinImages[i];
 
-                    // Check if image has valid pin link
-                    if (!hasValidPinLink(img)) {
-                        continue;
-                    }
-
                     // Check quality gate
                     const score = scoreImageQuality(img);
                     if (score < 0) {
                         continue; // Rejected by quality gate
                     }
 
-                    // Extract pinId directly from link (simpler than extractPinDataFromImage)
+                    // Extract pinId directly from link (try to find it, but don't require it)
                     let pinId = null;
                     let currentElement = img;
 
@@ -478,8 +473,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         }
                     }
 
+                    // If no pin ID found, try to extract from image src
+                    if (!pinId && img.src) {
+                        const srcMatch = img.src.match(/\/(\d+)x\//);
+                        if (srcMatch) {
+                            pinId = srcMatch[1];
+                        }
+                    }
+
                     if (!pinId) {
-                        continue; // No pin ID found
+                        console.log(`⚠️ No pin ID found for image, skipping: ${img.src.substring(0, 60)}...`);
+                        continue; // Skip if we really can't find a pin ID
                     }
 
                     // Try to upgrade to /736x/
