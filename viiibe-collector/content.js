@@ -4,97 +4,6 @@
 // Import centralized configuration
 const API_BASE = 'https://moood-refactor.vercel.app/api';
 
-// Google Vision API Key (from environment or hardcoded for content script)
-const GOOGLE_VISION_API_KEY = 'AIzaSyDwvV6TStK5MT3wChtpE1nk3zB1J20XRUE';
-
-// ============================================
-// AI VISION PRE-FILTER
-// ============================================
-
-/**
- * Analyze image with Google Vision API to detect if it's a web design
- * @param {string} imageUrl - URL of the image to analyze
- * @returns {Promise<string[]>} - Array of labels detected
- */
-async function analyzeImageWithVision(imageUrl) {
-    try {
-        const response = await fetch(
-            `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    requests: [{
-                        image: { source: { imageUri: imageUrl } },
-                        features: [
-                            { type: 'LABEL_DETECTION', maxResults: 10 }
-                        ]
-                    }]
-                })
-            }
-        );
-
-        if (!response.ok) {
-            console.warn('Vision API error:', response.status);
-            return []; // Fail gracefully
-        }
-
-        const data = await response.json();
-        const labels = data.responses[0].labelAnnotations || [];
-
-        return labels.map(l => l.description.toLowerCase());
-    } catch (error) {
-        console.error('Vision API error:', error);
-        return []; // Fail gracefully - include image if API fails
-    }
-}
-
-/**
- * Check if image labels indicate it's a web design (not logo/infographic/photo)
- * @param {string[]} labels - Labels from Vision API
- * @returns {boolean} - True if web design, false otherwise
- */
-function isWebDesign(labels) {
-    // Positive indicators - accept if ANY of these are present
-    const webDesignLabels = [
-        'website', 'web design', 'landing page', 'web page',
-        'user interface', 'ui design', 'web template',
-        'homepage', 'website design', 'web layout',
-        'web application', 'dashboard', 'interface'
-    ];
-
-    // Strong negative indicators - only reject if in top 3 labels (primary subject)
-    const strongRejectLabels = [
-        'logo', 'logotype', 'emblem', 'brand identity',
-        'infographic', 'chart', 'graph', 'data visualization',
-        'photo', 'photograph', 'portrait', 'headshot',
-        'illustration', 'drawing', 'painting'
-    ];
-
-
-    // Check for positive indicators first
-    const hasWebDesignLabel = labels.some(label => 
-        webDesignLabels.some(web => label.includes(web))
-    );
-    
-    if (hasWebDesignLabel) {
-        // If it has web design labels, only reject if strong negative is in top 3
-        const top3Labels = labels.slice(0, 3);
-        const hasStrongReject = top3Labels.some(label =>
-            strongRejectLabels.some(reject => label.includes(reject))
-        );
-        
-        if (hasStrongReject) {
-            console.log(`  ⚠️ Has web design labels but primary subject is ${top3Labels[0]}`);
-            return false; // Primary subject is logo/photo, reject
-        }
-        
-        return true; // Has web design labels and no strong reject in top 3
-    }
-    
-    // If no web design labels, be conservative - reject
-    return false;
-}
 
 // ============================================
 // URL UPGRADING HELPERS
@@ -530,7 +439,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                 // Phase 1: Filter by quality gate and upgrade to /736x/
                 const validImages = [];
-                const TARGET_COUNT = 20;
+                const TARGET_COUNT = 40;
                 const MAX_TO_SCAN = Math.min(pinImages.length, 100); // Limit to prevent infinite loop
 
                 console.log(`🔍 Scanning up to ${MAX_TO_SCAN} images...`);
@@ -544,23 +453,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         continue; // Rejected by quality gate
                     }
 
-                    // NEW: AI Vision pre-filter - Check if it's a web design
-                    console.log(`🤖 Analyzing image ${i + 1} with Vision API...`);
-                    const labels = await analyzeImageWithVision(img.src);
-
-                    if (labels.length > 0) {
-                        console.log(`  Labels: ${labels.join(', ')}`);
-
-                        if (!isWebDesign(labels)) {
-                            console.log(`  ❌ Rejected (not web design)`);
-                            continue; // Skip non-web designs
-                        }
-
-                        console.log(`  ✅ Confirmed web design`);
-                    } else {
-                        console.log(`  ⚠️ Vision API failed, including image anyway`);
-                        // If Vision API fails, include the image (fail gracefully)
-                    }
 
                     // Extract pinId directly from link (try to find it, but don't require it)
                     let pinId = null;
