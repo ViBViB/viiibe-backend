@@ -71,22 +71,28 @@ function isWebDesign(labels) {
         'illustration', 'drawing', 'painting'
     ];
 
-    // Check for reject labels first (priority)
-    for (const label of labels) {
-        if (rejectLabels.some(reject => label.includes(reject))) {
-            return false; // Reject
-        }
-    }
 
-    // Check for positive indicators
-    for (const label of labels) {
-        if (webDesignLabels.some(web => label.includes(web))) {
-            return true; // Accept
+    // Check for positive indicators first
+    const hasWebDesignLabel = labels.some(label => 
+        webDesignLabels.some(web => label.includes(web))
+    );
+    
+    if (hasWebDesignLabel) {
+        // If it has web design labels, only reject if strong negative is in top 3
+        const top3Labels = labels.slice(0, 3);
+        const hasStrongReject = top3Labels.some(label =>
+            strongRejectLabels.some(reject => label.includes(reject))
+        );
+        
+        if (hasStrongReject) {
+            console.log(`  ⚠️ Has web design labels but primary subject is ${top3Labels[0]}`);
+            return false; // Primary subject is logo/photo, reject
         }
+        
+        return true; // Has web design labels and no strong reject in top 3
     }
-
-    // If no clear indicators, be conservative - reject
-    // (This prevents random images from being included)
+    
+    // If no web design labels, be conservative - reject
     return false;
 }
 
