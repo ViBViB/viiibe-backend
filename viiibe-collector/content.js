@@ -63,13 +63,12 @@ function isWebDesign(labels) {
         'web application', 'dashboard', 'interface'
     ];
 
-    // Negative indicators - reject if ANY of these are present
-    const rejectLabels = [
-        'logo', 'brand', 'branding', 'logotype', 'emblem',
-        'infographic', 'chart', 'graph', 'diagram', 'data visualization',
-        'photo', 'photograph', 'portrait', 'headshot', 'selfie',
-        'illustration', 'drawing', 'artwork', 'painting',
-        'poster', 'flyer', 'banner', 'advertisement'
+    // Strong negative indicators - only reject if in top 3 labels (primary subject)
+    const strongRejectLabels = [
+        'logo', 'logotype', 'emblem', 'brand identity',
+        'infographic', 'chart', 'graph', 'data visualization',
+        'photo', 'photograph', 'portrait', 'headshot',
+        'illustration', 'drawing', 'painting'
     ];
 
     // Check for reject labels first (priority)
