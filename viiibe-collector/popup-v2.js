@@ -229,7 +229,20 @@ document.getElementById('syncStats').addEventListener('click', async () => {
 
 // Load curator mode on dashboard load
 document.addEventListener('DOMContentLoaded', () => {
-    // ... existing initialization code ...
+    console.log('🚀 Popup v2 loaded');
+
+    // Listen for batch save completion messages
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'batch-save-complete') {
+            console.log('📨 Received batch-save-complete message, refreshing...');
+            // Refresh curator mode and stats
+            loadCuratorMode();
+            loadStats();
+        }
+    });
+
+    initNavigation();
+    loadStats();
     loadCuratorMode();
 });
 

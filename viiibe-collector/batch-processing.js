@@ -127,28 +127,23 @@ function autoSelectBestImages() {
 
     console.log(`📌 Pinterest images found: ${pinImages.length}`);
 
-    // Filter out images without valid pin links BEFORE scoring
-    console.log('🔗 Checking for valid pin links...');
-    const imagesWithLinks = pinImages.filter(img => {
-        const hasLink = hasValidPinLink(img);
-        if (!hasLink) {
-            console.log(`  ❌ No link found for: ${img.src.substring(0, 60)}...`);
-        }
-        return hasLink;
-    });
-
-    console.log(`✅ Images with valid links: ${imagesWithLinks.length}`);
-
-    const scoredImages = imagesWithLinks.map(img => {
+    // Score all images (don't filter by links - Pinterest HTML changes too often)
+    const scoredImages = pinImages.map(img => {
         const score = scoreImage(img);
-        if (score > 0) {
-            console.log(`⭐ Image scored ${score.toFixed(2)}:`, img.src.substring(0, 60) + '...');
+
+        // Bonus points if we can find a link (but don't require it)
+        const hasLink = hasValidPinLink(img);
+        const finalScore = hasLink ? score + 0.5 : score;
+
+        if (finalScore > 0) {
+            console.log(`⭐ Image scored ${finalScore.toFixed(2)}${hasLink ? ' (has link)' : ''}:`, img.src.substring(0, 60) + '...');
         }
+
         return {
             element: img,
-            score: score
+            score: finalScore
         };
-    }); // Don't filter - accept all images with links
+    });
 
     console.log(`✅ Images to rank: ${scoredImages.length}`);
 
@@ -156,7 +151,7 @@ function autoSelectBestImages() {
 
     const topImages = scoredImages.slice(0, BATCH_CONFIG.MAX_IMAGES);
 
-    console.log(`🎯 Auto-selected top ${topImages.length} images (all have valid links)`);
+    console.log(`🎯 Auto-selected top ${topImages.length} images`);
 
     return topImages.map(item => item.element);
 }
