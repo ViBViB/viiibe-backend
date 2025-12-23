@@ -41,6 +41,7 @@ function generateQueries(industry: string): string[] {
         'construction': ['construction company', 'architecture firm', 'contractor'],
         'business': ['corporate website', 'business agency', 'professional services'],
         'legal': ['law firm', 'legal services', 'attorney'],
+        'home services': ['cleaning service', 'plumbing company', 'landscaping service'],
     };
 
     const queries = queryMap[industryLower] || [industryLower, `${industryLower} company`, `${industryLower} service`];

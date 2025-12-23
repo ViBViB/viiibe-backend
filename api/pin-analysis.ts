@@ -188,11 +188,13 @@ async function analyzeWithGPT4(imageUrl: string) {
     const prompt = `Analyze this design image and return ONLY a JSON object with these exact fields:
 {
   "style": array of 2-4 style tags from: minimal, bold, clean, dark, light, gradient, flat, 3d, glassmorphism, neumorphism, modern, retro, elegant, playful,
-  "industry": array of 1-3 industry tags from: tech, finance, healthcare, beauty, fashion, food, travel, education, real-estate, fitness, saas, ecommerce,
+  "industry": array with EXACTLY ONE industry tag. You MUST choose the single best match from this EXACT list: ["Real Estate", "Tech", "Finance", "Fitness", "Healthcare", "Saas", "Ecommerce", "Education", "Travel", "Food", "Fashion", "Logistics", "Furniture", "Beauty", "Transport", "Transportation", "Consulting", "Construction", "Business", "Legal", "Home Services"]. Use the EXACT capitalization shown. Choose only ONE that best matches the design's target industry.,
   "typography": one tag from: sans-serif, serif, display, monospace, handwritten, bold-headers, minimal-text,
   "layout": one tag from: hero-section, grid-layout, cards, split-screen, full-width, sidebar, centered, asymmetric,
   "elements": array of 2-5 key design elements like: gradient-background, large-cta-button, product-screenshot, testimonials, pricing-table, etc.
 }
+
+CRITICAL: For "industry", you MUST return an array with EXACTLY ONE element from the list above. Match the capitalization exactly (e.g., "Real Estate" not "real-estate", "Home Services" not "home-services").
 
 Return ONLY the JSON, no other text.`;
 
