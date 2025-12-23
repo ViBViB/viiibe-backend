@@ -49,7 +49,13 @@
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
             </button>
-            <div class="sidebar-spacer"></div>
+            <button class="nav-item" data-screen="recategorize">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M9 12L11 14L15 10M20.6179 5.98434C20.4132 5.99472 20.2072 5.99997 20 5.99997C16.9265 5.99997 14.123 4.84453 11.9999 2.94434C9.87691 4.84446 7.07339 5.99985 4 5.99985C3.79277 5.99985 3.58678 5.9946 3.38213 5.98422C3.1327 6.94783 3 7.95842 3 9.00001C3 14.5915 6.82432 19.2898 12 20.622C17.1757 19.2898 21 14.5915 21 9.00001C21 7.95847 20.8673 6.94791 20.6179 5.98434Z"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
             <button class="nav-item" data-screen="settings">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -78,50 +84,51 @@
                     <div class="stat-value" id="totalCount">0</div>
                 </div>
 
-<!-- Curator Mode Section -->
-<div class="curator-mode" id="curatorMode">
-    <div class="mission-header">
-        <h3>🎯 Today's Curation Mission</h3>
-        <div class="mission-industry" id="missionIndustry">Loading...</div>
-    </div>
+                <!-- Curator Mode Section -->
+                <div class="curator-mode" id="curatorMode">
+                    <div class="mission-header">
+                        <h3>🎯 Today's Curation Mission</h3>
+                        <div class="mission-industry" id="missionIndustry">Loading...</div>
+                    </div>
 
-    <div class="mission-progress">
-        <div class="progress-label">
-            <span id="progressCurrent">0</span> / <span id="progressTarget">100</span> pins
-        </div>
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="missionProgressBar"></div>
-        </div>
-        <div class="progress-percentage" id="progressPercentage">0%</div>
-    </div>
+                    <div class="mission-progress">
+                        <div class="progress-label">
+                            <span id="progressCurrent">0</span> / <span id="progressTarget">100</span> pins
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="missionProgressBar"></div>
+                        </div>
+                        <div class="progress-percentage" id="progressPercentage">0%</div>
+                    </div>
 
-    <div class="mission-queries">
-        <div class="queries-label">📋 Search Queries (copy & paste):</div>
-        <div class="query-list" id="queryList">
-            <!-- Populated by JS -->
-        </div>
-    </div>
+                    <div class="mission-queries">
+                        <div class="queries-label">📋 Search Queries (copy & paste):</div>
+                        <div class="query-list" id="queryList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
 
-    <div class="mission-tip">
-        💡 Tip: Use Batch Mode for faster curation
-    </div>
+                    <div class="mission-tip">
+                        💡 Tip: Use Batch Mode for faster curation
+                    </div>
 
-    <div class="mission-complete" id="missionComplete" style="display: none;">
-        <div class="complete-icon">✅</div>
-        <div class="complete-message">Mission Complete!</div>
-        <div class="complete-next">Next: <span id="nextIndustry"></span></div>
-        <button class="btn-next-mission" id="btnNextMission">🚀 Start Next Mission</button>
-    </div>
+                    <div class="mission-complete" id="missionComplete" style="display: none;">
+                        <div class="complete-icon">✅</div>
+                        <div class="complete-message">Mission Complete!</div>
+                        <div class="complete-next">Next: <span id="nextIndustry"></span></div>
+                        <button class="btn-next-mission" id="btnNextMission">🚀 Start Next Mission</button>
+                    </div>
 
-    <div class="all-complete" id="allComplete" style="display: none;">
-        <div class="complete-icon">🏆</div>
-        <div class="complete-message">All Industries Balanced!</div>
-        <div class="complete-stats">
-            <span id="totalPinsComplete">0</span> pins curated across 21 industries
-        </div>
-        <div class="complete-cta">You're ready for PUBLIC BETA! 🚀</div>
-    </div>
-</div>            </div>
+                    <div class="all-complete" id="allComplete" style="display: none;">
+                        <div class="complete-icon">🏆</div>
+                        <div class="complete-message">All Industries Balanced!</div>
+                        <div class="complete-stats">
+                            <span id="totalPinsComplete">0</span> pins curated across 21 industries
+                        </div>
+                        <div class="complete-cta">You're ready for PUBLIC BETA! 🚀</div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Batch Screen -->
             <div class="screen" id="batch">
