@@ -248,43 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadCuratorMode() {
     try {
-        const response = await fetch(`${API_BASE}/get-curation-mission`);
+        // Use NEW endpoint with correct logic (no cache issues)
+        const response = await fetch(`${API_BASE}/mission-v2`);
         const mission = await response.json();
-
-        // CRITICAL OVERRIDE: Calculate correct industry locally
-        const totalPins = mission.totalProgress?.current || 677;
-        const baseTotal = 677; // Total when we took snapshot
-        const newPins = totalPins - baseTotal;
-
-        // Update Finance count dynamically
-        const financeCount = 57 + newPins; // Assume all new pins go to Finance for now
-
-        // Find incomplete industries, sort by HIGHEST count first
-        const incomplete = [
-            ['Finance', { target: 100, current: financeCount }],
-            ['Fitness', { target: 100, current: 54 }],
-            ['Ecommerce', { target: 100, current: 46 }],
-            ['Tech', { target: 100, current: 45 }],
-            ['Education', { target: 100, current: 43 }],
-            ['Saas', { target: 100, current: 41 }],
-            ['Healthcare', { target: 100, current: 38 }]
-        ].filter(([name, data]) => data.current < data.target)
-            .sort((a, b) => b[1].current - a[1].current);
-
-        if (incomplete.length > 0) {
-            const [currentIndustry, currentData] = incomplete[0];
-            const nextIndustry = incomplete.length > 1 ? incomplete[1][0] : null;
-
-            // Override mission
-            mission.industry = currentIndustry;
-            mission.currentCount = currentData.current;
-            mission.targetCount = currentData.target;
-            mission.progress = Math.round((currentData.current / currentData.target) * 100);
-            mission.nextIndustry = nextIndustry;
-            mission.tier = 'core';
-
-            console.log('🔧 OVERRIDE:', currentIndustry, currentData.current + '/' + currentData.target, `(+${newPins} new)`);
-        }
 
         if (mission.isComplete) {
             showAllComplete(mission);
