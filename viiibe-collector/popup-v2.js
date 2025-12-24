@@ -615,6 +615,31 @@ async function handleProcessClick() {
                 lastDate: today
             });
         });
+
+        // SYNC LOCAL COUNTS with API after batch save
+        syncIndustryCounts();
+    }
+}
+
+// Sync local industry counts with API
+async function syncIndustryCounts() {
+    try {
+        console.log('🔄 Syncing industry counts with API...');
+        const response = await fetch(`${API_BASE}/industry-counts`);
+        const data = await response.json();
+
+        if (data.counts) {
+            await chrome.storage.local.set({
+                industryCounts: data.counts,
+                lastSync: Date.now()
+            });
+            console.log('✅ Industry counts synced:', data.counts);
+
+            // Reload curator mode to show updated counts
+            loadCuratorMode();
+        }
+    } catch (error) {
+        console.error('❌ Failed to sync counts:', error);
     }
 }
 
