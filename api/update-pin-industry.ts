@@ -26,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Update only the industry field
         const updatedTags = {
-            ...existingTags,
+            ...(existingTags as Record<string, any>),
             industry: [industry] // Keep as array for consistency
         };
 
