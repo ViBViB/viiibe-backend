@@ -84,7 +84,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 current: pinKeys.length,
                 target: 700,
                 percentage: Math.round((pinKeys.length / 700) * 100)
-            }
+            },
+            // ALL COUNTS for syncing local storage
+            allCounts: Object.fromEntries(
+                Array.from(counts.entries()).map(([k, v]) => [
+                    k.charAt(0).toUpperCase() + k.slice(1), // Capitalize
+                    v
+                ])
+            )
         });
 
     } catch (error: any) {

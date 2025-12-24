@@ -625,15 +625,15 @@ async function handleProcessClick() {
 async function syncIndustryCounts() {
     try {
         console.log('🔄 Syncing industry counts with API...');
-        const response = await fetch(`${API_BASE}/industry-counts`);
+        const response = await fetch(`${API_BASE}/get-curation-mission`);
         const data = await response.json();
 
-        if (data.counts) {
+        if (data.allCounts) {
             await chrome.storage.local.set({
-                industryCounts: data.counts,
+                industryCounts: data.allCounts,
                 lastSync: Date.now()
             });
-            console.log('✅ Industry counts synced:', data.counts);
+            console.log('✅ Industry counts synced:', data.allCounts);
 
             // Reload curator mode to show updated counts
             loadCuratorMode();
