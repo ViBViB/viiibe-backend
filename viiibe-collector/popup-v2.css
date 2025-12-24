@@ -441,15 +441,15 @@ body {
 /* Grid */
 .grid {
     display: grid;
-    grid-template-columns: repeat(4, 110px);
-    gap: var(--grid-gap);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
     margin-bottom: 20px;
 }
 
 .grid-item {
-    width: 110px;
-    height: 100px;
-    border-radius: 4px;
+    width: 100%;
+    aspect-ratio: 1.1;
+    border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     transition: all var(--transition);
@@ -465,8 +465,20 @@ body {
 }
 
 .grid-item.deselected {
+    opacity: 0.3;
+}
+
+.grid-item.deselected::after {
+    content: '✕';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 64px;
+    font-weight: bold;
+    color: #ff0000;
     opacity: 0.5;
-    filter: grayscale(50%);
+    pointer-events: none;
 }
 
 .grid-item:hover:not(.deselected) {
