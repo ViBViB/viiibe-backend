@@ -141,17 +141,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // LEVEL-BY-LEVEL PRIORITIZATION
         // Complete all Core industries first, then Secondary, then Nicho
 
-        // 1. Check Core industries (Nivel 1)
-        const coreIncomplete = INDUSTRY_TIERS.core.industries
+        // 1. Check Core industries (Nivel 1) - HIGHEST COUNT FIRST
+        const coreIncompleteIndustries = INDUSTRY_TIERS.core.industries
             .map(industry => ({
                 industry,
                 count: industryCounts.get(industry.toLowerCase()) || 0,
                 target: INDUSTRY_TIERS.core.target
             }))
             .filter(item => item.count < item.target)
-            .sort((a, b) => b.count - a.count); // Highest count first - complete one at a time
+            .sort((a, b) => b.count - a.count); // DESCENDING - complete one at a time
 
-        console.log('🔍 Core incomplete (sorted):', coreIncomplete.map(i => `${i.industry}:${i.count}`));
+        console.log('🔍 Core incomplete (sorted):', coreIncompleteIndustries.map(i => `${i.industry}:${i.count}`));
 
         // 2. Check Secondary industries (Nivel 2)
         const secondaryIncomplete = INDUSTRY_TIERS.secondary.industries
@@ -181,10 +181,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let currentMission: { industry: string; count: number; target: number; tier: 'core' | 'secondary' | 'nicho' } | null = null;
         let nextMission: { industry: string; count: number; target: number } | null = null;
 
-        if (coreIncomplete.length > 0) {
-            // Work on Core first
-            currentMission = { ...coreIncomplete[0], tier: 'core' };
-            nextMission = coreIncomplete.length > 1 ? coreIncomplete[1] :
+        if (coreIncompleteIndustries.length > 0) {
+            // Core tier has incomplete industries
+            currentMission = { ...coreIncompleteIndustries[0], tier: 'core' };
+            nextMission = coreIncompleteIndustries.length > 1 ? coreIncompleteIndustries[1] :
                 (secondaryIncomplete.length > 0 ? secondaryIncomplete[0] :
                     (nichoIncomplete.length > 0 ? nichoIncomplete[0] : null));
         } else if (secondaryIncomplete.length > 0) {
