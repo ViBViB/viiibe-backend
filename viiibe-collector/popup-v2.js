@@ -268,26 +268,38 @@ async function loadCuratorMode() {
 }
 
 function showMission(mission) {
-    // Hide completion states
-    document.getElementById('missionComplete').style.display = 'none';
-    document.getElementById('allComplete').style.display = 'none';
+    // Hide completion states (with null checks)
+    const missionComplete = document.getElementById('missionComplete');
+    const allComplete = document.getElementById('allComplete');
+    if (missionComplete) missionComplete.style.display = 'none';
+    if (allComplete) allComplete.style.display = 'none';
 
     // Show mission details
-    document.getElementById('missionIndustry').textContent = mission.industry.toUpperCase();
+    const industryEl = document.getElementById('missionIndustry');
+    if (industryEl) {
+        industryEl.textContent = mission.industry.toUpperCase();
+    }
 
     // Show next industry in header
-    if (mission.nextIndustry) {
-        document.getElementById('nextIndustryContainer').style.display = 'block';
-        document.getElementById('nextIndustry').textContent = mission.nextIndustry;
-    } else {
-        document.getElementById('nextIndustryContainer').style.display = 'none';
+    const nextContainer = document.getElementById('nextIndustryContainer');
+    const nextIndustryEl = document.getElementById('nextIndustry');
+    if (mission.nextIndustry && nextContainer && nextIndustryEl) {
+        nextContainer.style.display = 'block';
+        nextIndustryEl.textContent = mission.nextIndustry;
+    } else if (nextContainer) {
+        nextContainer.style.display = 'none';
     }
 
     // Update progress with DYNAMIC target (3-tier system)
-    document.getElementById('progressCurrent').textContent = mission.currentCount;
-    document.getElementById('progressTarget').textContent = mission.targetCount; // ✅ Dynamic!
-    document.getElementById('progressPercentage').textContent = `${mission.progress}%`;
-    document.getElementById('missionProgressBar').style.width = `${mission.progress}%`;
+    const currentEl = document.getElementById('progressCurrent');
+    const targetEl = document.getElementById('progressTarget');
+    const percentageEl = document.getElementById('progressPercentage');
+    const progressBarEl = document.getElementById('missionProgressBar');
+
+    if (currentEl) currentEl.textContent = mission.currentCount;
+    if (targetEl) targetEl.textContent = mission.targetCount; // ✅ Dynamic!
+    if (percentageEl) percentageEl.textContent = `${mission.progress}%`;
+    if (progressBarEl) progressBarEl.style.width = `${mission.progress}%`;
 
     // Render queries (removed from UI but keeping code for potential future use)
     const queryList = document.getElementById('queryList');
@@ -332,18 +344,36 @@ function copyQuery(btn) {
 }
 
 function showMissionComplete(mission) {
-    document.getElementById('missionComplete').style.display = 'block';
-    document.getElementById('nextIndustry').textContent = mission.nextIndustry || 'None';
+    const missionCompleteEl = document.getElementById('missionComplete');
+    const nextIndustryEl = document.getElementById('nextIndustry');
+
+    if (missionCompleteEl) {
+        missionCompleteEl.style.display = 'block';
+    }
+
+    if (nextIndustryEl) {
+        nextIndustryEl.textContent = mission.nextIndustry || 'None';
+    }
 
     const btnNext = document.getElementById('btnNextMission');
-    btnNext.onclick = () => {
-        loadCuratorMode(); // Reload to get next mission
-    };
+    if (btnNext) {
+        btnNext.onclick = () => {
+            loadCuratorMode(); // Reload to get next mission
+        };
+    }
 }
 
 function showAllComplete(mission) {
-    document.getElementById('allComplete').style.display = 'block';
-    document.getElementById('totalPinsComplete').textContent = mission.totalProgress.current;
+    const allCompleteEl = document.getElementById('allComplete');
+    const totalPinsEl = document.getElementById('totalPinsComplete');
+
+    if (allCompleteEl) {
+        allCompleteEl.style.display = 'block';
+    }
+
+    if (totalPinsEl && mission.totalProgress) {
+        totalPinsEl.textContent = mission.totalProgress.current;
+    }
 }
 
 function showCuratorError() {
