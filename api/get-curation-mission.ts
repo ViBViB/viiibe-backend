@@ -149,7 +149,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 target: INDUSTRY_TIERS.core.target
             }))
             .filter(item => item.count < item.target)
-            .sort((a, b) => a.count - b.count); // Lowest count first
+            .sort((a, b) => b.count - a.count); // Highest count first - complete one at a time
 
         // 2. Check Secondary industries (Nivel 2)
         const secondaryIncomplete = INDUSTRY_TIERS.secondary.industries
@@ -159,7 +159,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 target: INDUSTRY_TIERS.secondary.target
             }))
             .filter(item => item.count < item.target)
-            .sort((a, b) => a.count - b.count);
+            .sort((a, b) => b.count - a.count); // Highest count first
 
         // 3. Check Nicho industries (Nivel 3)
         const nichoIncomplete = INDUSTRY_TIERS.nicho.industries
@@ -169,7 +169,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 target: INDUSTRY_TIERS.nicho.target
             }))
             .filter(item => item.count < item.target)
-            .sort((a, b) => a.count - b.count);
+            .sort((a, b) => b.count - a.count); // Highest count first
 
         const totalPins = pinKeys.length;
         const targetPins = 1380; // 8×100 + 8×50 + 6×30 = 1380 pins
@@ -222,9 +222,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 target: targetPins,
                 percentage: totalProgress
             },
-            tier: currentMission.tier,
-            // TEMP DEBUG: Show all industry keys to find ecommerce variations
-            debugAllIndustries: Array.from(industryCounts.keys()).sort()
+            tier: currentMission.tier
         };
 
         return res.json(mission);
