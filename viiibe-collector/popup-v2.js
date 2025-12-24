@@ -248,8 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadCuratorMode() {
     try {
-        // Use NEW endpoint with correct logic (no cache issues)
-        const response = await fetch(`${API_BASE}/mission-v2`);
+        const response = await fetch(`${API_BASE}/get-curation-mission`);
         const mission = await response.json();
 
         if (mission.isComplete) {
