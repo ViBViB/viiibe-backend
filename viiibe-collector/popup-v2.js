@@ -256,6 +256,39 @@ async function loadCuratorMode() {
 
         const mission = await response.json();
 
+        // CRITICAL OVERRIDE: Calculate correct industry locally until Vercel fixes
+        // This bypasses the broken API logic
+        const CORE_INDUSTRIES = {
+            'Real Estate': { target: 100, current: 108 },
+            'Finance': { target: 100, current: 57 },
+            'Fitness': { target: 100, current: 54 },
+            'Ecommerce': { target: 100, current: 46 },
+            'Tech': { target: 100, current: 45 },
+            'Education': { target: 100, current: 43 },
+            'Saas': { target: 100, current: 41 },
+            'Healthcare': { target: 100, current: 38 }
+        };
+
+        // Find incomplete industries, sort by HIGHEST count first
+        const incomplete = Object.entries(CORE_INDUSTRIES)
+            .filter(([name, data]) => data.current < data.target)
+            .sort((a, b) => b[1].current - a[1].current);
+
+        if (incomplete.length > 0) {
+            const [currentIndustry, currentData] = incomplete[0];
+            const nextIndustry = incomplete.length > 1 ? incomplete[1][0] : null;
+
+            // Override mission with correct data
+            mission.industry = currentIndustry;
+            mission.currentCount = currentData.current;
+            mission.targetCount = currentData.target;
+            mission.progress = Math.round((currentData.current / currentData.target) * 100);
+            mission.nextIndustry = nextIndustry;
+            mission.tier = 'core';
+
+            console.log('🔧 FRONTEND OVERRIDE:', currentIndustry, currentData.current + '/' + currentData.target);
+        }
+
         if (mission.isComplete) {
             showAllComplete(mission);
         } else {
