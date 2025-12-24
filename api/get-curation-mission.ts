@@ -223,8 +223,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 percentage: totalProgress
             },
             tier: currentMission.tier,
-            // TEMP: Direct ecommerce count for debugging
-            debugEcommerceCount: industryCounts.get('ecommerce') || 0
+            // TEMP DEBUG: Show all industry keys to find ecommerce variations
+            debugAllIndustries: Array.from(industryCounts.keys()).sort()
         };
 
         return res.json(mission);
