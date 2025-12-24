@@ -248,14 +248,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadCuratorMode() {
     try {
-        const response = await fetch(`${API_BASE}/get-curation-mission`);
-        const mission = await response.json();
+        // Get LOCAL counts (100% accurate, independent of API)
+        const data = await chrome.storage.local.get('industryCounts');
+        const counts = data.industryCounts;
 
-        if (mission.isComplete) {
-            showAllComplete(mission);
-        } else {
-            showMission(mission);
+        if (!counts) {
+            showCuratorError();
+            return;
         }
+
+        // Core industries with targets
+        const CORE = [
+            'Finance', 'Fitness', 'Ecommerce', 'Tech',
+            'Education', 'Saas', 'Healthcare'
+        ];
+
+        // Find incomplete, sort by HIGHEST count (complete one at a time)
+        const incomplete = CORE
+            .map(name => ({
+                industry: name,
+                count: counts[name] || 0,
+                target: 100
+            }))
+            .filter(item => item.count < item.target)
+            .sort((a, b) => b.count - a.count);
+
+        if (incomplete.length === 0) {
+            showAllComplete({ message: 'All Core industries complete!' });
+            return;
+        }
+
+        const current = incomplete[0];
+        const next = incomplete[1] || null;
+
+        const mission = {
+            industry: current.industry,
+            currentCount: current.count,
+            targetCount: current.target,
+            progress: Math.round((current.count / current.target) * 100),
+            nextIndustry: next?.industry || null,
+            tier: 'core',
+            isComplete: false
+        };
+
+        showMission(mission);
+        console.log('📊 LOCAL COUNT:', current.industry, current.count + '/100');
+
     } catch (error) {
         console.error('Error loading curator mode:', error);
         showCuratorError();

@@ -149,6 +149,16 @@ async function saveDesignToMoood(designData, category = 'uncategorized') {
             return 'duplicate';
         }
 
+        // INCREMENT LOCAL COUNTER if AI analysis succeeded
+        if (result.aiAnalysis && result.aiAnalysis.industry) {
+            const industry = result.aiAnalysis.industry;
+            chrome.runtime.sendMessage({
+                action: 'increment-industry-count',
+                industry: industry
+            });
+            console.log(`📊 Incrementing local counter for: ${industry}`);
+        }
+
         // Show AI analysis status
         if (result.aiAnalysis) {
             const status = result.aiAnalysis.status;
