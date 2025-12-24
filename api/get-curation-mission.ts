@@ -9,6 +9,7 @@ interface CurationMission {
     queries: string[];
     isComplete: boolean;
     nextIndustry?: string;
+    tier?: 'core' | 'secondary' | 'nicho';
     totalProgress: {
         current: number;
         target: number;
@@ -35,17 +36,60 @@ function generateQueries(industry: string): string[] {
         'logistics': ['logistics company', 'shipping service', 'delivery'],
         'furniture': ['furniture store', 'interior design shop', 'home decor'],
         'beauty': ['beauty salon', 'spa', 'cosmetics'],
-        'transport': ['transportation service', 'fleet management', 'mobility'],
         'transportation': ['logistics company', 'shipping service', 'delivery'],
         'consulting': ['consulting agency', 'professional services', 'business consulting'],
         'construction': ['construction company', 'architecture firm', 'contractor'],
         'business': ['corporate website', 'business agency', 'professional services'],
         'legal': ['law firm', 'legal services', 'attorney'],
         'home services': ['cleaning service', 'plumbing company', 'landscaping service'],
+        'agriculture': ['farm', 'agriculture company', 'organic farming'],
+        'sustainability': ['green energy', 'eco-friendly', 'sustainable business'],
+        'ngo': ['non-profit', 'charity', 'foundation'],
+        'portfolio': ['designer portfolio', 'creative portfolio', 'personal website'],
+        'digital agency': ['digital agency', 'creative agency', 'marketing agency'],
     };
 
     const queries = queryMap[industryLower] || [industryLower, `${industryLower} company`, `${industryLower} service`];
     return queries.map(q => `${q} website design`);
+}
+
+// 3-Tier Target System
+const INDUSTRY_TIERS = {
+    core: {
+        target: 100,
+        industries: ['Real Estate', 'Finance', 'Tech', 'Saas', 'Healthcare', 'Ecommerce', 'Fitness', 'Education']
+    },
+    secondary: {
+        target: 50,
+        industries: ['Food', 'Fashion', 'Construction', 'Furniture', 'Home Services', 'Digital Agency', 'Sustainability', 'Travel']
+    },
+    nicho: {
+        target: 30,
+        industries: ['Consulting', 'Business', 'Transportation', 'Beauty', 'Agriculture', 'Logistics']
+    }
+};
+
+// Get target count for a specific industry
+function getTargetForIndustry(industry: string): number {
+    // Check each tier
+    if (INDUSTRY_TIERS.core.industries.includes(industry)) {
+        return INDUSTRY_TIERS.core.target;
+    }
+    if (INDUSTRY_TIERS.secondary.industries.includes(industry)) {
+        return INDUSTRY_TIERS.secondary.target;
+    }
+    if (INDUSTRY_TIERS.nicho.industries.includes(industry)) {
+        return INDUSTRY_TIERS.nicho.target;
+    }
+    // Default to secondary tier for unknown industries
+    return INDUSTRY_TIERS.secondary.target;
+}
+
+// Get tier name for an industry
+function getTierForIndustry(industry: string): 'core' | 'secondary' | 'nicho' {
+    if (INDUSTRY_TIERS.core.industries.includes(industry)) return 'core';
+    if (INDUSTRY_TIERS.secondary.industries.includes(industry)) return 'secondary';
+    return 'nicho';
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -92,13 +136,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
 
-        // Find industries that need curation (< 100 pins)
+        // Find industries that need curation (based on their tier target)
         const needsCuration = Array.from(industryCounts.entries())
-            .filter(([_, count]) => count < 100)
+            .filter(([industry, count]) => count < getTargetForIndustry(industry))
             .sort((a, b) => a[1] - b[1]); // Sort by count (lowest first)
 
         const totalPins = pinKeys.length;
-        const targetPins = 2100; // 21 industries × 100 pins
+        const targetPins = 1380; // 8×100 + 8×50 + 6×30 = 1380 pins
         const totalProgress = Math.round((totalPins / targetPins) * 100);
 
         // If all industries are balanced
@@ -117,12 +161,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Get current mission (most urgent industry)
         const [currentIndustry, currentCount] = needsCuration[0];
         const nextIndustry = needsCuration.length > 1 ? needsCuration[1][0] : null;
+        const currentTarget = getTargetForIndustry(currentIndustry);
+        const currentTier = getTierForIndustry(currentIndustry);
 
         const mission: CurationMission = {
             industry: currentIndustry,
             currentCount,
-            targetCount: 100,
-            progress: Math.round((currentCount / 100) * 100),
+            targetCount: currentTarget,
+            progress: Math.round((currentCount / currentTarget) * 100),
             queries: generateQueries(currentIndustry),
             isComplete: false,
             nextIndustry: nextIndustry || undefined,
@@ -130,7 +176,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 current: totalPins,
                 target: targetPins,
                 percentage: totalProgress
-            }
+            },
+            tier: currentTier
         };
 
         return res.json(mission);

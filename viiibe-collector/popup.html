@@ -447,6 +447,41 @@
         .result-value.error {
             color: #FF3B30;
         }
+
+        /* Curation Mode Badges */
+        .industry-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #00D9A3;
+            color: white;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .tier-badge.core {
+            background: #FF3B30;
+            color: white;
+        }
+
+        .tier-badge.secondary {
+            background: #FF9500;
+            color: white;
+        }
+
+        .tier-badge.nicho {
+            background: #007AFF;
+            color: white;
+        }
     </style>
 </head>
 
@@ -467,7 +502,8 @@
     <!-- Tabs -->
     <div class="tabs">
         <button class="tab" data-tab="dashboard">📊 Dashboard</button>
-        <button class="tab active" data-tab="batch">🖼️ Batch Mode</button>
+        <button class="tab active" data-tab="curation">🎯 Curation</button>
+        <button class="tab" data-tab="batch">🖼️ Batch Mode</button>
     </div>
 
     <!-- Dashboard Tab -->
@@ -504,8 +540,112 @@
         </div>
     </div>
 
+    <!-- Curation Tab -->
+    <div class="tab-content active" id="curation">
+        <div class="dashboard-scroll">
+            <!-- Loading State -->
+            <div id="curationLoading" class="stats-card" style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 32px; margin-bottom: 12px;">⏳</div>
+                <div style="font-size: 14px; color: #666;">Loading mission...</div>
+            </div>
+
+            <!-- Mission Card (hidden initially) -->
+            <div id="curationMission" style="display: none;">
+                <!-- Current Focus -->
+                <div class="stats-card">
+                    <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #000;">
+                        🎯 Today's Focus
+                    </h3>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span id="industryBadge" class="industry-badge">Finance</span>
+                        <span id="tierBadge" class="tier-badge">CORE</span>
+                    </div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 4px;">Progress</div>
+                    <div class="progress-bar-bg" style="margin-bottom: 8px;">
+                        <div class="progress-bar" id="curationProgress"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
+                        <span>Current: <strong id="currentCount">0</strong></span>
+                        <span>Target: <strong id="targetCount">100</strong></span>
+                    </div>
+                </div>
+
+                <!-- Session Stats -->
+                <div class="stats-card">
+                    <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #000;">
+                        📊 This Session
+                    </h3>
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; font-weight: 700; color: #00D9A3; line-height: 1;"
+                            id="sessionCount">0</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 4px;">pins saved</div>
+                    </div>
+                    <div
+                        style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e5e5; text-align: center;">
+                        <div style="font-size: 13px; color: #666;">
+                            <span id="remainingCount">43</span> more to complete
+                        </div>
+                        <div id="motivationalMessage"
+                            style="font-size: 12px; color: #00D9A3; margin-top: 4px; font-weight: 500;">
+                            Let's do this! 💪
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="settings-card">
+                    <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #000;">
+                        🚀 Quick Actions
+                    </h3>
+                    <a id="pinterestSearchLink" href="#" target="_blank" class="link-button"
+                        style="margin-bottom: 8px;">
+                        🔍 Search on Pinterest
+                    </a>
+                    <button class="btn-secondary" id="refreshMission" style="width: 100%;">
+                        🔄 Refresh Mission
+                    </button>
+                </div>
+
+                <!-- Next Up -->
+                <div id="nextIndustryCard" class="stats-card" style="display: none;">
+                    <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #000;">
+                        ⏭️ Next Up
+                    </h3>
+                    <div style="font-size: 13px; color: #666;">
+                        After completing <strong id="currentIndustryName">Finance</strong>, you'll work on:
+                    </div>
+                    <div
+                        style="margin-top: 8px; padding: 8px; background: white; border-radius: 6px; border: 1px solid #e5e5e5;">
+                        <strong id="nextIndustryName" style="color: #000;">Tech</strong>
+                    </div>
+                </div>
+
+                <!-- Completion Celebration (hidden initially) -->
+                <div id="completionCard" class="stats-card"
+                    style="display: none; background: linear-gradient(135deg, #00D9A3 0%, #00C090 100%); border: none; color: white; text-align: center; padding: 24px;">
+                    <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">Congratulations!</div>
+                    <div style="font-size: 14px; opacity: 0.9;" id="completionMessage">Finance completed!</div>
+                    <button class="btn-secondary" id="continueToNext"
+                        style="margin-top: 16px; background: white; color: #00D9A3; border: none;">
+                        Continue to Next →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error State (hidden initially) -->
+            <div id="curationError" style="display: none;" class="stats-card">
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 32px; margin-bottom: 12px;">⚠️</div>
+                    <div style="font-size: 14px; color: #666; margin-bottom: 12px;">Failed to load mission</div>
+                    <button class="btn-primary" id="retryLoad" style="width: 100%;">Retry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Batch Mode Tab -->
-    <div class="tab-content active" id="batch">
+    <div class="tab-content" id="batch">
         <div class="batch-container">
             <!-- Header with count and scan button -->
             <div class="batch-header">
@@ -574,6 +714,7 @@
     </div>
 
     <script src="popup-batch.js"></script>
+    <script src="popup-curation.js"></script>
     <script src="popup.js"></script>
 </body>
 
