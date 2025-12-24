@@ -151,6 +151,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .filter(item => item.count < item.target)
             .sort((a, b) => b.count - a.count); // Highest count first - complete one at a time
 
+        console.log('🔍 Core incomplete (sorted):', coreIncomplete.map(i => `${i.industry}:${i.count}`));
+
         // 2. Check Secondary industries (Nivel 2)
         const secondaryIncomplete = INDUSTRY_TIERS.secondary.industries
             .map(industry => ({
