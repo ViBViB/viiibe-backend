@@ -55,8 +55,8 @@ function switchScreen(screenName) {
 
     currentScreen = screenName;
 
-    // Refresh curator mode when returning to dashboard
-    if (screenName === 'dashboard') {
+    // Refresh curator mode when entering batch screen
+    if (screenName === 'batch') {
         loadCuratorMode();
     }
 }
@@ -94,7 +94,7 @@ const API_BASE = 'https://moood-refactor.vercel.app/api';
 // Auto-sync total pins from backend (silent, non-blocking)
 async function syncTotalPinsFromBackend(adminKey) {
     try {
-        const response = await fetch(`${API_BASE}/get-pins-count?adminKey=${adminKey}`);
+        const response = await fetch(`${API_BASE}/pins?action=count&adminKey=${adminKey}`);
 
         if (!response.ok) {
             console.warn('Failed to sync total pins:', response.status);
@@ -102,7 +102,7 @@ async function syncTotalPinsFromBackend(adminKey) {
         }
 
         const data = await response.json();
-        const realTotal = data.count; // Note: get-pins-count returns 'count' not 'exactCount'
+        const realTotal = data.count; // Note: pins endpoint returns 'count' not 'exactCount'
 
         // Update cache and UI
         await chrome.storage.sync.set({ totalPins: realTotal });
@@ -185,8 +185,8 @@ document.getElementById('syncStats').addEventListener('click', async () => {
             return;
         }
 
-        // Use get-pins-count endpoint for precise financial tracking
-        const response = await fetch(`${API_BASE}/get-pins-count?adminKey=${adminKey}`);
+        // Use pins endpoint with action=count for precise financial tracking
+        const response = await fetch(`${API_BASE}/pins?action=count&adminKey=${adminKey}`);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -274,33 +274,45 @@ function showMission(mission) {
 
     // Show mission details
     document.getElementById('missionIndustry').textContent = mission.industry.toUpperCase();
+
+    // Show next industry in header
+    if (mission.nextIndustry) {
+        document.getElementById('nextIndustryContainer').style.display = 'block';
+        document.getElementById('nextIndustry').textContent = mission.nextIndustry;
+    } else {
+        document.getElementById('nextIndustryContainer').style.display = 'none';
+    }
+
+    // Update progress with DYNAMIC target (3-tier system)
     document.getElementById('progressCurrent').textContent = mission.currentCount;
-    document.getElementById('progressTarget').textContent = mission.targetCount;
+    document.getElementById('progressTarget').textContent = mission.targetCount; // ✅ Dynamic!
     document.getElementById('progressPercentage').textContent = `${mission.progress}%`;
     document.getElementById('missionProgressBar').style.width = `${mission.progress}%`;
 
-    // Render queries
+    // Render queries (removed from UI but keeping code for potential future use)
     const queryList = document.getElementById('queryList');
-    queryList.innerHTML = '';
+    if (queryList) {
+        queryList.innerHTML = '';
 
-    mission.queries.forEach((query, index) => {
-        const card = document.createElement('div');
-        card.className = 'query-card';
-        card.innerHTML = `
-            <span class="query-text">${index + 1}. ${query}</span>
-            <button class="btn-copy-query" data-query="${query}">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11.6667 7.65624L11.6667 4.74996C11.6667 3.09309 10.3236 1.74994 8.66671 1.74996L5.7605 1.74999M8.16675 12.25L4.22925 12.25C3.50438 12.25 2.91675 11.6624 2.91675 10.9375L2.91675 5.24999C2.91675 4.52512 3.50437 3.93749 4.22925 3.93749L8.16675 3.93749C8.89162 3.93749 9.47925 4.52512 9.47925 5.24999L9.47925 10.9375C9.47925 11.6624 8.89162 12.25 8.16675 12.25Z" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
-                </svg>
-            </button>
-        `;
-        queryList.appendChild(card);
-    });
+        mission.queries.forEach((query, index) => {
+            const card = document.createElement('div');
+            card.className = 'query-card';
+            card.innerHTML = `
+                <span class="query-text">${index + 1}. ${query}</span>
+                <button class="btn-copy-query" data-query="${query}">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.6667 7.65624L11.6667 4.74996C11.6667 3.09309 10.3236 1.74994 8.66671 1.74996L5.7605 1.74999M8.16675 12.25L4.22925 12.25C3.50438 12.25 2.91675 11.6624 2.91675 10.9375L2.91675 5.24999C2.91675 4.52512 3.50437 3.93749 4.22925 3.93749L8.16675 3.93749C8.89162 3.93749 9.47925 4.52512 9.47925 5.24999L9.47925 10.9375C9.47925 11.6624 8.89162 12.25 8.16675 12.25Z" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            `;
+            queryList.appendChild(card);
+        });
 
-    // Add copy listeners
-    document.querySelectorAll('.btn-copy-query').forEach(btn => {
-        btn.addEventListener('click', () => copyQuery(btn));
-    });
+        // Add copy listeners
+        document.querySelectorAll('.btn-copy-query').forEach(btn => {
+            btn.addEventListener('click', () => copyQuery(btn));
+        });
+    }
 
     // Check if mission is complete
     if (mission.currentCount >= mission.targetCount) {

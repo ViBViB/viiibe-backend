@@ -674,20 +674,22 @@ body {
     background: #F5F5F5;
     border: 1px solid #E5E5E5;
     border-radius: 12px;
-    padding: 32px;
+    padding: 20px;
     color: #000;
-    margin-top: 24px;
+    margin-bottom: 24px;
 }
 
 .mission-header {
-    text-align: center;
-    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
 .mission-header h3 {
     font-size: 14px;
     font-weight: 400;
-    margin: 0 0 8px 0;
+    margin: 0;
     color: #999;
 }
 
@@ -698,7 +700,7 @@ body {
 .mission-industry {
     font-size: 14px;
     font-weight: 600;
-    color: #000;
+    color: #00D9A3;
     display: inline;
 }
 
@@ -706,7 +708,7 @@ body {
     background: #ECECEC;
     border-radius: 8px;
     padding: 20px;
-    margin-bottom: 32px;
+    margin-bottom: 0;
 }
 
 .progress-label {
