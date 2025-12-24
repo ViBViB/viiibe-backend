@@ -222,7 +222,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 target: targetPins,
                 percentage: totalProgress
             },
-            tier: currentMission.tier
+            tier: currentMission.tier,
+            // TEMP DEBUG INFO
+            _debug: {
+                ecommerceCount: industryCounts.get('ecommerce') || 0,
+                healthcareCount: industryCounts.get('healthcare') || 0,
+                allCounts: Object.fromEntries(
+                    Array.from(industryCounts.entries())
+                        .filter(([k]) => k.toLowerCase().includes('ecommerce') || k.toLowerCase().includes('healthcare'))
+                )
+            }
         };
 
         return res.json(mission);
