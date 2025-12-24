@@ -248,7 +248,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadCuratorMode() {
     try {
-        // Get LOCAL counts (100% accurate, independent of API)
+        // ALWAYS sync counts first to ensure accuracy
+        await syncIndustryCounts();
+
+        // Get LOCAL counts (100% accurate, just synced)
         const data = await chrome.storage.local.get('industryCounts');
         const counts = data.industryCounts;
 
@@ -634,9 +637,6 @@ async function syncIndustryCounts() {
                 lastSync: Date.now()
             });
             console.log('✅ Industry counts synced:', data.allCounts);
-
-            // Reload curator mode to show updated counts
-            loadCuratorMode();
         }
     } catch (error) {
         console.error('❌ Failed to sync counts:', error);

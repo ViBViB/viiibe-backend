@@ -409,6 +409,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         lastDate: today
                     });
 
+                    // SYNC COUNTER after individual save
+                    chrome.runtime.sendMessage({ action: 'sync-industry-counts' });
                     console.log(`📊 Stats updated: Today=${todayPins}, Total=${totalPins}`);
                 });
             } else if (success === 'duplicate') {
