@@ -131,8 +131,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const aiTags = await kv.get(`pin-tags:${pinId}`);
 
             if (aiTags && (aiTags as any).industry && Array.isArray((aiTags as any).industry) && (aiTags as any).industry.length > 0) {
-                const industry = (aiTags as any).industry[0]; // Use AI's exact categorization
-                industryCounts.set(industry, (industryCounts.get(industry) || 0) + 1);
+                const industry = (aiTags as any).industry[0];
+                // Normalize to lowercase for consistent counting
+                const normalizedIndustry = industry.toLowerCase();
+                industryCounts.set(normalizedIndustry, (industryCounts.get(normalizedIndustry) || 0) + 1);
             }
         }
 
@@ -143,7 +145,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const coreIncomplete = INDUSTRY_TIERS.core.industries
             .map(industry => ({
                 industry,
-                count: industryCounts.get(industry) || 0,
+                count: industryCounts.get(industry.toLowerCase()) || 0,
                 target: INDUSTRY_TIERS.core.target
             }))
             .filter(item => item.count < item.target)
@@ -153,7 +155,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const secondaryIncomplete = INDUSTRY_TIERS.secondary.industries
             .map(industry => ({
                 industry,
-                count: industryCounts.get(industry) || 0,
+                count: industryCounts.get(industry.toLowerCase()) || 0,
                 target: INDUSTRY_TIERS.secondary.target
             }))
             .filter(item => item.count < item.target)
@@ -163,7 +165,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const nichoIncomplete = INDUSTRY_TIERS.nicho.industries
             .map(industry => ({
                 industry,
-                count: industryCounts.get(industry) || 0,
+                count: industryCounts.get(industry.toLowerCase()) || 0,
                 target: INDUSTRY_TIERS.nicho.target
             }))
             .filter(item => item.count < item.target)
