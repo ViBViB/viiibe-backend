@@ -136,17 +136,66 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
 
-        // Find industries that need curation (based on their tier target)
-        const needsCuration = Array.from(industryCounts.entries())
-            .filter(([industry, count]) => count < getTargetForIndustry(industry))
-            .sort((a, b) => a[1] - b[1]); // Sort by count (lowest first)
+        // LEVEL-BY-LEVEL PRIORITIZATION
+        // Complete all Core industries first, then Secondary, then Nicho
+
+        // 1. Check Core industries (Nivel 1)
+        const coreIncomplete = INDUSTRY_TIERS.core.industries
+            .map(industry => ({
+                industry,
+                count: industryCounts.get(industry) || 0,
+                target: INDUSTRY_TIERS.core.target
+            }))
+            .filter(item => item.count < item.target)
+            .sort((a, b) => a.count - b.count); // Lowest count first
+
+        // 2. Check Secondary industries (Nivel 2)
+        const secondaryIncomplete = INDUSTRY_TIERS.secondary.industries
+            .map(industry => ({
+                industry,
+                count: industryCounts.get(industry) || 0,
+                target: INDUSTRY_TIERS.secondary.target
+            }))
+            .filter(item => item.count < item.target)
+            .sort((a, b) => a.count - b.count);
+
+        // 3. Check Nicho industries (Nivel 3)
+        const nichoIncomplete = INDUSTRY_TIERS.nicho.industries
+            .map(industry => ({
+                industry,
+                count: industryCounts.get(industry) || 0,
+                target: INDUSTRY_TIERS.nicho.target
+            }))
+            .filter(item => item.count < item.target)
+            .sort((a, b) => a.count - b.count);
 
         const totalPins = pinKeys.length;
         const targetPins = 1380; // 8×100 + 8×50 + 6×30 = 1380 pins
         const totalProgress = Math.round((totalPins / targetPins) * 100);
 
+        // Determine current mission based on level priority
+        let currentMission: { industry: string; count: number; target: number; tier: 'core' | 'secondary' | 'nicho' } | null = null;
+        let nextMission: { industry: string; count: number; target: number } | null = null;
+
+        if (coreIncomplete.length > 0) {
+            // Work on Core first
+            currentMission = { ...coreIncomplete[0], tier: 'core' };
+            nextMission = coreIncomplete.length > 1 ? coreIncomplete[1] :
+                (secondaryIncomplete.length > 0 ? secondaryIncomplete[0] :
+                    (nichoIncomplete.length > 0 ? nichoIncomplete[0] : null));
+        } else if (secondaryIncomplete.length > 0) {
+            // Core complete, work on Secondary
+            currentMission = { ...secondaryIncomplete[0], tier: 'secondary' };
+            nextMission = secondaryIncomplete.length > 1 ? secondaryIncomplete[1] :
+                (nichoIncomplete.length > 0 ? nichoIncomplete[0] : null);
+        } else if (nichoIncomplete.length > 0) {
+            // Core and Secondary complete, work on Nicho
+            currentMission = { ...nichoIncomplete[0], tier: 'nicho' };
+            nextMission = nichoIncomplete.length > 1 ? nichoIncomplete[1] : null;
+        }
+
         // If all industries are balanced
-        if (needsCuration.length === 0) {
+        if (!currentMission) {
             return res.json({
                 isComplete: true,
                 message: 'All industries balanced! 🎉',
@@ -158,26 +207,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
         }
 
-        // Get current mission (most urgent industry)
-        const [currentIndustry, currentCount] = needsCuration[0];
-        const nextIndustry = needsCuration.length > 1 ? needsCuration[1][0] : null;
-        const currentTarget = getTargetForIndustry(currentIndustry);
-        const currentTier = getTierForIndustry(currentIndustry);
-
         const mission: CurationMission = {
-            industry: currentIndustry,
-            currentCount,
-            targetCount: currentTarget,
-            progress: Math.round((currentCount / currentTarget) * 100),
-            queries: generateQueries(currentIndustry),
+            industry: currentMission.industry,
+            currentCount: currentMission.count,
+            targetCount: currentMission.target,
+            progress: Math.round((currentMission.count / currentMission.target) * 100),
+            queries: generateQueries(currentMission.industry),
             isComplete: false,
-            nextIndustry: nextIndustry || undefined,
+            nextIndustry: nextMission?.industry || undefined,
             totalProgress: {
                 current: totalPins,
                 target: targetPins,
                 percentage: totalProgress
             },
-            tier: currentTier
+            tier: currentMission.tier
         };
 
         return res.json(mission);
