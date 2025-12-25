@@ -93,7 +93,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (imageUrl) {
             try {
                 // Wait for analysis with a timeout (25s to stay under Vercel's 30s limit)
-                const analysisPromise = triggerAIAnalysis(pinId);
+                // PASS FORCED CATEGORY to override AI classification
+                const analysisPromise = triggerAIAnalysis(pinId, category);
                 const timeoutPromise = new Promise((_, reject) =>
                     setTimeout(() => reject(new Error('Analysis timeout')), 25000)
                 );
@@ -142,9 +143,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 /**
  * Trigger AI analysis for a pin (non-blocking background task)
  */
-async function triggerAIAnalysis(pinId: string): Promise<void> {
+async function triggerAIAnalysis(pinId: string, forcedCategory?: string): Promise<void> {
     try {
         console.log(`🔍 Triggering AI analysis for pin ${pinId}...`);
+        if (forcedCategory) {
+            console.log(`🎯 FORCING category: ${forcedCategory}`);
+        }
 
         // Call the pin-analysis endpoint
         // Use VERCEL_URL for same-deployment calls, or fallback to current production URL
@@ -157,7 +161,8 @@ async function triggerAIAnalysis(pinId: string): Promise<void> {
             body: JSON.stringify({
                 action: 'analyze',
                 adminKey: process.env.CURATOR_ADMIN_KEY,
-                pinId
+                pinId,
+                forcedCategory  // PASS forced category to analysis
             })
         });
 

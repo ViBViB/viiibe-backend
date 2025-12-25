@@ -26,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Route to appropriate handler
         if (action === 'analyze') {
-            await analyzePin(pinId, res);
+            await analyzePin(pinId, req.body.forcedCategory, res);
         } else if (action === 'auto-add-board') {
             return res.status(200).json({
                 success: true,
@@ -51,12 +51,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 /**
  * Analyze a pin with AI
  */
-async function analyzePin(pinId: string, res: VercelResponse) {
+async function analyzePin(pinId: string, forcedCategory: string | undefined, res: VercelResponse) {
     if (!pinId) {
         return res.status(400).json({ error: 'Missing pinId' });
     }
 
     console.log(`🔍 Analyzing pin: ${pinId}`);
+    if (forcedCategory) {
+        console.log(`🎯 FORCED CATEGORY: ${forcedCategory} (will override AI)`);
+    }
 
     // 1. Get pin from KV
     const pin: any = await kv.get(`saved-pin:${pinId}`);
@@ -87,13 +90,13 @@ async function analyzePin(pinId: string, res: VercelResponse) {
         console.log(`🧠 Running GPT-4 Vision analysis...`);
         const gptAnalysis = await analyzeWithGPT4(imageUrl);
 
-        // 5. Combine tags
+        // 5. Combine tags - PASS FORCED CATEGORY
         console.log(`🏷️  Combining tags...`);
         const tags = combineTags(visionAnalysis, gptAnalysis, {
             title: pin.title,
             description: pin.description,
             pinterestUrl: pin.pinterestUrl
-        });
+        }, forcedCategory);
 
         // 6. Save tags to KV
         await kv.set(`pin-tags:${pinId}`, tags);
@@ -234,7 +237,7 @@ Return ONLY the JSON, no other text.`;
 /**
  * Combine tags from both AI analyses
  */
-function combineTags(visionData: any, gptData: any, pinMetadata: any) {
+function combineTags(visionData: any, gptData: any, pinMetadata: any, forcedCategory?: string) {
     // Filter colors by dominance score (only keep colors with >5% presence)
     // Lowered from 10% to capture important secondary colors
     const dominantColors = visionData.colors
@@ -244,13 +247,20 @@ function combineTags(visionData: any, gptData: any, pinMetadata: any) {
     // Remove duplicates (e.g., multiple shades of red all mapping to "red")
     const uniqueColors = [...new Set(dominantColors)];
 
+    // USE FORCED CATEGORY if provided, otherwise use AI classification
+    const industry = forcedCategory ? [forcedCategory] : (gptData.industry || ['tech']);
+
+    if (forcedCategory) {
+        console.log(`🎯 OVERRIDING AI industry (${gptData.industry}) with FORCED: ${forcedCategory}`);
+    }
+
     return {
         style: gptData.style || ['modern'],
         color: uniqueColors.slice(0, 3),  // Top 3 unique dominant colors
         type: extractTypeTags(visionData.labels, pinMetadata.title),
         typography: gptData.typography || 'sans-serif',
         imagery: extractImageryTags(visionData.labels),
-        industry: gptData.industry || ['tech'],
+        industry,  // Use forced or AI
         layout: gptData.layout || 'hero-section',
         elements: gptData.elements || [],
         confidence: 0.8

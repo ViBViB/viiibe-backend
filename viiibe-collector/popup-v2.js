@@ -246,6 +246,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCuratorMode();
 });
 
+// GLOBAL: Store current mission industry for forced categorization
+let currentMissionIndustry = null;
+
 async function loadCuratorMode() {
     try {
         // ALWAYS sync counts first to ensure accuracy
@@ -284,6 +287,9 @@ async function loadCuratorMode() {
         const current = incomplete[0];
         const next = incomplete[1] || null;
 
+        // STORE current mission industry globally
+        currentMissionIndustry = current.industry;
+
         const mission = {
             industry: current.industry,
             currentCount: current.count,
@@ -296,6 +302,7 @@ async function loadCuratorMode() {
 
         showMission(mission);
         console.log('📊 LOCAL COUNT:', current.industry, current.count + '/100');
+        console.log('🎯 FORCED CATEGORY:', currentMissionIndustry);
 
     } catch (error) {
         console.error('Error loading curator mode:', error);
@@ -573,10 +580,11 @@ async function handleProcessClick() {
             // Get active tab
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-            // Send message to save image
+            // Send message to save image WITH FORCED CATEGORY
             const response = await chrome.tabs.sendMessage(tab.id, {
                 action: 'save-image-from-popup',
-                imageData: selectedImages[i]
+                imageData: selectedImages[i],
+                forcedCategory: currentMissionIndustry  // FORCE this category
             });
 
             if (response && response.success) {

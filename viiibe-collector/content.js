@@ -608,8 +608,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     return;
                 }
 
-                // Save to backend
-                const category = defaultCategory || 'uncategorized';
+                // USE FORCED CATEGORY from mission if provided
+                const category = request.forcedCategory || defaultCategory || 'uncategorized';
+                console.log(`🎯 Using category: ${category} ${request.forcedCategory ? '(FORCED from mission)' : '(default)'}`);
+
                 const result = await savePinToViiibe(pinData, category, false);
 
                 if (result === true) {
