@@ -81,10 +81,7 @@ function loadStats() {
         document.getElementById('todayCount').textContent = todayPins;
         document.getElementById('totalCount').textContent = result.totalPins || 0;
 
-        // Auto-sync with backend in background (if adminKey is set)
-        if (result.adminKey) {
-            syncTotalPinsFromBackend(result.adminKey);
-        }
+        // Note: Counter sync now handled by syncIndustryCounts() in loadCuratorMode()
     });
 }
 
@@ -92,28 +89,7 @@ function loadStats() {
 const API_BASE = 'https://moood-refactor.vercel.app/api';
 
 // Auto-sync total pins from backend (silent, non-blocking)
-async function syncTotalPinsFromBackend(adminKey) {
-    try {
-        const response = await fetch(`${API_BASE}/pins?action=count&adminKey=${adminKey}`);
-
-        if (!response.ok) {
-            console.warn('Failed to sync total pins:', response.status);
-            return;
-        }
-
-        const data = await response.json();
-        const realTotal = data.count; // Note: pins endpoint returns 'count' not 'exactCount'
-
-        // Update cache and UI
-        await chrome.storage.sync.set({ totalPins: realTotal });
-        document.getElementById('totalCount').textContent = realTotal;
-
-        console.log(`✅ Auto-synced: ${realTotal} pins`);
-    } catch (error) {
-        console.warn('Auto-sync failed (using cached value):', error.message);
-        // Silently fail - user still sees cached value
-    }
-}
+// REMOVED: syncTotalPinsFromBackend - obsolete, now using syncIndustryCounts()
 
 
 // Auto-refresh stats when storage changes
