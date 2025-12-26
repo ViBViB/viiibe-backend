@@ -263,7 +263,42 @@ async function loadCuratorMode() {
             .sort((a, b) => b.count - a.count);
 
         if (incomplete.length === 0) {
-            showAllComplete({ message: 'All Core industries complete!' });
+            // Core complete - check Secondary
+            const SECONDARY = ['Real Estate', 'Food', 'Fashion', 'Travel'];
+
+            const secondaryIncomplete = SECONDARY
+                .map(name => ({
+                    industry: name,
+                    count: counts[name] || counts[name.replace(' ', '')] || 0,
+                    target: 50
+                }))
+                .filter(item => item.count < item.target)
+                .sort((a, b) => b.count - a.count);
+
+            if (secondaryIncomplete.length === 0) {
+                showAllComplete({ message: 'All Core and Secondary complete!' });
+                return;
+            }
+
+            const current = secondaryIncomplete[0];
+            const next = secondaryIncomplete[1] || null;
+
+            // STORE current mission industry globally
+            currentMissionIndustry = current.industry;
+
+            const mission = {
+                industry: current.industry,
+                currentCount: current.count,
+                targetCount: current.target,
+                progress: Math.round((current.count / current.target) * 100),
+                nextIndustry: next?.industry || null,
+                tier: 'secondary',
+                isComplete: false
+            };
+
+            showMission(mission);
+            console.log('📊 SECONDARY:', current.industry, current.count + '/50');
+            console.log('🎯 FORCED CATEGORY:', currentMissionIndustry);
             return;
         }
 
