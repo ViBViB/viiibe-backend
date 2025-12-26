@@ -269,7 +269,8 @@ async function loadCuratorMode() {
             const secondaryIncomplete = SECONDARY
                 .map(name => ({
                     industry: name,
-                    count: counts[name] || counts[name.replace(' ', '')] || 0,
+                    // FIX: Try lowercase first (database has "Real estate"), then original
+                    count: counts[name.toLowerCase()] || counts[name] || counts[name.replace(' ', '')] || 0,
                     target: 50
                 }))
                 .filter(item => item.count < item.target)
