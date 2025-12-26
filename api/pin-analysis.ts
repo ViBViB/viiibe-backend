@@ -86,9 +86,9 @@ async function analyzePin(pinId: string, forcedCategory: string | undefined, res
         console.log(`🤖 Running Vision AI analysis...`);
         const visionAnalysis = await analyzeWithVision(imageUrl);
 
-        // 4. Analyze with GPT-4 Vision
+        // 4. Analyze with GPT-4 Vision - PASS FORCED CATEGORY TO SKIP INDUSTRY
         console.log(`🧠 Running GPT-4 Vision analysis...`);
-        const gptAnalysis = await analyzeWithGPT4(imageUrl);
+        const gptAnalysis = await analyzeWithGPT4(imageUrl, forcedCategory);
 
         // 5. Combine tags - PASS FORCED CATEGORY
         console.log(`🏷️  Combining tags...`);
@@ -182,22 +182,27 @@ async function analyzeWithVision(imageUrl: string) {
 /**
  * Analyze with GPT-4 Vision
  */
-async function analyzeWithGPT4(imageUrl: string) {
+async function analyzeWithGPT4(imageUrl: string, forcedCategory?: string) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
         throw new Error('OPENAI_API_KEY not configured');
     }
 
+    // COST OPTIMIZATION: Skip industry classification if forced category provided
+    const industryField = forcedCategory
+        ? '' // Don't ask AI for industry if we already know it
+        : `  \"industry\": array with EXACTLY ONE industry tag. You MUST choose the single best match from this EXACT list: [\"Real Estate\", \"Tech\", \"Finance\", \"Fitness\", \"Healthcare\", \"Saas\", \"Ecommerce\", \"Education\", \"Travel\", \"Food\", \"Fashion\", \"Logistics\", \"Furniture\", \"Beauty\", \"Transport\", \"Transportation\", \"Consulting\", \"Construction\", \"Business\", \"Legal\", \"Home Services\"]. Use the EXACT capitalization shown. Choose only ONE that best matches the design's target industry.,`;
+
     const prompt = `Analyze this design image and return ONLY a JSON object with these exact fields:
 {
-  "style": array of 2-4 style tags from: minimal, bold, clean, dark, light, gradient, flat, 3d, glassmorphism, neumorphism, modern, retro, elegant, playful,
-  "industry": array with EXACTLY ONE industry tag. You MUST choose the single best match from this EXACT list: ["Real Estate", "Tech", "Finance", "Fitness", "Healthcare", "Saas", "Ecommerce", "Education", "Travel", "Food", "Fashion", "Logistics", "Furniture", "Beauty", "Transport", "Transportation", "Consulting", "Construction", "Business", "Legal", "Home Services"]. Use the EXACT capitalization shown. Choose only ONE that best matches the design's target industry.,
-  "typography": one tag from: sans-serif, serif, display, monospace, handwritten, bold-headers, minimal-text,
-  "layout": one tag from: hero-section, grid-layout, cards, split-screen, full-width, sidebar, centered, asymmetric,
-  "elements": array of 2-5 key design elements like: gradient-background, large-cta-button, product-screenshot, testimonials, pricing-table, etc.
+  \"style\": array of 2-4 style tags from: minimal, bold, clean, dark, light, gradient, flat, 3d, glassmorphism, neumorphism, modern, retro, elegant, playful,
+${industryField}
+  \"typography\": one tag from: sans-serif, serif, display, monospace, handwritten, bold-headers, minimal-text,
+  \"layout\": one tag from: hero-section, grid-layout, cards, split-screen, full-width, sidebar, centered, asymmetric,
+  \"elements\": array of 2-5 key design elements like: gradient-background, large-cta-button, product-screenshot, testimonials, pricing-table, etc.
 }
 
-CRITICAL: For "industry", you MUST return an array with EXACTLY ONE element from the list above. Match the capitalization exactly (e.g., "Real Estate" not "real-estate", "Home Services" not "home-services").
+${forcedCategory ? `NOTE: This design is for the ${forcedCategory} industry (already known), so focus on style, typography, layout, and elements.` : 'CRITICAL: For \"industry\", you MUST return an array with EXACTLY ONE element from the list above. Match the capitalization exactly (e.g., \"Real Estate\" not \"real-estate\", \"Home Services\" not \"home-services\").'}
 
 Return ONLY the JSON, no other text.`;
 
