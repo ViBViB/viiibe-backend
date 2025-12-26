@@ -65,37 +65,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.json({
                 isComplete: true,
                 message: 'All Core industries complete!',
-                totalProgress: { current: pinKeys.length, target: 700, percentage: 100 }
+                totalProgress: { current: pinKeys.length, target: 700, percentage: 100 },
+                // CRITICAL: Return allCounts even when complete for extension sync
+                allCounts: Object.fromEntries(
+                    Array.from(counts.entries()).map(([k, v]) => [
+                        k.charAt(0).toUpperCase() + k.slice(1), // Capitalize
+                        v
+                    ])
+                )
             });
+
+            const current = incomplete[0];
+            const next = incomplete[1] || null;
+
+            return res.json({
+                industry: current.industry,
+                currentCount: current.count,
+                targetCount: current.target,
+                progress: Math.round((current.count / current.target) * 100),
+                nextIndustry: next?.industry || null,
+                tier: 'core',
+                isComplete: false,
+                totalProgress: {
+                    current: pinKeys.length,
+                    target: 700,
+                    percentage: Math.round((pinKeys.length / 700) * 100)
+                },
+                // ALL COUNTS for syncing local storage
+                allCounts: Object.fromEntries(
+                    Array.from(counts.entries()).map(([k, v]) => [
+                        k.charAt(0).toUpperCase() + k.slice(1), // Capitalize
+                        v
+                    ])
+                )
+            });
+
+        } catch (error: any) {
+            console.error('Mission error:', error);
+            return res.status(500).json({ error: 'Failed', message: error.message });
         }
-
-        const current = incomplete[0];
-        const next = incomplete[1] || null;
-
-        return res.json({
-            industry: current.industry,
-            currentCount: current.count,
-            targetCount: current.target,
-            progress: Math.round((current.count / current.target) * 100),
-            nextIndustry: next?.industry || null,
-            tier: 'core',
-            isComplete: false,
-            totalProgress: {
-                current: pinKeys.length,
-                target: 700,
-                percentage: Math.round((pinKeys.length / 700) * 100)
-            },
-            // ALL COUNTS for syncing local storage
-            allCounts: Object.fromEntries(
-                Array.from(counts.entries()).map(([k, v]) => [
-                    k.charAt(0).toUpperCase() + k.slice(1), // Capitalize
-                    v
-                ])
-            )
-        });
-
-    } catch (error: any) {
-        console.error('Mission error:', error);
-        return res.status(500).json({ error: 'Failed', message: error.message });
     }
-}
