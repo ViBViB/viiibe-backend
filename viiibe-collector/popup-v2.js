@@ -151,49 +151,30 @@ document.getElementById('syncStats').addEventListener('click', async () => {
         button.disabled = true;
         button.innerHTML = '<span>Syncing...</span>';
 
-        // Get admin key
-        const { adminKey } = await chrome.storage.sync.get(['adminKey']);
+        // FORCE SYNC: Clear cache and re-sync from API
+        await chrome.storage.local.remove(['industryCounts', 'isComplete', 'lastSync']);
 
-        if (!adminKey) {
-            alert('Please set your admin key first');
-            button.disabled = false;
-            button.innerHTML = originalHTML;
-            return;
-        }
+        // Sync counts from API
+        await syncIndustryCounts();
 
-        // Use pins endpoint with action=count for precise financial tracking
-        const response = await fetch(`${API_BASE}/pins?action=count&adminKey=${adminKey}`);
+        // Reload curator mode to show updated counts
+        await loadCuratorMode();
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-        const realTotal = data.count; // Exact count from KV
-        const remaining = 1000 - realTotal;
-        const percentage = ((realTotal / 1000) * 100).toFixed(1);
-
-        // Update local cache
-        await chrome.storage.sync.set({ totalPins: realTotal });
-
-        // Show success with details
-        button.innerHTML = `<span>✓ ${realTotal} pins (${remaining} left, ${percentage}% used)</span>`;
+        // Show success
+        button.innerHTML = '<span>✓ Synced!</span>';
         button.style.background = '#00D9A3';
         button.style.color = '#fff';
-
-        // Reload stats
-        loadStats();
 
         setTimeout(() => {
             button.disabled = false;
             button.innerHTML = originalHTML;
             button.style.background = '';
             button.style.color = '';
-        }, 3000);
+        }, 2000);
 
     } catch (error) {
         console.error('Sync error:', error);
-        alert(`Failed to sync: ${error.message}\n\nPlease check your admin key and try again.`);
+        alert(`Failed to sync: ${error.message}\n\nPlease try again.`);
         button.disabled = false;
         button.innerHTML = originalHTML;
     }
