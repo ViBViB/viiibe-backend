@@ -46,12 +46,28 @@ chrome.runtime.onInstalled.addListener(async () => {
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'add-to-moood') {
-        // PUBLIC: Quick Save
-        chrome.tabs.sendMessage(tab.id, {
-            action: 'save-pin',
-            url: info.pageUrl || info.linkUrl
-        }).catch(err => {
-            console.log('Content script not available:', err.message);
+        // PUBLIC: Quick Save - GET CURRENT MISSION INDUSTRY
+        chrome.storage.local.get('industryCounts', (data) => {
+            const counts = data.industryCounts || INITIAL_COUNTS;
+
+            // Determine current mission (same logic as popup)
+            const CORE = ['Finance', 'Fitness', 'Ecommerce', 'Tech', 'Education', 'Saas', 'Healthcare'];
+            const incomplete = CORE
+                .map(name => ({ industry: name, count: counts[name] || 0, target: 100 }))
+                .filter(item => item.count < item.target)
+                .sort((a, b) => b.count - a.count);
+
+            const currentMission = incomplete[0]?.industry || null;
+
+            console.log(`🎯 Individual save - Forced category: ${currentMission}`);
+
+            chrome.tabs.sendMessage(tab.id, {
+                action: 'save-pin',
+                url: info.pageUrl || info.linkUrl,
+                forcedCategory: currentMission  // PASS FORCED CATEGORY
+            }).catch(err => {
+                console.log('Content script not available:', err.message);
+            });
         });
     }
 

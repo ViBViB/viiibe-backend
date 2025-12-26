@@ -375,11 +375,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             return;
         }
 
-        // Get category from storage or use default
+        // Get category from storage or use forced category from request
         chrome.storage.sync.get(['defaultCategory'], async (result) => {
-            console.log('📁 Category from storage:', result);
-            const category = result.defaultCategory || 'uncategorized';
-            console.log('🚀 Calling savePinToViiibe...');
+            // PRIORITIZE forced category from background (mission-based)
+            const category = request.forcedCategory || result.defaultCategory || 'uncategorized';
+            console.log(`🎯 Using category: ${category} ${request.forcedCategory ? '(FORCED from mission)' : '(from storage)'}`);
+
             const success = await savePinToViiibe(designData, category);
             console.log('✅ savePinToViiibe result:', success);
 
