@@ -62,14 +62,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .sort((a, b) => b.count - a.count); // DESCENDING
 
         if (incomplete.length === 0) {
+            // Core complete - check Secondary
+            const SECONDARY = ['Real Estate', 'Food', 'Fashion', 'Travel'];
+
+            const secondaryIncomplete = SECONDARY
+                .map(name => ({
+                    industry: name,
+                    count: counts.get(name.toLowerCase().replace(' ', ' ')) || 0,
+                    target: 50
+                }))
+                .filter(item => item.count < item.target)
+                .sort((a, b) => b.count - a.count);
+
+            if (secondaryIncomplete.length === 0) {
+                // Both Core and Secondary complete
+                return res.json({
+                    isComplete: true,
+                    message: 'All Core and Secondary industries complete!',
+                    totalProgress: { current: pinKeys.length, target: 900, percentage: 100 },
+                    allCounts: Object.fromEntries(
+                        Array.from(counts.entries()).map(([k, v]) => [
+                            k.charAt(0).toUpperCase() + k.slice(1),
+                            v
+                        ])
+                    )
+                });
+            }
+
+            // Return next Secondary industry
+            const current = secondaryIncomplete[0];
+            const next = secondaryIncomplete[1] || null;
+
             return res.json({
-                isComplete: true,
-                message: 'All Core industries complete!',
-                totalProgress: { current: pinKeys.length, target: 700, percentage: 100 },
-                // CRITICAL: Return allCounts even when complete for extension sync
+                industry: current.industry,
+                currentCount: current.count,
+                targetCount: current.target,
+                progress: Math.round((current.count / current.target) * 100),
+                nextIndustry: next?.industry || null,
+                tier: 'secondary',
+                isComplete: false,
+                totalProgress: {
+                    current: pinKeys.length,
+                    target: 900,
+                    percentage: Math.round((pinKeys.length / 900) * 100)
+                },
                 allCounts: Object.fromEntries(
                     Array.from(counts.entries()).map(([k, v]) => [
-                        k.charAt(0).toUpperCase() + k.slice(1), // Capitalize
+                        k.charAt(0).toUpperCase() + k.slice(1),
                         v
                     ])
                 )
