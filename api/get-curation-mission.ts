@@ -68,7 +68,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const secondaryIncomplete = SECONDARY
                 .map(name => ({
                     industry: name,
-                    count: counts.get(name.toLowerCase().replace(' ', ' ')) || 0,
+                    // FIX: Database has "Real estate" but we expect "Real Estate"
+                    count: counts.get(name.toLowerCase()) || counts.get(name) || 0,
                     target: 50
                 }))
                 .filter(item => item.count < item.target)
