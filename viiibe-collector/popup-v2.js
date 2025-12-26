@@ -231,10 +231,17 @@ async function loadCuratorMode() {
         await syncIndustryCounts();
 
         // Get LOCAL counts (100% accurate, just synced)
-        const data = await chrome.storage.local.get('industryCounts');
+        const data = await chrome.storage.local.get(['industryCounts', 'isComplete']);
         const counts = data.industryCounts;
 
+        // If sync failed but we know it's complete, show completion
+        if (!counts && data.isComplete) {
+            showAllComplete({ message: 'All Core industries complete! (1,118 pins total)' });
+            return;
+        }
+
         if (!counts) {
+            console.error('No counts available and not marked complete');
             showCuratorError();
             return;
         }
