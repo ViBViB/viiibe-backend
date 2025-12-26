@@ -57,7 +57,22 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
                 .filter(item => item.count < item.target)
                 .sort((a, b) => b.count - a.count);
 
-            const currentMission = incomplete[0]?.industry || null;
+            let currentMission = incomplete[0]?.industry || null;
+
+            // If Core complete, check Secondary
+            if (!currentMission) {
+                const SECONDARY = ['Real Estate', 'Food', 'Fashion', 'Travel'];
+                const secondaryIncomplete = SECONDARY
+                    .map(name => ({
+                        industry: name,
+                        count: counts[name] || counts[name.replace(' ', '')] || 0,
+                        target: 50
+                    }))
+                    .filter(item => item.count < item.target)
+                    .sort((a, b) => b.count - a.count);
+
+                currentMission = secondaryIncomplete[0]?.industry || null;
+            }
 
             console.log(`🎯 Individual save - Forced category: ${currentMission}`);
 
