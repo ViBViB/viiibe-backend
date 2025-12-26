@@ -615,15 +615,21 @@ async function syncIndustryCounts() {
         const response = await fetch(`${API_BASE}/get-curation-mission`);
         const data = await response.json();
 
+        // Handle both normal and "all complete" responses
         if (data.allCounts) {
             await chrome.storage.local.set({
                 industryCounts: data.allCounts,
-                lastSync: Date.now()
+                lastSync: Date.now(),
+                isComplete: data.isComplete || false
             });
             console.log('✅ Industry counts synced:', data.allCounts);
+            console.log('📊 All complete:', data.isComplete);
+        } else {
+            console.warn('⚠️ No allCounts in response:', data);
         }
     } catch (error) {
         console.error('❌ Failed to sync counts:', error);
+        // Don't throw - allow UI to continue with cached data
     }
 }
 
