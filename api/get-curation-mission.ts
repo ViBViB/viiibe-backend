@@ -103,15 +103,22 @@ function buildMissionResponse(counts: Map<string, number>) {
         .sort((a, b) => b.count - a.count);
 
     const allCountsObj = Object.fromEntries(
-        Array.from(counts.entries()).map(([k, v]) => [
-            k.charAt(0).toUpperCase() + k.slice(1),
-            v
-        ])
+        Array.from(counts.entries()).map(([k, v]) => {
+            // Special case for acronyms
+            if (k === 'ngo') return ['NGO', v];
+            // Standard capitalization
+            return [k.charAt(0).toUpperCase() + k.slice(1), v];
+        })
     );
 
     if (incomplete.length === 0) {
-        // Core complete - check Secondary
-        const SECONDARY = ['Real Estate', 'Food', 'Fashion', 'Travel'];
+        // Core complete - check ALL Secondary categories (target: 50 each)
+        const SECONDARY = [
+            'Real estate', 'Food', 'Fashion', 'Travel',
+            'Construction', 'Furniture', 'Home services', 'Logistics',
+            'Business', 'Sustainability', 'Consulting', 'Transportation',
+            'Digital agency', 'Beauty', 'Agriculture', 'NGO', 'Portfolio'
+        ];
 
         const secondaryIncomplete = SECONDARY
             .map(name => ({
@@ -120,7 +127,7 @@ function buildMissionResponse(counts: Map<string, number>) {
                 target: 50
             }))
             .filter(item => item.count < item.target)
-            .sort((a, b) => b.count - a.count);
+            .sort((a, b) => a.count - b.count); // Sort by LOWEST count first
 
         if (secondaryIncomplete.length === 0) {
             return {

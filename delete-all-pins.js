@@ -15,7 +15,7 @@ const API_BASE = 'https://viiibe-backend-l7t6xxnca-alberto-contreras-projects-10
 async function getAllPins() {
     console.log('📥 Fetching all saved pins...');
 
-    const response = await fetch(`${API_BASE}/get-saved-pins`);
+    const response = await fetch(`${API_BASE}/pins`);
     if (!response.ok) {
         throw new Error(`Failed to fetch pins: ${response.status}`);
     }

@@ -1,30 +1,33 @@
 // ============================================
-// MOOOD! COLLECTOR V2 - MAIN SCRIPT
+// MOOOD! COLLECTOR V2 - REWRITTEN (Dec 26, 2024)
+// Clean, minimal implementation
 // ============================================
+
+// API Configuration
+const API_BASE = 'https://moood-refactor.vercel.app/api';
 
 // State Management
 let currentScreen = 'dashboard';
-let batchState = 'initial'; // initial, scanned, processing, results
+let batchState = 'initial';
 let scannedImages = [];
 let selectedCount = 0;
+let currentMissionIndustry = null;
 
 // ============================================
-// INITIALIZATION
+// INITIALIZATION (Single event listener)
 // ============================================
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Force popup size
-    document.documentElement.style.width = '600px';
-    document.documentElement.style.height = '600px';
-    document.body.style.width = '600px';
-    document.body.style.height = '600px';
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Moood! Collector v2 loaded');
 
-    // Initialize app
+    // Initialize UI
     initNavigation();
-    loadStats();
-    loadSettings();
     initBatchHandlers();
     setupStorageListener();
+
+    // Load data
+    loadStats();
+    await loadCuratorMode();
 });
 
 // ============================================
@@ -32,9 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================
 
 function initNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-
-    navItems.forEach(item => {
+    document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             const screen = item.dataset.screen;
             switchScreen(screen);
@@ -43,19 +44,14 @@ function initNavigation() {
 }
 
 function switchScreen(screenName) {
-    // Update nav items
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.toggle('active', item.dataset.screen === screenName);
     });
-
-    // Update screens
     document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.toggle('active', screen.id === screenName);
     });
-
     currentScreen = screenName;
 
-    // Refresh curator mode when entering batch screen
     if (screenName === 'batch') {
         loadCuratorMode();
     }
@@ -65,40 +61,45 @@ function switchScreen(screenName) {
 // STATS (DASHBOARD)
 // ============================================
 
-function loadStats() {
-    chrome.storage.sync.get(['todayPins', 'totalPins', 'lastDate', 'adminKey'], (result) => {
+async function loadStats() {
+    // Get today's count from local storage
+    chrome.storage.sync.get(['todayPins', 'lastDate'], (result) => {
         const today = new Date().toDateString();
-        const lastDate = result.lastDate || '';
-
-        // Reset today count if it's a new day
         let todayPins = result.todayPins || 0;
-        if (lastDate !== today) {
+
+        if (result.lastDate !== today) {
             todayPins = 0;
             chrome.storage.sync.set({ todayPins: 0, lastDate: today });
         }
 
-        // Update UI with cached values immediately
         document.getElementById('todayCount').textContent = todayPins;
-        document.getElementById('totalCount').textContent = result.totalPins || 0;
-
-        // Note: Counter sync now handled by syncIndustryCounts() in loadCuratorMode()
     });
+
+    // Fetch REAL total from API
+    try {
+        const response = await fetch(`${API_BASE}/get-curation-mission`);
+        if (response.ok) {
+            const data = await response.json();
+            const totalPins = data.totalProgress?.current || 0;
+            document.getElementById('totalCount').textContent = totalPins;
+            console.log(`📊 Total pins from API: ${totalPins}`);
+        }
+    } catch (error) {
+        console.error('Failed to fetch total pins:', error);
+        // Fallback to local storage
+        chrome.storage.sync.get(['totalPins'], (result) => {
+            document.getElementById('totalCount').textContent = result.totalPins || 0;
+        });
+    }
 }
 
-// Import centralized configuration
-const API_BASE = 'https://moood-refactor.vercel.app/api';
-
-// Auto-sync total pins from backend (silent, non-blocking)
-// REMOVED: syncTotalPinsFromBackend - obsolete, now using syncIndustryCounts()
-
-
-// Auto-refresh stats when storage changes
 function setupStorageListener() {
     chrome.storage.onChanged.addListener((changes, namespace) => {
-        if (namespace === 'sync') {
-            if (changes.todayPins || changes.totalPins) {
-                loadStats();
-            }
+        if (namespace === 'sync' && (changes.todayPins || changes.totalPins)) {
+            loadStats();
+        }
+        if (changes.industryCounts) {
+            loadCuratorMode();
         }
     });
 }
@@ -107,18 +108,7 @@ function setupStorageListener() {
 // SETTINGS
 // ============================================
 
-function loadSettings() {
-    chrome.storage.sync.get(['adminKey', 'defaultCategory'], (result) => {
-        if (result.adminKey) {
-            document.getElementById('adminKey').value = result.adminKey;
-        }
-        if (result.defaultCategory) {
-            document.getElementById('defaultCategory').value = result.defaultCategory;
-        }
-    });
-}
-
-document.getElementById('saveSettings').addEventListener('click', () => {
+document.getElementById('saveSettings')?.addEventListener('click', () => {
     const adminKey = document.getElementById('adminKey').value;
     const defaultCategory = document.getElementById('defaultCategory').value;
 
@@ -128,317 +118,212 @@ document.getElementById('saveSettings').addEventListener('click', () => {
     }
 
     chrome.storage.sync.set({ adminKey, defaultCategory }, () => {
-        // Show success feedback
         const button = document.getElementById('saveSettings');
-        const originalText = button.textContent;
         button.textContent = '✓ Saved!';
         button.style.background = '#00D9A3';
-
         setTimeout(() => {
-            button.textContent = originalText;
+            button.textContent = 'Save Settings';
             button.style.background = '';
         }, 2000);
     });
 });
 
-// Sync Stats with Backend
-document.getElementById('syncStats').addEventListener('click', async () => {
+document.getElementById('syncStats')?.addEventListener('click', async () => {
     const button = document.getElementById('syncStats');
-    const originalHTML = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span>Syncing...</span>';
 
     try {
-        // Disable button and show loading
-        button.disabled = true;
-        button.innerHTML = '<span>Syncing...</span>';
-
-        // FORCE SYNC: Clear cache and re-sync from API
-        await chrome.storage.local.remove(['industryCounts', 'isComplete', 'lastSync']);
-
-        // Sync counts from API
-        await syncIndustryCounts();
-
-        // Reload curator mode to show updated counts
+        await syncIndustryCounts(true);  // FORCE REFRESH to get accurate data
         await loadCuratorMode();
 
-        // Show success
         button.innerHTML = '<span>✓ Synced!</span>';
         button.style.background = '#00D9A3';
-        button.style.color = '#fff';
-
+    } catch (error) {
+        alert(`Sync failed: ${error.message}`);
+    } finally {
         setTimeout(() => {
             button.disabled = false;
-            button.innerHTML = originalHTML;
+            button.innerHTML = '<span>Sync Stats</span>';
             button.style.background = '';
-            button.style.color = '';
         }, 2000);
-
-    } catch (error) {
-        console.error('Sync error:', error);
-        alert(`Failed to sync: ${error.message}\n\nPlease try again.`);
-        button.disabled = false;
-        button.innerHTML = originalHTML;
     }
 });
 
 // ============================================
-// CURATOR MODE
+// CURATOR MODE (Core Logic)
 // ============================================
-
-// Load curator mode on dashboard load
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Popup v2 loaded');
-
-    // Listen for batch save completion messages
-    window.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'batch-save-complete') {
-            console.log('📨 Received batch-save-complete message, refreshing...');
-            // Refresh curator mode and stats
-            loadCuratorMode();
-            loadStats();
-        }
-    });
-
-    initNavigation();
-    loadStats();
-    loadCuratorMode();
-});
-
-// GLOBAL: Store current mission industry for forced categorization
-let currentMissionIndustry = null;
 
 async function loadCuratorMode() {
     try {
-        // ALWAYS sync counts first to ensure accuracy
-        await syncIndustryCounts();
+        // 1. Check for locked category
+        const locked = await chrome.storage.local.get('lockedCategory');
 
-        // Get LOCAL counts (100% accurate, just synced)
-        const data = await chrome.storage.local.get(['industryCounts', 'isComplete']);
-        const counts = data.industryCounts;
+        if (locked.lockedCategory) {
+            // Get fresh counts from API
+            const response = await fetch(`${API_BASE}/get-curation-mission`);
+            const data = await response.json();
+            const currentCount = data.allCounts[locked.lockedCategory.name] || 0;
 
-        // If sync failed but we know it's complete, show completion
-        if (!counts && data.isComplete) {
-            showAllComplete({ message: 'All Core industries complete! (1,118 pins total)' });
-            return;
+            // Check if complete
+            if (currentCount >= locked.lockedCategory.target) {
+                await chrome.storage.local.remove('lockedCategory');
+                console.log(`✅ ${locked.lockedCategory.name} COMPLETE! Unlocking...`);
+                // Fall through to find next category
+            } else {
+                // STAY LOCKED - show locked category
+                console.log(`🔒 LOCKED: ${locked.lockedCategory.name} (${currentCount}/${locked.lockedCategory.target})`);
+                currentMissionIndustry = locked.lockedCategory.name;
+                showMission({
+                    name: locked.lockedCategory.name,
+                    current: currentCount,
+                    target: locked.lockedCategory.target,
+                    progress: Math.round((currentCount / locked.lockedCategory.target) * 100),
+                    tier: locked.lockedCategory.target === 100 ? 'core' : 'secondary',
+                    locked: true
+                });
+                return;
+            }
+        }
+
+        // 2. No lock or just completed - find next category
+        console.log('📡 Syncing counts from API...');
+        const synced = await syncIndustryCounts(false);
+
+        let counts;
+        if (synced) {
+            const fresh = await chrome.storage.local.get('industryCounts');
+            counts = fresh.industryCounts;
         }
 
         if (!counts) {
-            console.error('No counts available and not marked complete');
-            showCuratorError();
+            showError('No data available. Please check your connection.');
             return;
         }
 
-        // Core industries with targets
-        const CORE = [
-            'Finance', 'Fitness', 'Ecommerce', 'Tech',
-            'Education', 'Saas', 'Healthcare'
-        ];
+        const mission = getCurrentMission(counts);
 
-        // Find incomplete, sort by HIGHEST count (complete one at a time)
-        const incomplete = CORE
-            .map(name => ({
-                industry: name,
-                count: counts[name] || 0,
-                target: 100
-            }))
-            .filter(item => item.count < item.target)
-            .sort((a, b) => b.count - a.count);
+        if (mission.isAllComplete) {
+            showAllComplete();
+            return;
+        }
 
-        if (incomplete.length === 0) {
-            // Core complete - check Secondary
-            const SECONDARY = ['Real Estate', 'Food', 'Fashion', 'Travel'];
-
-            const secondaryIncomplete = SECONDARY
-                .map(name => ({
-                    industry: name,
-                    // FIX: Try lowercase first (database has "Real estate"), then original
-                    count: counts[name.toLowerCase()] || counts[name] || counts[name.replace(' ', '')] || 0,
-                    target: 50
-                }))
-                .filter(item => item.count < item.target)
-                .sort((a, b) => b.count - a.count);
-
-            if (secondaryIncomplete.length === 0) {
-                showAllComplete({ message: 'All Core and Secondary complete!' });
-                return;
+        // 3. LOCK the new category
+        await chrome.storage.local.set({
+            lockedCategory: {
+                name: mission.name,
+                target: mission.target,
+                startCount: mission.current,
+                lockedAt: Date.now()
             }
+        });
+        console.log(`🔒 LOCKED: ${mission.name} (${mission.current}/${mission.target})`);
 
-            const current = secondaryIncomplete[0];
-            const next = secondaryIncomplete[1] || null;
+        // Store for forced category
+        currentMissionIndustry = mission.name;
 
-            // STORE current mission industry globally
-            currentMissionIndustry = current.industry;
-
-            const mission = {
-                industry: current.industry,
-                currentCount: current.count,
-                targetCount: current.target,
-                progress: Math.round((current.count / current.target) * 100),
-                nextIndustry: next?.industry || null,
-                tier: 'secondary',
-                isComplete: false
-            };
-
-            showMission(mission);
-            console.log('📊 SECONDARY:', current.industry, current.count + '/50');
-            console.log('🎯 FORCED CATEGORY:', currentMissionIndustry);
-            return;
-        }
-
-        const current = incomplete[0];
-        const next = incomplete[1] || null;
-
-        // STORE current mission industry globally
-        currentMissionIndustry = current.industry;
-
-        const mission = {
-            industry: current.industry,
-            currentCount: current.count,
-            targetCount: current.target,
-            progress: Math.round((current.count / current.target) * 100),
-            nextIndustry: next?.industry || null,
-            tier: 'core',
-            isComplete: false
-        };
-
+        // Update UI
         showMission(mission);
-        console.log('📊 LOCAL COUNT:', current.industry, current.count + '/100');
-        console.log('🎯 FORCED CATEGORY:', currentMissionIndustry);
+
+        console.log(`🎯 Current mission: ${mission.name} (${mission.current}/${mission.target})`);
 
     } catch (error) {
-        console.error('Error loading curator mode:', error);
-        showCuratorError();
+        console.error('Error in loadCuratorMode:', error);
+        showError('Error loading data');
     }
 }
 
 function showMission(mission) {
-    // Hide completion states (with null checks)
-    const missionComplete = document.getElementById('missionComplete');
-    const allComplete = document.getElementById('allComplete');
-    if (missionComplete) missionComplete.style.display = 'none';
-    if (allComplete) allComplete.style.display = 'none';
-
-    // Show mission details
     const industryEl = document.getElementById('missionIndustry');
-    if (industryEl) {
-        industryEl.textContent = mission.industry.toUpperCase();
-    }
-
-    // Show next industry in header
-    const nextContainer = document.getElementById('nextIndustryContainer');
-    const nextIndustryEl = document.getElementById('nextIndustry');
-    if (mission.nextIndustry && nextContainer && nextIndustryEl) {
-        nextContainer.style.display = 'block';
-        nextIndustryEl.textContent = mission.nextIndustry;
-    } else if (nextContainer) {
-        nextContainer.style.display = 'none';
-    }
-
-    // Update progress with DYNAMIC target (3-tier system)
     const currentEl = document.getElementById('progressCurrent');
     const targetEl = document.getElementById('progressTarget');
-    const percentageEl = document.getElementById('progressPercentage');
-    const progressBarEl = document.getElementById('missionProgressBar');
+    const percentEl = document.getElementById('progressPercentage');
+    const barEl = document.getElementById('missionProgressBar');
 
-    if (currentEl) currentEl.textContent = mission.currentCount;
-    if (targetEl) targetEl.textContent = mission.targetCount; // ✅ Dynamic!
-    if (percentageEl) percentageEl.textContent = `${mission.progress}%`;
-    if (progressBarEl) progressBarEl.style.width = `${mission.progress}%`;
+    if (industryEl) industryEl.textContent = mission.name.toUpperCase();
+    if (currentEl) currentEl.textContent = mission.current;
+    if (targetEl) targetEl.textContent = mission.target;
+    if (percentEl) percentEl.textContent = `${mission.progress}%`;
+    if (barEl) barEl.style.width = `${mission.progress}%`;
 
-    // Render queries (removed from UI but keeping code for potential future use)
-    const queryList = document.getElementById('queryList');
-    if (queryList) {
-        queryList.innerHTML = '';
+    // Show lock indicator if locked
+    const lockIndicator = document.getElementById('lockIndicator');
+    if (lockIndicator) {
+        lockIndicator.style.display = mission.locked ? 'inline' : 'none';
+    }
 
-        mission.queries.forEach((query, index) => {
-            const card = document.createElement('div');
-            card.className = 'query-card';
-            card.innerHTML = `
-                <span class="query-text">${index + 1}. ${query}</span>
-                <button class="btn-copy-query" data-query="${query}">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11.6667 7.65624L11.6667 4.74996C11.6667 3.09309 10.3236 1.74994 8.66671 1.74996L5.7605 1.74999M8.16675 12.25L4.22925 12.25C3.50438 12.25 2.91675 11.6624 2.91675 10.9375L2.91675 5.24999C2.91675 4.52512 3.50437 3.93749 4.22925 3.93749L8.16675 3.93749C8.89162 3.93749 9.47925 4.52512 9.47925 5.24999L9.47925 10.9375C9.47925 11.6624 8.89162 12.25 8.16675 12.25Z" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
-                    </svg>
-                </button>
-            `;
-            queryList.appendChild(card);
+    // Hide completion states
+    const allComplete = document.getElementById('allComplete');
+    if (allComplete) allComplete.style.display = 'none';
+}
+
+function showAllComplete() {
+    const industryEl = document.getElementById('missionIndustry');
+    const allComplete = document.getElementById('allComplete');
+
+    if (industryEl) {
+        industryEl.textContent = 'ALL COMPLETE! 🎉';
+        industryEl.style.color = '#00D9A3';
+    }
+    if (allComplete) {
+        allComplete.style.display = 'block';
+    }
+
+    currentMissionIndustry = null;
+}
+
+function showError(message) {
+    const industryEl = document.getElementById('missionIndustry');
+    if (industryEl) {
+        industryEl.textContent = 'ERROR';
+        industryEl.style.color = '#ff6b6b';
+    }
+    console.error(message);
+}
+
+// ============================================
+// API SYNC
+// ============================================
+
+async function syncIndustryCounts(forceRefresh = false) {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout (refresh is slower)
+
+        // Add ?refresh=true to bypass server cache when needed
+        const url = forceRefresh
+            ? `${API_BASE}/get-curation-mission?refresh=true`
+            : `${API_BASE}/get-curation-mission`;
+
+        console.log(`🔄 Syncing counts${forceRefresh ? ' (FORCE REFRESH)' : ''}...`);
+
+        const response = await fetch(url, {
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
-        // Add copy listeners
-        document.querySelectorAll('.btn-copy-query').forEach(btn => {
-            btn.addEventListener('click', () => copyQuery(btn));
-        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+
+        if (data.allCounts) {
+            await chrome.storage.local.set({
+                industryCounts: data.allCounts,
+                lastSync: Date.now()
+            });
+            console.log('✅ Counts synced:', Object.keys(data.allCounts).length, 'categories');
+            return true;
+        }
+
+        return false;
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            console.warn('⏱️ Sync timeout');
+        } else {
+            console.error('❌ Sync failed:', error.message);
+        }
+        return false;
     }
-
-    // Check if mission is complete
-    if (mission.currentCount >= mission.targetCount) {
-        showMissionComplete(mission);
-    }
-}
-
-function copyQuery(btn) {
-    const query = btn.dataset.query;
-    navigator.clipboard.writeText(query);
-
-    btn.classList.add('copied');
-
-    setTimeout(() => {
-        btn.classList.remove('copied');
-    }, 2000);
-}
-
-function showMissionComplete(mission) {
-    const missionCompleteEl = document.getElementById('missionComplete');
-    const nextIndustryEl = document.getElementById('nextIndustry');
-
-    if (missionCompleteEl) {
-        missionCompleteEl.style.display = 'block';
-    }
-
-    if (nextIndustryEl) {
-        nextIndustryEl.textContent = mission.nextIndustry || 'None';
-    }
-
-    const btnNext = document.getElementById('btnNextMission');
-    if (btnNext) {
-        btnNext.onclick = () => {
-            loadCuratorMode(); // Reload to get next mission
-        };
-    }
-}
-
-function showAllComplete(mission) {
-    const allCompleteEl = document.getElementById('allComplete');
-    const totalPinsEl = document.getElementById('totalPinsComplete');
-
-    if (allCompleteEl) {
-        allCompleteEl.style.display = 'block';
-    }
-
-    if (totalPinsEl && mission.totalProgress) {
-        totalPinsEl.textContent = mission.totalProgress.current;
-    }
-}
-
-function showCuratorError() {
-    const industry = document.getElementById('missionIndustry');
-    if (industry) {
-        industry.textContent = 'ERROR';
-        industry.style.color = '#ff6b6b';
-    }
-}
-
-// Auto-refresh after batch save
-chrome.storage.onChanged.addListener((changes) => {
-    if (changes.totalPins) {
-        // Batch save completed, refresh mission
-        setTimeout(() => loadCuratorMode(), 1000);
-    }
-});
-
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).catch(err => {
-        console.error('Failed to copy:', err);
-    });
 }
 
 // ============================================
@@ -446,96 +331,62 @@ function copyToClipboard(text) {
 // ============================================
 
 function initBatchHandlers() {
-    const scanBtn = document.getElementById('scanBtn');
-    const processBtn = document.getElementById('processBtn');
-
-    scanBtn.addEventListener('click', handleScanClick);
-    processBtn.addEventListener('click', handleProcessClick);
+    document.getElementById('scanBtn')?.addEventListener('click', handleScanClick);
+    document.getElementById('processBtn')?.addEventListener('click', handleProcessClick);
 }
 
 async function handleScanClick() {
     const btn = document.getElementById('scanBtn');
     const btnText = document.getElementById('scanBtnText');
 
-    if (batchState === 'processing') {
-        // Cancel processing
-        cancelProcessing();
-        return;
-    }
-
-    // Disable button
     btn.disabled = true;
     btnText.textContent = 'Scanning...';
 
     try {
-        // Get active tab
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-        // Check if on Pinterest
         if (!tab.url.includes('pinterest.com') && !tab.url.includes('pinterest.cl')) {
             alert('Please navigate to Pinterest first!');
-            btn.disabled = false;
-            btnText.textContent = batchState === 'initial' ? 'Smart Scan' : 'Scan page';
             return;
         }
 
-        // Send message to content script
         const response = await chrome.tabs.sendMessage(tab.id, {
             action: 'scan-images-for-popup'
         });
 
-        if (response && response.images && response.images.length > 0) {
+        if (response?.images?.length > 0) {
             scannedImages = response.images;
             selectedCount = scannedImages.filter(img => img.selected).length;
-
             renderGrid();
             setBatchState('scanned');
         } else {
             alert('No images found on this page.');
         }
-
     } catch (err) {
         console.error('Scan error:', err);
-
-        let errorMsg = 'Could not scan page. Please try the following:\n\n';
-        if (err.message && err.message.includes('Receiving end does not exist')) {
-            errorMsg += '1. Refresh the Pinterest page\n';
-            errorMsg += '2. Reload the extension (chrome://extensions/)\n';
-            errorMsg += '3. Try again';
-        } else {
-            errorMsg += '1. Refresh the Pinterest page\n';
-            errorMsg += '2. Try again';
-        }
-
-        alert(errorMsg);
+        alert('Could not scan page. Please refresh and try again.');
     } finally {
         btn.disabled = false;
-        btnText.textContent = batchState === 'initial' ? 'Smart Scan' : 'Scan page';
+        btnText.textContent = 'Smart Scan';
     }
 }
 
 function renderGrid() {
     const grid = document.getElementById('thumbnailGrid');
+    if (!grid) return;
+
     grid.innerHTML = '';
 
     scannedImages.forEach((imageData, index) => {
         const item = document.createElement('div');
-        item.className = 'grid-item';
-        if (!imageData.selected) {
-            item.classList.add('deselected');
-        }
+        item.className = 'grid-item' + (imageData.selected ? '' : ' deselected');
 
         const img = document.createElement('img');
         img.src = imageData.src;
         img.alt = imageData.alt || '';
 
         item.appendChild(img);
-
-        // Click to toggle selection
-        item.addEventListener('click', () => {
-            toggleSelection(index);
-        });
-
+        item.addEventListener('click', () => toggleSelection(index));
         grid.appendChild(item);
     });
 
@@ -545,21 +396,20 @@ function renderGrid() {
 function toggleSelection(index) {
     scannedImages[index].selected = !scannedImages[index].selected;
 
-    // Update UI
     const items = document.querySelectorAll('.grid-item');
     items[index].classList.toggle('deselected');
 
-    // Update counter
     selectedCount = scannedImages.filter(img => img.selected).length;
     updateSelectionCounter();
 
-    // Enable/disable process button
     document.getElementById('processBtn').disabled = selectedCount === 0;
 }
 
 function updateSelectionCounter() {
     const counter = document.getElementById('selectionCounter');
-    counter.textContent = `${selectedCount} designs selected. Deselect the ones you think are not a good fit in terms of design quality.`;
+    if (counter) {
+        counter.textContent = `${selectedCount} designs selected.`;
+    }
 }
 
 async function handleProcessClick() {
@@ -568,34 +418,23 @@ async function handleProcessClick() {
     setBatchState('processing');
 
     const selectedImages = scannedImages.filter(img => img.selected);
-    let saved = 0;
-    let duplicates = 0;
-    let failed = 0;
+    let saved = 0, duplicates = 0, failed = 0;
 
     for (let i = 0; i < selectedImages.length; i++) {
-        // Update progress
         updateProgress(i + 1, selectedImages.length);
 
         try {
-            // Get active tab
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-            // Send message to save image WITH FORCED CATEGORY
             const response = await chrome.tabs.sendMessage(tab.id, {
                 action: 'save-image-from-popup',
                 imageData: selectedImages[i],
-                forcedCategory: currentMissionIndustry  // FORCE this category
+                forcedCategory: currentMissionIndustry  // FORCE category
             });
 
-            if (response && response.success) {
-                if (response.success === 'saved') {
-                    saved++;
-                } else if (response.success === 'duplicate') {
-                    duplicates++;
-                }
-            } else {
-                failed++;
-            }
+            if (response?.success === 'saved') saved++;
+            else if (response?.success === 'duplicate') duplicates++;
+            else failed++;
 
         } catch (err) {
             console.error('Error saving image:', err);
@@ -603,57 +442,25 @@ async function handleProcessClick() {
         }
     }
 
-    // Show results
     showResults(saved, duplicates, failed);
 
-    // Update storage
     if (saved > 0) {
+        // Update local stats
         chrome.storage.sync.get(['todayPins', 'totalPins', 'lastDate'], (result) => {
             const today = new Date().toDateString();
             let todayPins = result.todayPins || 0;
-            let totalPins = result.totalPins || 0;
-
-            if (result.lastDate !== today) {
-                todayPins = 0;
-            }
-
-            todayPins += saved;
-            totalPins += saved;
+            if (result.lastDate !== today) todayPins = 0;
 
             chrome.storage.sync.set({
-                todayPins,
-                totalPins,
+                todayPins: todayPins + saved,
+                totalPins: (result.totalPins || 0) + saved,
                 lastDate: today
             });
         });
 
-        // SYNC LOCAL COUNTS with API after batch save
-        syncIndustryCounts();
-    }
-}
-
-// Sync local industry counts with API
-async function syncIndustryCounts() {
-    try {
-        console.log('🔄 Syncing industry counts with API...');
-        const response = await fetch(`${API_BASE}/get-curation-mission`);
-        const data = await response.json();
-
-        // Handle both normal and "all complete" responses
-        if (data.allCounts) {
-            await chrome.storage.local.set({
-                industryCounts: data.allCounts,
-                lastSync: Date.now(),
-                isComplete: data.isComplete || false
-            });
-            console.log('✅ Industry counts synced:', data.allCounts);
-            console.log('📊 All complete:', data.isComplete);
-        } else {
-            console.warn('⚠️ No allCounts in response:', data);
-        }
-    } catch (error) {
-        console.error('❌ Failed to sync counts:', error);
-        // Don't throw - allow UI to continue with cached data
+        // Sync counts after save - FORCE REFRESH to bypass server cache
+        await syncIndustryCounts(true);
+        await loadCuratorMode();
     }
 }
 
@@ -661,36 +468,22 @@ function updateProgress(current, total) {
     const label = document.getElementById('progressLabel');
     const bar = document.getElementById('progressBar');
 
-    label.textContent = `Processing ${current}/${total} images`;
-    bar.style.width = `${(current / total) * 100}%`;
+    if (label) label.textContent = `Processing ${current}/${total} images`;
+    if (bar) bar.style.width = `${(current / total) * 100}%`;
 }
 
 function showResults(saved, duplicates, failed) {
     document.getElementById('savedCount').textContent = saved;
     document.getElementById('duplicatesCount').textContent = duplicates;
     document.getElementById('failedCount').textContent = failed;
-
     setBatchState('results');
 }
-
-function cancelProcessing() {
-    // TODO: Implement cancel logic
-    setBatchState('scanned');
-}
-
-// ============================================
-// BATCH STATE MANAGEMENT
-// ============================================
 
 function setBatchState(state) {
     batchState = state;
 
-    // Hide all states
-    document.querySelectorAll('.batch-state').forEach(el => {
-        el.classList.add('hidden');
-    });
+    document.querySelectorAll('.batch-state').forEach(el => el.classList.add('hidden'));
 
-    // Show current state
     const stateMap = {
         'initial': 'batch-initial',
         'scanned': 'batch-scanned',
@@ -698,37 +491,79 @@ function setBatchState(state) {
         'results': 'batch-results'
     };
 
-    document.getElementById(stateMap[state]).classList.remove('hidden');
+    document.getElementById(stateMap[state])?.classList.remove('hidden');
 
-    // Update buttons
-    updateBatchButtons();
+    const scanBtn = document.getElementById('scanBtn');
+    const processBtn = document.getElementById('processBtn');
+
+    if (scanBtn) scanBtn.disabled = state === 'processing';
+    if (processBtn) processBtn.disabled = state !== 'scanned' || selectedCount === 0;
 }
 
-function updateBatchButtons() {
-    const scanBtn = document.getElementById('scanBtn');
-    const scanBtnText = document.getElementById('scanBtnText');
-    const processBtn = document.getElementById('processBtn');
-    const processBtnText = document.getElementById('processBtnText');
+// ============================================
+// SHARED LOGIC (from categories-config.js)
+// ============================================
 
-    switch (batchState) {
-        case 'initial':
-            scanBtn.disabled = false;
-            processBtn.disabled = true;
-            break;
+// Inline the getCurrentMission logic to avoid import issues in Chrome extension
+function getCurrentMission(counts) {
+    const allCategories = [
+        // Core (target: 100)
+        { name: 'Finance', target: 100 },
+        { name: 'Fitness', target: 100 },
+        { name: 'Ecommerce', target: 100 },
+        { name: 'Tech', target: 100 },
+        { name: 'Education', target: 100 },
+        { name: 'Saas', target: 100 },
+        { name: 'Healthcare', target: 100 },
+        // Secondary (target: 50)
+        { name: 'Real estate', target: 50 },
+        { name: 'Food', target: 50 },
+        { name: 'Fashion', target: 50 },
+        { name: 'Travel', target: 50 },
+        { name: 'Construction', target: 50 },
+        { name: 'Furniture', target: 50 },
+        { name: 'Home services', target: 50 },
+        { name: 'Logistics', target: 50 },
+        { name: 'Business', target: 50 },
+        { name: 'Sustainability', target: 50 },
+        { name: 'Consulting', target: 50 },
+        { name: 'Transportation', target: 50 },
+        { name: 'Digital agency', target: 50 },
+        { name: 'Beauty', target: 50 },
+        { name: 'Agriculture', target: 50 },
+        { name: 'NGO', target: 50 },
+        { name: 'Portfolio', target: 50 }
+    ];
 
-        case 'scanned':
-            scanBtn.disabled = false;
-            processBtn.disabled = selectedCount === 0;
-            break;
+    const incomplete = allCategories
+        .map(cat => {
+            const count = getCountCaseInsensitive(counts, cat.name);
+            return {
+                name: cat.name,
+                target: cat.target,
+                current: count,
+                progress: Math.round((count / cat.target) * 100),
+                tier: cat.target === 100 ? 'core' : 'secondary',
+                isComplete: count >= cat.target
+            };
+        })
+        .filter(cat => !cat.isComplete)
+        .sort((a, b) => a.current - b.current);
 
-        case 'processing':
-            scanBtn.disabled = true;
-            processBtn.disabled = false;
-            break;
-
-        case 'results':
-            scanBtn.disabled = false;
-            processBtn.disabled = true;
-            break;
+    if (incomplete.length === 0) {
+        return { name: null, isAllComplete: true };
     }
+
+    return incomplete[0];
+}
+
+function getCountCaseInsensitive(counts, name) {
+    if (!counts) return 0;
+    if (counts[name] !== undefined) return counts[name];
+
+    const lowerName = name.toLowerCase();
+    for (const key of Object.keys(counts)) {
+        if (key.toLowerCase() === lowerName) return counts[key];
+    }
+    return 0;
 }

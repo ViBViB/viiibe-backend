@@ -12,7 +12,7 @@ const API_BASE_URL = 'https://moood-refactor.vercel.app/api';
 const API_ENDPOINTS = {
     pinterestProxy: `${API_BASE_URL}/pinterest-proxy`,
     curatedBoards: `${API_BASE_URL}/curated-boards`,
-    getSavedPins: `${API_BASE_URL}/get-saved-pins`,
+    getSavedPins: `${API_BASE_URL}/pins`,
     imageProxy: `${API_BASE_URL}/image-proxy`,
 };
 

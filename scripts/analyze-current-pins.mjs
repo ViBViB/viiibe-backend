@@ -1,4 +1,8 @@
+import { config } from 'dotenv';
 import { kv } from '@vercel/kv';
+
+// Load environment variables from .env.local
+config({ path: '.env.local' });
 
 async function analyzeAllIndustries() {
     console.log('🔍 Scanning all pins for industry distribution...\n');

@@ -4,6 +4,31 @@
 // Import centralized configuration
 const API_BASE = 'https://moood-refactor.vercel.app/api';
 
+// ============================================
+// SAFE RUNTIME MESSAGING
+// ============================================
+
+/**
+ * Safely send messages to background script
+ * Handles extension context invalidation gracefully
+ */
+function safeRuntimeMessage(message) {
+    try {
+        return chrome.runtime.sendMessage(message).catch(err => {
+            if (err.message.includes('Extension context invalidated') ||
+                err.message.includes('Receiving end does not exist')) {
+                console.warn('⚠️ Extension was reloaded. Please refresh this page to reconnect.');
+                return null;
+            } else {
+                console.error('Runtime message error:', err);
+                return null;
+            }
+        });
+    } catch (err) {
+        console.error('Failed to send runtime message:', err);
+        return null;
+    }
+}
 
 // ============================================
 // URL UPGRADING HELPERS
@@ -152,7 +177,7 @@ async function saveDesignToMoood(designData, category = 'uncategorized') {
         // INCREMENT LOCAL COUNTER if AI analysis succeeded
         if (result.aiAnalysis && result.aiAnalysis.industry) {
             const industry = result.aiAnalysis.industry;
-            chrome.runtime.sendMessage({
+            safeRuntimeMessage({
                 action: 'increment-industry-count',
                 industry: industry
             });
@@ -370,7 +395,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('❌ No valid design data found');
             const platform = typeof getCurrentPlatform !== 'undefined' ? getCurrentPlatform() : 'unknown';
             showNotification(`Not a valid ${platform} design page`, 'error');
-            chrome.runtime.sendMessage({ action: 'pin-error' });
+            safeRuntimeMessage({ action: 'pin-error' });
             sendResponse({ success: false });
             return;
         }
@@ -386,7 +411,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             if (success && success !== 'duplicate') {
                 // Don't show notification here - savePinToViiibe already shows it
-                chrome.runtime.sendMessage({ action: 'pin-saved' });
+                safeRuntimeMessage({ action: 'pin-saved' });
 
 
 
@@ -411,14 +436,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     });
 
                     // SYNC COUNTER after individual save
-                    chrome.runtime.sendMessage({ action: 'sync-industry-counts' });
+                    safeRuntimeMessage({ action: 'sync-industry-counts' });
                     console.log(`📊 Stats updated: Today=${todayPins}, Total=${totalPins}`);
                 });
             } else if (success === 'duplicate') {
                 // Duplicate already handled in savePinToViiibe
-                chrome.runtime.sendMessage({ action: 'pin-saved' });
+                safeRuntimeMessage({ action: 'pin-saved' });
             } else {
-                chrome.runtime.sendMessage({ action: 'pin-error' });
+                safeRuntimeMessage({ action: 'pin-error' });
             }
 
             sendResponse({ success: !!success });

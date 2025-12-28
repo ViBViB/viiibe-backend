@@ -6,7 +6,7 @@
 const API_BASE_URL = 'https://moood-refactor.vercel.app/api';
 const PROXY_URL = `${API_BASE_URL}/pinterest-proxy`;
 const CURATED_BOARDS_URL = `${API_BASE_URL}/curated-boards`;
-const SAVED_PINS_URL = `${API_BASE_URL}/get-saved-pins`;
+const SAVED_PINS_URL = `${API_BASE_URL}/pins`;
 
 figma.showUI(__html__, { width: 720, height: 760, title: "Viiibe" });
 

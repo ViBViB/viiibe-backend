@@ -222,20 +222,9 @@
                     return;
                 }
 
-                // If we got a pin, check if it's categorized
+                // If we got a pin, render it
                 if (data.pins.length > 0) {
                     currentPin = data.pins[0];
-
-                    // Auto-skip uncategorized pins (those without AI analysis)
-                    if (currentPin.currentIndustry === 'Uncategorized') {
-                        console.log(`Auto-skipping uncategorized pin: ${currentPin.pinId}`);
-                        currentOffset++;
-                        saveProgress();
-                        // Recursively load next pin
-                        await loadNextPin();
-                        return;
-                    }
-
                     renderPin(currentPin);
                     updateProgress();
                     saveProgress(); // Save after loading each pin

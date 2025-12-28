@@ -191,18 +191,30 @@ async function analyzeWithGPT4(imageUrl: string, forcedCategory?: string) {
     // COST OPTIMIZATION: Skip industry classification if forced category provided
     const industryField = forcedCategory
         ? '' // Don't ask AI for industry if we already know it
-        : `  \"industry\": array with EXACTLY ONE industry tag. You MUST choose the single best match from this EXACT list: [\"Real Estate\", \"Tech\", \"Finance\", \"Fitness\", \"Healthcare\", \"Saas\", \"Ecommerce\", \"Education\", \"Travel\", \"Food\", \"Fashion\", \"Logistics\", \"Furniture\", \"Beauty\", \"Transport\", \"Transportation\", \"Consulting\", \"Construction\", \"Business\", \"Legal\", \"Home Services\"]. Use the EXACT capitalization shown. Choose only ONE that best matches the design's target industry.,`;
+        : `  "industry": array with EXACTLY ONE industry tag. You MUST choose the single best match from this EXACT list: ["Real Estate", "Tech", "Finance", "Fitness", "Healthcare", "Saas", "Ecommerce", "Education", "Travel", "Food", "Fashion", "Logistics", "Furniture", "Beauty", "Transport", "Transportation", "Consulting", "Construction", "Business", "Legal", "Home Services", "NGO", "Portfolio"]. Use the EXACT capitalization shown. Choose only ONE that best matches the design's target industry.,`;
 
-    const prompt = `Analyze this design image and return ONLY a JSON object with these exact fields:
+    const prompt = forcedCategory
+        ? `Analyze this design image and return ONLY a JSON object with these exact fields:
 {
-  \"style\": array of 2-4 style tags from: minimal, bold, clean, dark, light, gradient, flat, 3d, glassmorphism, neumorphism, modern, retro, elegant, playful,
-${industryField}
-  \"typography\": one tag from: sans-serif, serif, display, monospace, handwritten, bold-headers, minimal-text,
-  \"layout\": one tag from: hero-section, grid-layout, cards, split-screen, full-width, sidebar, centered, asymmetric,
-  \"elements\": array of 2-5 key design elements like: gradient-background, large-cta-button, product-screenshot, testimonials, pricing-table, etc.
+  "style": array of 2-4 style tags from: minimal, bold, clean, dark, light, gradient, flat, 3d, glassmorphism, neumorphism, modern, retro, elegant, playful,
+  "typography": one tag from: sans-serif, serif, display, monospace, handwritten, bold-headers, minimal-text,
+  "layout": one tag from: hero-section, grid-layout, cards, split-screen, full-width, sidebar, centered, asymmetric,
+  "elements": array of 2-5 key design elements like: gradient-background, large-cta-button, product-screenshot, testimonials, pricing-table, etc.
 }
 
-${forcedCategory ? `NOTE: This design is for the ${forcedCategory} industry (already known), so focus on style, typography, layout, and elements.` : 'CRITICAL: For \"industry\", you MUST return an array with EXACTLY ONE element from the list above. Match the capitalization exactly (e.g., \"Real Estate\" not \"real-estate\", \"Home Services\" not \"home-services\").'}
+NOTE: This design is for the ${forcedCategory} industry (already known), so focus ONLY on style, typography, layout, and elements. DO NOT analyze industry.
+
+Return ONLY the JSON, no other text.`
+        : `Analyze this design image and return ONLY a JSON object with these exact fields:
+{
+  "style": array of 2-4 style tags from: minimal, bold, clean, dark, light, gradient, flat, 3d, glassmorphism, neumorphism, modern, retro, elegant, playful,
+${industryField}
+  "typography": one tag from: sans-serif, serif, display, monospace, handwritten, bold-headers, minimal-text,
+  "layout": one tag from: hero-section, grid-layout, cards, split-screen, full-width, sidebar, centered, asymmetric,
+  "elements": array of 2-5 key design elements like: gradient-background, large-cta-button, product-screenshot, testimonials, pricing-table, etc.
+}
+
+CRITICAL: For "industry", you MUST return an array with EXACTLY ONE element from the list above. Match the capitalization exactly (e.g., "Real Estate" not "real-estate", "Home Services" not "home-services").
 
 Return ONLY the JSON, no other text.`;
 
@@ -253,10 +265,12 @@ function combineTags(visionData: any, gptData: any, pinMetadata: any, forcedCate
     const uniqueColors = [...new Set(dominantColors)];
 
     // USE FORCED CATEGORY if provided, otherwise use AI classification
-    const industry = forcedCategory ? [forcedCategory] : (gptData.industry || ['tech']);
+    const industry = forcedCategory ? [forcedCategory] : (gptData.industry || ['Tech']);
 
     if (forcedCategory) {
-        console.log(`🎯 OVERRIDING AI industry (${gptData.industry}) with FORCED: ${forcedCategory}`);
+        console.log(`✅ Using FORCED category: ${forcedCategory} (AI analysis skipped, cost saved)`);
+    } else {
+        console.log(`🤖 Using AI category: ${gptData.industry || ['Tech']}`);
     }
 
     return {

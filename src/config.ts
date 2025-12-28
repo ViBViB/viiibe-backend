@@ -13,8 +13,8 @@ export const API_BASE_URL = 'https://moood-refactor.vercel.app/api';
 export const API_ENDPOINTS = {
     // Pin management
     savePin: `${API_BASE_URL}/save-pin`,
-    getSavedPins: `${API_BASE_URL}/get-saved-pins`,
-    getPinsCount: `${API_BASE_URL}/get-pins-count`,
+    getSavedPins: `${API_BASE_URL}/pins`,
+    getPinsCount: `${API_BASE_URL}/pins?action=count`,
     deletePin: `${API_BASE_URL}/delete-pin`,
 
     // Pinterest proxy

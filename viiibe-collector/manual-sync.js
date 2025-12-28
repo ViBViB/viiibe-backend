@@ -17,7 +17,7 @@
         const API_BASE = 'https://viiibe-backend-nfueitpl1-alberto-contreras-projects-101c33ba.vercel.app/api';
 
         console.log('📡 Fetching from backend...');
-        const response = await fetch(`${API_BASE}/get-saved-pins?adminKey=${adminKey}&limit=1`);
+        const response = await fetch(`${API_BASE}/pins?adminKey=${adminKey}&limit=1`);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);

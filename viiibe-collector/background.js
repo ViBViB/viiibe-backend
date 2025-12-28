@@ -1,85 +1,94 @@
-// Background service worker for Moood! Collector
-// Handles context menu creation and messaging
+// ============================================
+// MOOOD! COLLECTOR - BACKGROUND SERVICE WORKER
+// Rewritten Dec 26, 2024
+// ============================================
 
-// LOCAL PIN COUNTER - Real counts from DB (Dec 24, 2024)
-const INITIAL_COUNTS = {
-    'Finance': 81, 'Fitness': 71, 'Healthcare': 59, 'Ecommerce': 46,
-    'Tech': 45, 'Education': 43, 'Saas': 42, 'Food': 37,
-    'Construction': 30, 'Furniture': 23, 'Fashion': 23, 'Home Services': 20,
-    'Logistics': 19, 'Sustainability': 16, 'Travel': 15, 'Consulting': 13,
-    'Business': 11, 'Transportation': 11, 'Digital Agency': 11,
-    'Beauty': 9, 'Agriculture': 7
-};
+// All 22 categories with targets
+const ALL_CATEGORIES = [
+    // Core (target: 100)
+    { name: 'Finance', target: 100 },
+    { name: 'Fitness', target: 100 },
+    { name: 'Ecommerce', target: 100 },
+    { name: 'Tech', target: 100 },
+    { name: 'Education', target: 100 },
+    { name: 'Saas', target: 100 },
+    { name: 'Healthcare', target: 100 },
+    // Secondary (target: 50)
+    { name: 'Real estate', target: 50 },
+    { name: 'Food', target: 50 },
+    { name: 'Fashion', target: 50 },
+    { name: 'Travel', target: 50 },
+    { name: 'Construction', target: 50 },
+    { name: 'Furniture', target: 50 },
+    { name: 'Home services', target: 50 },
+    { name: 'Logistics', target: 50 },
+    { name: 'Business', target: 50 },
+    { name: 'Sustainability', target: 50 },
+    { name: 'Consulting', target: 50 },
+    { name: 'Transportation', target: 50 },
+    { name: 'Digital agency', target: 50 },
+    { name: 'Beauty', target: 50 },
+    { name: 'Agriculture', target: 50 }
+];
 
-// Create context menu on installation
+// Initial counts will be fetched from API on first load
+const INITIAL_COUNTS = {};
+
+// ============================================
+// INSTALLATION
+// ============================================
+
 chrome.runtime.onInstalled.addListener(async () => {
-    // Initialize local counts
-    const stored = await chrome.storage.local.get('industryCounts');
-    if (!stored.industryCounts) {
-        await chrome.storage.local.set({
-            industryCounts: INITIAL_COUNTS,
-            lastSync: Date.now()
+    // Don't initialize with hardcoded counts - popup will fetch from API
+    console.log('✅ Extension installed - counts will be fetched from API on first popup open');
+
+    // Initialize stats if not present
+    const stats = await chrome.storage.sync.get(['todayPins', 'totalPins', 'lastDate']);
+    if (stats.todayPins === undefined) {
+        await chrome.storage.sync.set({
+            todayPins: 0,
+            totalPins: 0,
+            lastDate: new Date().toDateString()
         });
-        console.log('✅ Industry counts initialized');
+        console.log('✅ Stats initialized to 0');
+    } else {
+        console.log(`✅ Stats loaded: Today=${stats.todayPins}, Total=${stats.totalPins}`);
     }
 
-    // Remove all existing context menus first to avoid duplicates
+    // Create context menus
     chrome.contextMenus.removeAll(() => {
-        // PUBLIC: Quick Save (future public feature)
         chrome.contextMenus.create({
             id: 'add-to-moood',
             title: '💾 Add to Moood!',
             contexts: ['page', 'link', 'image']
         });
 
-        // PRO: Batch Mode (internal only)
         chrome.contextMenus.create({
             id: 'batch-mode',
-            title: '🖼️ Batch Mode (Select 20 images)',
+            title: '🖼️ Batch Mode',
             contexts: ['page']
         });
 
-        console.log('✅ Moood! Collector PRO installed - Context menus created');
+        console.log('✅ Context menus created');
     });
 });
 
-// Handle context menu clicks
+// ============================================
+// CONTEXT MENU HANDLER
+// ============================================
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'add-to-moood') {
-        // PUBLIC: Quick Save - GET CURRENT MISSION INDUSTRY
-        chrome.storage.local.get('industryCounts', (data) => {
-            const counts = data.industryCounts || INITIAL_COUNTS;
+        // Get locked category for forced save
+        chrome.storage.local.get('lockedCategory', (data) => {
+            const forcedCategory = data.lockedCategory?.name || null;
 
-            // Determine current mission (same logic as popup)
-            const CORE = ['Finance', 'Fitness', 'Ecommerce', 'Tech', 'Education', 'Saas', 'Healthcare'];
-            const incomplete = CORE
-                .map(name => ({ industry: name, count: counts[name] || 0, target: 100 }))
-                .filter(item => item.count < item.target)
-                .sort((a, b) => b.count - a.count);
-
-            let currentMission = incomplete[0]?.industry || null;
-
-            // If Core complete, check Secondary
-            if (!currentMission) {
-                const SECONDARY = ['Real Estate', 'Food', 'Fashion', 'Travel'];
-                const secondaryIncomplete = SECONDARY
-                    .map(name => ({
-                        industry: name,
-                        count: counts[name] || counts[name.replace(' ', '')] || 0,
-                        target: 50
-                    }))
-                    .filter(item => item.count < item.target)
-                    .sort((a, b) => b.count - a.count);
-
-                currentMission = secondaryIncomplete[0]?.industry || null;
-            }
-
-            console.log(`🎯 Individual save - Forced category: ${currentMission}`);
+            console.log(`🎯 Right-click save - Category: ${forcedCategory || 'uncategorized'}`);
 
             chrome.tabs.sendMessage(tab.id, {
                 action: 'save-pin',
                 url: info.pageUrl || info.linkUrl,
-                forcedCategory: currentMission  // PASS FORCED CATEGORY
+                forcedCategory: forcedCategory
             }).catch(err => {
                 console.log('Content script not available:', err.message);
             });
@@ -87,7 +96,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 
     if (info.menuItemId === 'batch-mode') {
-        // PRO: Batch Mode
         chrome.tabs.sendMessage(tab.id, {
             action: 'toggle-batch-mode'
         }).catch(err => {
@@ -96,51 +104,103 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 });
 
-// Listen for messages from content script
+// ============================================
+// MESSAGE HANDLERS
+// ============================================
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    // INCREMENT LOCAL COUNTER when pin saved
     if (request.action === 'increment-industry-count') {
         chrome.storage.local.get('industryCounts', (data) => {
             const counts = data.industryCounts || INITIAL_COUNTS;
             const industry = request.industry;
 
-            if (counts[industry] !== undefined) {
-                counts[industry]++;
+            // Case-insensitive increment
+            const key = findKeyCI(counts, industry);
+            if (key) {
+                counts[key]++;
                 chrome.storage.local.set({ industryCounts: counts });
-                console.log(`📊 ${industry}: ${counts[industry]}/100`);
+                console.log(`📊 ${key}: ${counts[key]}`);
             }
         });
     }
 
     if (request.action === 'pin-saved') {
-        // Update badge
         chrome.action.setBadgeText({ text: '✓', tabId: sender.tab.id });
         chrome.action.setBadgeBackgroundColor({ color: '#00D9A3', tabId: sender.tab.id });
-        setTimeout(() => {
-            chrome.action.setBadgeText({ text: '', tabId: sender.tab.id });
-        }, 2000);
+        setTimeout(() => chrome.action.setBadgeText({ text: '', tabId: sender.tab.id }), 2000);
     }
 
     if (request.action === 'pin-error') {
-        // Show error badge
         chrome.action.setBadgeText({ text: '!', tabId: sender.tab.id });
         chrome.action.setBadgeBackgroundColor({ color: '#ff0000', tabId: sender.tab.id });
-        setTimeout(() => {
-            chrome.action.setBadgeText({ text: '', tabId: sender.tab.id });
-        }, 3000);
+        setTimeout(() => chrome.action.setBadgeText({ text: '', tabId: sender.tab.id }), 3000);
     }
 
     if (request.action === 'batch-completed') {
-        // Update badge with batch count
         const saved = request.saved || 0;
         chrome.action.setBadgeText({ text: `${saved}`, tabId: sender.tab.id });
         chrome.action.setBadgeBackgroundColor({ color: '#00D9A3', tabId: sender.tab.id });
-        setTimeout(() => {
-            chrome.action.setBadgeText({ text: '', tabId: sender.tab.id });
-        }, 5000);
+        setTimeout(() => chrome.action.setBadgeText({ text: '', tabId: sender.tab.id }), 5000);
     }
 
     return true;
 });
 
-console.log('✅ Moood! Collector PRO background script loaded');
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+function getCurrentMission(counts) {
+    const incomplete = ALL_CATEGORIES
+        .map(cat => {
+            const count = getCountCI(counts, cat.name);
+            return {
+                name: cat.name,
+                target: cat.target,
+                current: count,
+                isComplete: count >= cat.target
+            };
+        })
+        .filter(cat => !cat.isComplete)
+        .sort((a, b) => a.current - b.current); // Lowest first
+
+    if (incomplete.length === 0) {
+        return { name: null, isAllComplete: true };
+    }
+
+    return incomplete[0];
+}
+
+function getCountCI(counts, name) {
+    if (!counts) return 0;
+    if (counts[name] !== undefined) return counts[name];
+
+    const lowerName = name.toLowerCase();
+    for (const key of Object.keys(counts)) {
+        if (key.toLowerCase() === lowerName) return counts[key];
+    }
+    return 0;
+}
+
+function findKeyCI(counts, name) {
+    if (!counts) return null;
+    if (counts[name] !== undefined) return name;
+
+    const lowerName = name.toLowerCase();
+    for (const key of Object.keys(counts)) {
+        if (key.toLowerCase() === lowerName) return key;
+    }
+    return null;
+}
+
+// ============================================
+// KEEPALIVE - Prevent service worker from going inactive
+// ============================================
+
+setInterval(() => {
+    chrome.storage.local.get('keepalive', () => {
+        // This keeps the service worker active
+    });
+}, 20000); // Every 20 seconds
+
+console.log('✅ Moood! Collector background loaded');
