@@ -5,7 +5,9 @@ export const views = {
     loading: document.getElementById('view-loading'),
     generating: document.getElementById('view-generating'),
     moodboard: document.getElementById('view-moodboard'),
-    details: document.getElementById('view-details')
+    details: document.getElementById('view-details'),
+    'mini-prd': document.getElementById('view-mini-prd'),
+    confirmation: document.getElementById('view-confirmation')
 };
 
 const wrapper = document.getElementById('view-wrapper');
@@ -25,7 +27,7 @@ export const sections = {
 };
 
 export function showView(viewId: string) {
-    const center = ['auth', 'authorization', 'search', 'loading', 'generating'].includes(viewId);
+    const center = ['auth', 'authorization', 'search', 'loading', 'generating', 'confirmation'].includes(viewId);
     wrapper?.classList.toggle('centered', center);
     Object.values(views).forEach(v => v?.classList.remove('active'));
     // @ts-ignore

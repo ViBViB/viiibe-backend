@@ -455,6 +455,22 @@ async function searchSavedPins(query, intent, randomize = false) {
       const description = (pin.description || '').toLowerCase();
       const text = title + ' ' + description;
 
+      // CRITICAL: Filter by industry FIRST if specified
+      if (intent && intent.industry) {
+        const pinIndustries = pin.aiAnalysis && pin.aiAnalysis.industry ? pin.aiAnalysis.industry : [];
+        const hasIndustryMatch = pinIndustries.some(ind =>
+          ind.toLowerCase() === intent.industry.toLowerCase()
+        );
+
+        // Skip pins that don't match the specified industry
+        if (!hasIndustryMatch) {
+          continue; // Skip this pin entirely
+        }
+
+        // Give massive boost for industry match
+        score += 10.0;
+      }
+
       // Match against query words
       const queryWords = query.toLowerCase().split(' ').filter(w => w.length > 2);
       for (let j = 0; j < queryWords.length; j++) {
@@ -465,12 +481,23 @@ async function searchSavedPins(query, intent, randomize = false) {
         }
       }
 
-      // Match against intent - styles
+      // Match against intent - styles (INCREASED WEIGHT)
       if (intent && intent.styles) {
         for (let j = 0; j < intent.styles.length; j++) {
           const style = intent.styles[j];
+          // Check in aiAnalysis.style array first (more reliable)
+          if (pin.aiAnalysis && pin.aiAnalysis.style && Array.isArray(pin.aiAnalysis.style)) {
+            for (let k = 0; k < pin.aiAnalysis.style.length; k++) {
+              const pinStyle = pin.aiAnalysis.style[k].toLowerCase();
+              if (pinStyle === style.toLowerCase() || pinStyle.includes(style.toLowerCase())) {
+                score += 5.0; // HIGH boost for AI style match
+                break;
+              }
+            }
+          }
+          // Fallback: also check text for style mentions
           if (text.indexOf(style) !== -1) {
-            score += 1.5;
+            score += 2.0;
           }
         }
       }
@@ -1868,9 +1895,17 @@ figma.ui.onmessage = async (msg) => {
       step: 1
     });
 
-    // 1. Analyze the query using NLP
-    const intent = analyzeSearchIntent(query);
-    console.log("📊 Extracted intent:", intent);
+    // 1. Use intent from Mini-PRD if provided, otherwise analyze the query using NLP
+    let intent;
+    if (msg.intent && msg.intent.industry) {
+      // Intent provided by Mini-PRD - use it directly
+      intent = msg.intent;
+      console.log("📊 Using Mini-PRD intent:", intent);
+    } else {
+      // No intent provided - analyze query with NLP
+      intent = analyzeSearchIntent(query);
+      console.log("📊 Extracted intent from query:", intent);
+    }
 
     // Progress: Step 2 - Searching saved pins
     figma.ui.postMessage({

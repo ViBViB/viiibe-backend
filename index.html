@@ -27,6 +27,18 @@
                         </svg>
                     </button>
                 </div>
+
+                <!-- MINI-PRD CTA -->
+                <div class="mini-prd-cta">
+                    <span class="or-divider">or</span>
+                    <button type="button" id="startMiniPRDButton" class="btn-mini-prd">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        Crear con Moood! 💬
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -191,6 +203,64 @@
                                 <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. MINI-PRD CHAT VIEW -->
+        <div id="view-mini-prd" class="view">
+            <div class="chat-container">
+                <!-- Header con progreso -->
+                <div class="chat-header">
+                    <div class="back-btn-chat" id="backFromChat">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="black" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="progress-indicator">
+                        <span id="chatCurrentStep">1</span>/<span id="chatTotalSteps">6</span>
+                    </div>
+                </div>
+
+                <!-- Mensajes del chat -->
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Los mensajes se agregan dinámicamente -->
+                </div>
+
+                <!-- Input area -->
+                <div class="chat-input-container">
+                    <textarea id="chatInput" placeholder="Escribe tu respuesta..." rows="1"></textarea>
+                    <button id="chatSendBtn" class="send-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="white" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. CONFIRMATION VIEW -->
+        <div id="view-confirmation" class="view centered">
+            <div class="container confirmation">
+                <div class="confirmation-content">
+                    <div class="confirmation-icon">✨</div>
+                    <h2 class="confirmation-title">I understand you're looking for:</h2>
+                    <p class="confirmation-summary" id="confirmationSummary">
+                        <!-- Se llena dinámicamente -->
+                    </p>
+                    <div class="confirmation-details" id="confirmationDetails">
+                        <!-- Se llena dinámicamente con tags -->
+                    </div>
+                    <div class="confirmation-actions">
+                        <button id="confirmGenerateBtn" class="btn-primary">
+                            Create Moood! board
+                        </button>
+                        <button id="confirmBackBtn" class="btn-secondary">
+                            Add more info
+                        </button>
                     </div>
                 </div>
             </div>

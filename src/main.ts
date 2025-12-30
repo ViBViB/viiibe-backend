@@ -10,8 +10,12 @@ import { getImageProxyUrl, upgradeToOriginals } from './config';
 import { calculatePaletteFromImages } from './ui/palette';
 
 // ==============================================================
-// DRAWER STATE MANAGEMENT
+// MINI-PRD CONTROLLER
 // ==============================================================
+
+import { MiniPRDController, MiniPRD } from './ui/mini-prd-gpt';
+
+
 
 interface StyleGuideConfig {
     downloadMoodboard: boolean;
@@ -161,6 +165,270 @@ document.addEventListener('DOMContentLoaded', function () {
             startSearch(searchInput.value);
         }
     };
+
+    // MINI-PRD CHAT FUNCTIONALITY
+    let miniPRDController: MiniPRDController | null = null;
+    const startMiniPRDButton = document.getElementById('startMiniPRDButton');
+    const chatInput = document.getElementById('chatInput') as HTMLTextAreaElement;
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatCurrentStep = document.getElementById('chatCurrentStep');
+    const backFromChat = document.getElementById('backFromChat');
+    const confirmGenerateBtn = document.getElementById('confirmGenerateBtn');
+    const confirmBackBtn = document.getElementById('confirmBackBtn');
+
+    function addChatMessage(text: string, isUser: boolean) {
+        if (!chatMessages) return;
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = isUser ? '👤' : '🎨';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+        bubble.textContent = text;
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(bubble);
+        chatMessages.appendChild(messageDiv);
+
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function updateChatProgress(current: number) {
+        if (chatCurrentStep) {
+            chatCurrentStep.textContent = String(current);
+        }
+    }
+
+    function showTypingIndicator() {
+        if (!chatMessages) return;
+
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot typing-indicator';
+        typingDiv.id = 'typing-indicator';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = '🎨';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+        bubble.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+
+        typingDiv.appendChild(avatar);
+        typingDiv.appendChild(bubble);
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+        const indicator = document.getElementById('typing-indicator');
+        if (indicator) indicator.remove();
+    }
+
+    async function handleChatSend() {
+        if (!miniPRDController || !chatInput) return;
+
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
+
+        // Add user message
+        addChatMessage(userMessage, true);
+
+        // Clear input
+        chatInput.value = '';
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        try {
+            // Send message to GPT-4
+            const botResponse = await miniPRDController.sendMessage(userMessage);
+
+            // Hide typing indicator
+            hideTypingIndicator();
+
+            // Add bot response
+            addChatMessage(botResponse, false);
+
+            // Check if PRD is complete
+            if (miniPRDController.isPRDComplete()) {
+                // Show confirmation IN THE CHAT after a short delay
+                setTimeout(() => {
+                    showInlinePRDConfirmation();
+                }, 1000);
+            }
+
+        } catch (error) {
+            hideTypingIndicator();
+            addChatMessage("Sorry, something went wrong. Please try again.", false);
+            console.error('Chat error:', error);
+        }
+    }
+
+    function showConfirmation() {
+        if (!miniPRDController) return;
+
+        const confirmationSummary = document.getElementById('confirmationSummary');
+        const confirmationDetails = document.getElementById('confirmationDetails');
+
+        // Generate conversational Mini-PRD summary
+        if (confirmationSummary) {
+            const summary = miniPRDController.generatePRDDocument();
+            confirmationSummary.textContent = summary;
+        }
+
+        // Hide the tags section - we don't need it anymore
+        if (confirmationDetails) {
+            confirmationDetails.style.display = 'none';
+        }
+
+        showView('confirmation');
+
+        function showInlinePRDConfirmation() {
+            if (!miniPRDController) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) return;
+
+            // Generate Mini-PRD summary and clean markdown formatting
+            let prdSummary = miniPRDController.generatePRDDocument();
+
+            // Remove markdown formatting (**, -, etc.)
+            prdSummary = prdSummary
+                .replace(/\*\*/g, '')  // Remove bold markers
+                .replace(/\*/g, '')    // Remove italic markers
+                .replace(/^- /gm, '')  // Remove list markers
+                .trim();
+
+            // Create confirmation message
+            const confirmDiv = document.createElement('div');
+            confirmDiv.className = 'message bot prd-confirmation';
+            confirmDiv.innerHTML = `
+            <div class="message-avatar">✨</div>
+            <div class="message-bubble">
+                <div class="prd-summary">${prdSummary}</div>
+                <div class="prd-actions">
+                    <button id="inlineConfirmBtn" class="btn-primary">Create Moood! board</button>
+                    <button id="inlineBackBtn" class="btn-secondary">Add more info</button>
+                </div>
+            </div>
+        `;
+
+            chatMessages.appendChild(confirmDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Add event listeners to inline buttons
+            const inlineConfirmBtn = document.getElementById('inlineConfirmBtn');
+            const inlineBackBtn = document.getElementById('inlineBackBtn');
+
+            if (inlineConfirmBtn) {
+                inlineConfirmBtn.onclick = () => {
+                    const prd = miniPRDController!.getPRD();
+
+                    // Build search query from PRD
+                    let query = '';
+                    if (prd.projectType) query += prd.projectType + ' ';
+                    if (prd.industry) query += prd.industry + ' ';
+                    if (prd.styles.length > 0) query += prd.styles.join(' ') + ' ';
+                    if (prd.colors.length > 0) query += prd.colors.join(' ') + ' ';
+
+                    // Start search
+                    startSearch(query.trim(), false, prd);
+
+                    // Reset controller
+                    miniPRDController = null;
+                };
+            }
+
+            if (inlineBackBtn) {
+                inlineBackBtn.onclick = () => {
+                    // Remove confirmation message
+                    confirmDiv.remove();
+                    // User can continue chatting
+                };
+            }
+        }
+    }
+
+    // Mini-PRD button click
+    if (startMiniPRDButton) {
+        startMiniPRDButton.onclick = () => {
+            miniPRDController = new MiniPRDController();
+
+            // Clear chat messages
+            if (chatMessages) chatMessages.innerHTML = '';
+
+            // Show initial GPT-4 prompt
+            const initialPrompt = miniPRDController.getInitialPrompt();
+            addChatMessage(initialPrompt, false);
+
+            // Hide progress indicator (no fixed questions in GPT-4 mode)
+            const progressContainer = document.querySelector('.chat-progress');
+            if (progressContainer) {
+                (progressContainer as HTMLElement).style.display = 'none';
+            }
+
+            showView('mini-prd');
+        };
+    }
+
+
+    // Chat send button
+    if (chatSendBtn) {
+        chatSendBtn.onclick = handleChatSend;
+    }
+
+    // Chat input enter key
+    if (chatInput) {
+        chatInput.onkeydown = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleChatSend();
+            }
+        };
+    }
+
+    // Back from chat
+    if (backFromChat) {
+        backFromChat.onclick = () => {
+            showView('search');
+            miniPRDController = null;
+        };
+    }
+
+    // Confirmation buttons
+    if (confirmGenerateBtn) {
+        confirmGenerateBtn.onclick = () => {
+            if (!miniPRDController) return;
+
+            const intent = miniPRDController.getIntent();
+
+            // Build search query from intent
+            let query = '';
+            if (intent.projectType) query += intent.projectType + ' ';
+            if (intent.industry) query += intent.industry + ' ';
+            if (intent.styles.length > 0) query += intent.styles.join(' ') + ' ';
+            if (intent.colors.length > 0) query += intent.colors.join(' ') + ' ';
+
+            // Start search with the generated query AND the intent object
+            startSearch(query.trim(), false, intent);
+
+            // Reset controller
+            miniPRDController = null;
+        };
+    }
+
+    if (confirmBackBtn) {
+        confirmBackBtn.onclick = () => {
+            showView('mini-prd');
+        };
+    }
 
     // Auth handlers removed - plugin now uses saved pins from Vercel KV
 

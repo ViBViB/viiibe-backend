@@ -6,7 +6,9 @@
         "node": "20.x"
     },
     "scripts": {
-        "dev": "vite"
+        "dev": "vite",
+        "build": "vite build",
+        "watch": "vite build --watch"
     },
     "devDependencies": {
         "@figma/plugin-typings": "^1.99.0",
@@ -23,6 +25,7 @@
         "dotenv": "^17.2.3",
         "express": "^5.1.0",
         "node-fetch": "^2.7.0",
-        "open": "^11.0.0"
+        "open": "^11.0.0",
+        "openai": "^6.15.0"
     }
 }

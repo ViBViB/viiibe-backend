@@ -138,7 +138,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Call OpenAI API
         const completion = await openai.chat.completions.create({
-            model: 'gpt-4-turbo-preview',
+            model: 'gpt-4-1106-preview',
             messages: messages as any,
             functions: [MINI_PRD_FUNCTION],
             function_call: 'auto',
