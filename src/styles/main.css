@@ -923,77 +923,90 @@ header {
 }
 
 
-/* 11. LOADING PROGRESS SCREEN */
-.container.loading {
-  max-width: 480px;
-  width: 100%;
-  padding: 40px 24px;
-  align-items: flex-start;
-  /* Override center alignment */
-  text-align: left;
-}
+/* ============================
+   LOADING (Simple)
+   ============================ */
 
-.loading-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin: 0 0 32px 0;
-  text-align: left;
-  padding-left: 4px;
-}
-
-.progress-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
-  text-align: left;
-}
-
-.progress-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  opacity: 0.4;
-  transition: opacity 0.3s ease;
-}
-
-.progress-item.active {
-  opacity: 1;
-}
-
-.progress-item.completed {
-  opacity: 0.6;
-}
-
-.progress-item .checkbox {
-  font-family: monospace;
-  font-size: 18px;
-  line-height: 1.4;
-  color: var(--text-sec);
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.progress-item.completed .checkbox {
-  color: var(--text-main);
-}
-
-.progress-item .text {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-main);
-  flex: 1;
-}
-
-/* 12. SEARCH AGENT REDESIGN */
-.container.search-agent {
-  max-width: 600px;
-  width: 100%;
-  padding: 0 24px;
+.container.loading-simple {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.loading-logo {
+  width: 70px;
+  height: 55px;
+  margin-bottom: 16px;
+}
+
+.logo-path {
+  fill-opacity: 0;
+  animation: draw 3s ease-in-out infinite;
+}
+
+@keyframes draw {
+  0% {
+    fill-opacity: 0;
+  }
+
+  25% {
+    fill-opacity: 1;
+  }
+
+  75% {
+    fill-opacity: 1;
+  }
+
+  100% {
+    fill-opacity: 0;
+  }
+}
+
+.loading-title-simple {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.loading-subtitle {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ============================
+   SEARCH AGENT (NLP)
+   ============================ */
+
+.container.search-agent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 520px;
+  margin-top: -40px;
+  /* Shift content up slightly from center */
+}
+
+.search-illustration {
+  width: 200px;
+  height: auto;
+  margin-bottom: 8px;
+  opacity: 0.9;
 }
 
 .agent-title {
@@ -1086,6 +1099,69 @@ header {
   background: #F0F0F0;
 }
 
+/* ============================
+   EMPTY STATE (No Results)
+   ============================ */
+
+.container.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  max-width: 520px;
+  min-height: 400px;
+  padding: 40px;
+}
+
+.empty-state-content {
+  text-align: center;
+  padding: 0 40px;
+  width: 100%;
+}
+
+.empty-state-content h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #000;
+  line-height: 1.4;
+}
+
+.empty-state-content p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+}
+
+.empty-illustration {
+  width: 120px;
+  height: auto;
+  margin-bottom: 40px;
+  opacity: 0.9;
+}
+
+.empty-back-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-back-btn:hover {
+  transform: scale(1.05);
+}
+
+.empty-back-btn:active {
+  transform: scale(0.95);
+}
+
 .results-label {
   font-size: 13px;
   font-weight: 600;
@@ -1160,6 +1236,7 @@ header {
   color: #7D7D7D;
   margin: 0;
 }
+
 /* ============================================ */
 /* MINI-PRD STYLES */
 /* ============================================ */
@@ -1292,7 +1369,7 @@ header {
   padding: 12px 16px;
   border-radius: 16px;
   max-width: 70%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -1361,6 +1438,7 @@ header {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1479,10 +1557,14 @@ header {
 }
 
 @keyframes typingDot {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     opacity: 0.3;
     transform: translateY(0);
   }
+
   30% {
     opacity: 1;
     transform: translateY(-4px);
@@ -1491,54 +1573,54 @@ header {
 
 /* PRD Confirmation in Chat */
 .prd-confirmation .message-bubble {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
 }
 
 .prd-summary {
-    font-size: 15px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    font-weight: 500;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  font-weight: 500;
 }
 
 .prd-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 .prd-actions .btn-primary,
 .prd-actions .btn-secondary {
-    width: 100%;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
 }
 
 .prd-actions .btn-primary {
-    background: white;
-    color: #667eea;
+  background: white;
+  color: #667eea;
 }
 
 .prd-actions .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .prd-actions .btn-secondary {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .prd-actions .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.3);
 }

@@ -2,6 +2,8 @@ import './styles/main.css';
 import { showView, showToast, tabs } from './ui/views';
 import { switchTab, startSearch, applyVisualFilter, updateProgress } from './ui/moodboard';
 import { getImageProxyUrl, upgradeToOriginals } from './config';
+import lottie, { AnimationItem } from 'lottie-web';
+import viiibeLogo from './assets/viiibe-logo.json';
 
 // ==============================================================
 // STYLE GUIDE DATA COLLECTION
@@ -14,6 +16,9 @@ import { calculatePaletteFromImages } from './ui/palette';
 // ==============================================================
 
 import { MiniPRDController, MiniPRD } from './ui/mini-prd-gpt';
+
+// Lottie animation instance
+let logoAnimation: AnimationItem | null = null;
 
 
 
@@ -141,6 +146,21 @@ async function collectAllData(): Promise<{ images: any[], colors: any[], typogra
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('🚀 Viiibe Plugin Loaded');
+
+    // Initialize Lottie animation
+    const lottieContainer = document.getElementById('lottie-logo');
+    if (lottieContainer) {
+        logoAnimation = lottie.loadAnimation({
+            container: lottieContainer,
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            animationData: viiibeLogo
+        });
+        console.log('✨ Lottie animation loaded');
+    }
+
     // Plugin always starts on search view - no auth needed
 
     // TABS
@@ -474,13 +494,51 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (msg.type === 'show-view') {
             console.log('📨 Received show-view message:', msg.view);
-            // If it's moodboard view, DON'T show immediately - let progress handler do it
-            if (msg.view !== 'moodboard') {
-                console.log('✅ Showing view:', msg.view);
-                showView(msg.view);
-            } else {
-                console.log('⏸️ Skipping immediate moodboard view (handled by progress)');
+
+            // Special case: If moodboard with 0 pins, show empty state view instead
+            const hasNoPins = msg.view === 'moodboard' && msg.data && msg.data.pins && msg.data.pins.length === 0;
+
+            if (hasNoPins) {
+                console.log('✅ Showing empty state view (no results)');
+                const emptyContent = document.getElementById('emptyStateContent');
+                if (emptyContent) {
+                    emptyContent.innerHTML = `
+                        <svg width="144" height="144" viewBox="0 0 144 144" fill="none" xmlns="http://www.w3.org/2000/svg" class="empty-illustration">
+                            <rect width="44" height="44" rx="6" fill="#F5F5F5"/>
+                            <rect x="50" width="44" height="44" rx="6" fill="#F5F5F5"/>
+                            <rect x="100" width="44" height="44" rx="6" fill="#F5F5F5"/>
+                            <rect y="50" width="44" height="44" rx="6" fill="#F5F5F5"/>
+                            <rect x="50" y="50" width="44" height="44" rx="6" fill="#F5F5F5"/>
+                            <rect x="100" y="50" width="44" height="44" rx="6" fill="#F5F5F5"/>
+                            <rect y="100" width="44" height="44" rx="6" fill="#F5F5F5"/>
+                            <rect x="50" y="100" width="44" height="44" rx="6" fill="#F5F5F5"/>
+                            <path d="M119.647 133.771C120.4 133.92 121.186 134 122 134V144C120.53 144 119.095 143.854 117.706 143.579L119.647 133.771ZM126.293 143.579C124.904 143.854 123.469 144 122 144V134C122.814 134 123.6 133.92 124.353 133.771L126.293 143.579ZM112.016 128.66C112.895 129.973 114.027 131.105 115.34 131.984L109.776 140.294C107.377 138.688 105.311 136.622 103.705 134.223L104.039 134L112.016 128.66ZM131.984 128.66L140.294 134.223C138.688 136.622 136.622 138.688 134.223 140.294L128.66 131.984C129.973 131.105 131.105 129.973 131.984 128.66ZM100 122C100 120.531 100.145 119.095 100.42 117.706L110.229 119.647C110.08 120.4 110 121.186 110 122C110 122.814 110.08 123.6 110.229 124.353L100.42 126.293C100.145 124.904 100 123.469 100 122ZM144 122C144 123.469 143.854 124.904 143.579 126.293L133.771 124.353C133.92 123.6 134 122.814 134 122C134 121.186 133.92 120.4 133.771 119.647L143.579 117.706C143.854 119.095 144 120.53 144 122ZM115.34 112.016C114.027 112.895 112.895 114.027 112.016 115.34L103.705 109.776C105.311 107.377 107.377 105.311 109.776 103.705L115.34 112.016ZM134.223 103.705C136.622 105.311 138.688 107.377 140.294 109.776L131.984 115.34C131.105 114.027 129.973 112.895 128.66 112.016L134.223 103.705ZM122 100C123.469 100 124.904 100.145 126.293 100.42L124.353 110.229C123.6 110.08 122.814 110 122 110C121.186 110 120.4 110.08 119.647 110.229L117.706 100.42C119.095 100.145 120.531 100 122 100Z" fill="#F5F5F5"/>
+                        </svg>
+                        <h2>No results found for that search.</h2>
+                        <p>Try broader terms or search by industry<br>(finance, tech, healthcare, saas, ecommerce).</p>
+                        <button id="emptyBackButton" class="empty-back-btn">
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="40" height="40" rx="20" fill="black"/>
+                                <path d="M14 20L26 20M14 20L19 24.5M14 20L19 15.5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    `;
+
+                    // Add click handler for back button
+                    setTimeout(() => {
+                        const backBtn = document.getElementById('emptyBackButton');
+                        if (backBtn) {
+                            backBtn.onclick = () => showView('search');
+                        }
+                    }, 100);
+                }
+                showView('empty');
+                return;
             }
+
+            // Show the requested view immediately
+            console.log('✅ Showing view:', msg.view);
+            showView(msg.view);
 
             if (msg.view === 'moodboard' && msg.data) {
                 imgUrls = [];

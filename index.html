@@ -15,10 +15,11 @@
         <!-- SEARCH VIEW (Default) -->
         <div id="view-search" class="view centered active">
             <div class="container search-agent">
+                <img src="moodboard-illustration.png" alt="Moodboard" class="search-illustration" />
                 <h1 class="agent-title">What will spark your creativity today?</h1>
                 <div class="agent-input-wrapper">
                     <textarea id="searchInput" class="agent-input"
-                        placeholder="Describe: &quot;modern red landing, big imagery, strong titles&quot;"></textarea>
+                        placeholder="Describe the vibe you're looking for with as much detail as possible. Viiibe! will create a precise mood board complete with color palette, typography scale, and ready-to-use Figma styles and tokens."></textarea>
                     <button id="createMoodboardButton" class="agent-submit-btn">
                         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="40" height="40" rx="20" fill="black" />
@@ -27,55 +28,15 @@
                         </svg>
                     </button>
                 </div>
-
-                <!-- MINI-PRD CTA -->
-                <div class="mini-prd-cta">
-                    <span class="or-divider">or</span>
-                    <button type="button" id="startMiniPRDButton" class="btn-mini-prd">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        Crear con Moood! 💬
-                    </button>
-                </div>
             </div>
         </div>
 
-        <!-- 3.5 LOADING -->
+        <!-- 3.5 LOADING (Searching) -->
         <div id="view-loading" class="view centered">
-            <div class="container loading">
-                <h2 class="loading-title">Creating your mood board</h2>
-                <div class="progress-list">
-                    <div class="progress-item" data-step="1">
-                        <span class="checkbox">☐</span>
-                        <span class="text">Getting the creative spark you're chasing</span>
-                    </div>
-                    <div class="progress-item" data-step="2">
-                        <span class="checkbox">☐</span>
-                        <span class="text">Roaming across sources for the good stuff</span>
-                    </div>
-                    <div class="progress-item" data-step="3">
-                        <span class="checkbox">☐</span>
-                        <span class="text">Giving shape to your Viiibe board</span>
-                    </div>
-                    <div class="progress-item" data-step="4">
-                        <span class="checkbox">☐</span>
-                        <span class="text">Blending colors and pixels that click</span>
-                    </div>
-                    <div class="progress-item" data-step="5">
-                        <span class="checkbox">☐</span>
-                        <span class="text">Laying out text styles that read beautifully</span>
-                    </div>
-                    <div class="progress-item" data-step="6">
-                        <span class="checkbox">☐</span>
-                        <span class="text">Selecting the patterns that truly fit</span>
-                    </div>
-                    <div class="progress-item" data-step="7">
-                        <span class="checkbox">☐</span>
-                        <span class="text">Ready to go: review and polish your Viiibe board</span>
-                    </div>
-                </div>
+            <div class="container loading-simple">
+                <div id="lottie-logo" class="loading-logo"></div>
+                <h2 class="loading-title-simple">Viiibe! is creating your mood board</h2>
+                <p class="loading-subtitle">This might take a second or two...</p>
             </div>
         </div>
 
@@ -85,6 +46,15 @@
                 <div class="spinner" style="margin-bottom: 24px;"></div>
                 <p class="generating-message">Putting it all together: color palette, type scale, and a beautiful Viiibe
                     board...</p>
+            </div>
+        </div>
+
+        <!-- 3.7 EMPTY STATE (No Results) -->
+        <div id="view-empty" class="view centered">
+            <div class="container empty-state">
+                <div id="emptyStateContent" class="empty-state-content">
+                    <!-- Content will be injected by JavaScript -->
+                </div>
             </div>
         </div>
 

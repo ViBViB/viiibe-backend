@@ -214,9 +214,9 @@ async function handleGetSavedPins(req: VercelRequest, res: VercelResponse) {
 
     const totalPins = allKeys.length; // Actual count in KV
 
-    // Parse limit from query params (default 500, max 500)
+    // Parse limit from query params (default 2000, max 2000)
     const limitParam = req.query.limit;
-    const limit = limitParam ? Math.min(parseInt(limitParam as string, 10), 500) : 500;
+    const limit = limitParam ? Math.min(parseInt(limitParam as string, 10), 2000) : 2000;
 
     // Only fetch the pins we need (up to limit)
     const keysToFetch = allKeys.slice(0, limit);

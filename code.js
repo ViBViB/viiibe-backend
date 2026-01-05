@@ -16,6 +16,32 @@ figma.showUI(__html__, { width: 720, height: 760, title: "Viiibe" });
 
 // Keyword dictionaries for entity extraction
 const NLP_KEYWORDS = {
+  industries: {
+    'Finance': ['finance', 'bank', 'banking', 'financial', 'fintech', 'investment', 'trading', 'stock', 'crypto', 'wallet', 'payment'],
+    'Healthcare': ['healthcare', 'health', 'medical', 'hospital', 'clinic', 'doctor', 'medicine', 'wellness', 'therapy'],
+    'Ecommerce': ['ecommerce', 'e-commerce', 'shop', 'store', 'retail', 'shopping', 'marketplace', 'cart', 'checkout', 'product'],
+    'Education': ['education', 'learning', 'course', 'school', 'university', 'training', 'academy', 'student', 'teacher'],
+    'Real Estate': ['real estate', 'property', 'house', 'home', 'apartment', 'realty', 'housing', 'rent', 'buy home'],
+    'Tech': ['tech', 'technology', 'software', 'digital', 'cloud', 'ai', 'ml', 'startup', 'innovation'],
+    'Saas': ['saas', 'software as a service', 'platform', 'web app', 'webapp', 'cloud software'],
+    'Food': ['food', 'restaurant', 'cafe', 'bakery', 'dining', 'culinary', 'recipe', 'cooking', 'chef'],
+    'Fashion': ['fashion', 'clothing', 'apparel', 'style', 'boutique', 'wear', 'outfit', 'wardrobe'],
+    'Travel': ['travel', 'tourism', 'hotel', 'vacation', 'trip', 'destination', 'booking', 'flight'],
+    'NGO': ['ngo', 'nonprofit', 'charity', 'foundation', 'social', 'community', 'volunteer', 'cause'],
+    'Portfolio': ['portfolio', 'personal', 'freelance', 'creative', 'designer', 'developer', 'artist'],
+    'Fitness': ['fitness', 'gym', 'workout', 'exercise', 'training', 'health club', 'wellness', 'sports'],
+    'Agriculture': ['agriculture', 'farming', 'farm', 'organic', 'crops', 'harvest', 'rural', 'agro'],
+    'Logistics': ['logistics', 'shipping', 'delivery', 'transport', 'freight', 'courier', 'warehouse', 'supply chain'],
+    'Furniture': ['furniture', 'furnishing', 'interior', 'decor', 'home decor', 'sofa', 'table', 'chair'],
+    'Consulting': ['consulting', 'consultant', 'advisory', 'strategy', 'business consulting', 'management'],
+    'Business': ['business', 'corporate', 'enterprise', 'company', 'professional services'],
+    'Sustainability': ['sustainability', 'sustainable', 'green', 'eco', 'environment', 'renewable', 'climate'],
+    'Construction': ['construction', 'building', 'contractor', 'architecture', 'engineering', 'renovation'],
+    'Beauty': ['beauty', 'cosmetics', 'salon', 'spa', 'makeup', 'skincare', 'haircare', 'aesthetics'],
+    'Transportation': ['transportation', 'transport', 'mobility', 'transit', 'automotive', 'vehicle'],
+    'Digital Agency': ['digital agency', 'agency', 'marketing agency', 'creative agency', 'advertising', 'branding'],
+    'Home Services': ['home services', 'home service', 'cleaning', 'maintenance', 'repair', 'handyman', 'plumbing']
+  },
   projectTypes: {
     'landing page': ['landing', 'página', 'homepage', 'home page', 'landing page', 'hero', 'hero section'],
     'dashboard': ['dashboard', 'panel', 'analytics', 'admin', 'admin panel', 'control panel', 'metrics'],
@@ -444,6 +470,15 @@ async function searchSavedPins(query, intent, randomize = false) {
       return [];
     }
 
+    // Early exit: if query has no recognizable keywords and no intent, return empty immediately
+    const queryWords = query.toLowerCase().split(' ').filter(w => w.length > 2);
+    const hasIntent = intent && (intent.industry || intent.projectType || intent.styles.length > 0 || intent.colors.length > 0);
+
+    if (!hasIntent && queryWords.length === 0) {
+      console.log('⚠️ Query has no valid keywords - returning empty results immediately');
+      return [];
+    }
+
     // Score and filter pins based on query and intent
     const scoredPins = [];
 
@@ -614,6 +649,7 @@ async function searchSavedPins(query, intent, randomize = false) {
 function analyzeSearchIntent(query) {
   const lowerQuery = query.toLowerCase();
   const intent = {
+    industry: null,
     projectType: null,
     styles: [],
     colors: [],
@@ -622,6 +658,24 @@ function analyzeSearchIntent(query) {
     layouts: [],
     rawQuery: query
   };
+
+  // Extract industry (first match wins)
+  const industryKeys = Object.keys(NLP_KEYWORDS.industries);
+  for (let i = 0; i < industryKeys.length; i++) {
+    const industry = industryKeys[i];
+    const keywords = NLP_KEYWORDS.industries[industry];
+    let found = false;
+    for (let j = 0; j < keywords.length; j++) {
+      if (lowerQuery.indexOf(keywords[j]) !== -1) {
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      intent.industry = industry;
+      break;
+    }
+  }
 
   // Extract project type (first match wins)
   const projectTypeKeys = Object.keys(NLP_KEYWORDS.projectTypes);
@@ -1914,29 +1968,31 @@ figma.ui.onmessage = async (msg) => {
     });
 
     // 2. Search saved pins from Vercel KV (with optional randomization)
-    const pins = await searchSavedPins(query, intent, reload);
-    console.log(`✅ Found ${pins.length} matching pins from saved collection`);
+    const results = await searchSavedPins(query, intent, reload);
+    console.log(`✅ Found ${results.length} matching pins from saved collection`);
 
-    // Progress: Step 3 - Pins fetched and ranked
+    // Early exit if no results
+    if (results.length === 0) {
+      console.log('⚠️ No results found - showing empty state');
+      figma.ui.postMessage({
+        type: 'show-view',
+        view: 'moodboard',
+        data: { pins: [], category: query, intent: intent }
+      });
+      return;
+    }
+
+    console.log(`✅ Found ${results.length} matching pins`);
+
+    // Send results to UI and show moodboard immediately
     figma.ui.postMessage({
-      type: 'progress-update',
-      step: 3
-    });
-
-    // 3. Take top 50 results
-    const topPins = pins.slice(0, 50);
-
-    console.log(`📦 Returning top ${topPins.length} pins to UI`);
-
-    // 4. Send results to UI
-    figma.ui.postMessage({
-      type: "show-view",
-      view: "moodboard",
+      type: 'show-view',
+      view: 'moodboard',
       data: {
-        pins: topPins,
+        pins: results,
         category: query,
         intent: intent
-      },
+      }
     });
 
     return;

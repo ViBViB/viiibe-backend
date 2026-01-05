@@ -80,10 +80,7 @@ function processNextStep() {
 
         // After a brief moment, mark as completed with checkmark
         setTimeout(() => {
-            const checkbox = item.querySelector('.checkbox');
-            if (checkbox) {
-                checkbox.textContent = '✓';
-            }
+            // CSS handles the checkmark via ::before
             item.classList.remove('active');
             item.classList.add('completed');
 
@@ -113,10 +110,15 @@ export function resetProgress() {
     pendingSteps = [];
     isProcessing = false;
     const progressItems = document.querySelectorAll('.progress-item');
-    progressItems.forEach(item => {
+    progressItems.forEach((item, index) => {
         item.classList.remove('active', 'completed');
-        const checkbox = item.querySelector('.checkbox');
-        if (checkbox) checkbox.textContent = '☐';
+        const itemStep = index + 1;
+        if (itemStep < currentStep) {
+            item.classList.add('completed');
+            // CSS handles the checkmark via ::before
+        } else if (itemStep === currentStep) {
+            // This case is for the currently active step, which is handled by 'active' class
+        }
     });
 }
 
@@ -222,7 +224,17 @@ export function showMoodboard(data: any) {
         }
 
     } else {
-        grid.innerHTML = '<p style="text-align:center; width:100%; margin-top: 20px;">No pins found.</p>';
+        grid.innerHTML = `
+            <div style="text-align:center; width:100%; margin-top: 60px; padding: 0 40px;">
+                <p style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #000;">
+                    No encontramos resultados para esa búsqueda.
+                </p>
+                <p style="font-size: 14px; color: #666; line-height: 1.6;">
+                    Prueba con términos más amplios o busca por industria<br>
+                    (finance, tech, healthcare, saas, ecommerce).
+                </p>
+            </div>
+        `;
     }
 }
 
