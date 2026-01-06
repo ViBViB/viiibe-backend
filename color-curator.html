@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Curator - Viiibe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            height: 100vh;
+        }
+
+        .image-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            position: relative;
+        }
+
+        .pin-image {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .controls-panel {
+            background: #1a1a1a;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .pin-info {
+            background: #0a0a0a;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+
+        .pin-info-item {
+            margin-bottom: 8px;
+        }
+
+        .pin-info-label {
+            color: #888;
+            margin-right: 8px;
+        }
+
+        .current-color {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .color-btn {
+            padding: 16px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .color-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .color-btn.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .shortcut {
+            margin-left: auto;
+            font-size: 12px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .keyboard-hint {
+            margin-top: 30px;
+            padding: 16px;
+            background: #0a0a0a;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .keyboard-hint h3 {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .keyboard-hint-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-size: 18px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loading" class="loading">
+        Loading pins...
+    </div>
+
+    <div id="app" class="container" style="display: none;">
+        <div class="image-panel">
+            <img id="pinImage" class="pin-image" alt="Pin">
+        </div>
+
+        <div class="controls-panel">
+            <div class="header">
+                <h1>🎨 Color Curator</h1>
+                <div class="progress">
+                    <span id="progressText">0 / 0</span>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pin-info">
+                <div class="pin-info-item">
+                    <span class="pin-info-label">Current:</span>
+                    <span id="currentColor" class="current-color">-</span>
+                </div>
+                <div class="pin-info-item">
+                    <span class="pin-info-label">Title:</span>
+                    <span id="pinTitle">-</span>
+                </div>
+            </div>
+
+            <div class="color-grid" id="colorGrid"></div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="skipPin()">Skip</button>
+                <button class="btn btn-primary" id="saveBtn" onclick="saveAndNext()" disabled>Save & Next</button>
+            </div>
+
+            <div id="status" class="status"></div>
+
+            <div class="keyboard-hint">
+                <h3>⌨️ Keyboard Shortcuts</h3>
+                <div class="keyboard-hint-item">
+                    <span>Numbers 1-9, 0</span>
+                    <span>Select color</span>
+                </div>
+                <div class="keyboard-hint-item">
+                    <span>Enter</span>
+                    <span>Save & Next</span>
+                </div>
+                <div class="keyboard-hint-item">
+                    <span>Space</span>
+                    <span>Skip</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://viiibe-backend-hce5.vercel.app/api';
+
+        const COLORS = [
+            { name: 'red', hex: '#ef4444', key: '1' },
+            { name: 'pink', hex: '#ec4899', key: '2' },
+            { name: 'orange', hex: '#f97316', key: '3' },
+            { name: 'yellow', hex: '#eab308', key: '4' },
+            { name: 'green', hex: '#22c55e', key: '5' },
+            { name: 'blue', hex: '#3b82f6', key: '6' },
+            { name: 'purple', hex: '#a855f7', key: '7' },
+            { name: 'brown', hex: '#92400e', key: '8' },
+            { name: 'black', hex: '#000000', key: '9' },
+            { name: 'white', hex: '#ffffff', key: '0' },
+            { name: 'gray', hex: '#6b7280', key: 'Q' },
+            { name: 'beige', hex: '#d4a574', key: 'W' }
+        ];
+
+        let pins = [];
+        let currentIndex = 0;
+        let selectedColor = null;
+
+        async function init() {
+            try {
+                // Fetch all pins
+                const response = await fetch(`${API_BASE}/get-pins`);
+                const data = await response.json();
+                pins = data.pins || [];
+
+                if (pins.length === 0) {
+                    showStatus('No pins found', 'error');
+                    return;
+                }
+
+                // Render color buttons
+                renderColorButtons();
+
+                // Load first pin
+                loadPin(0);
+
+                // Show app
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'grid';
+
+                // Setup keyboard shortcuts
+                setupKeyboard();
+
+            } catch (error) {
+                showStatus(`Error loading pins: ${error.message}`, 'error');
+            }
+        }
+
+        function renderColorButtons() {
+            const grid = document.getElementById('colorGrid');
+            grid.innerHTML = COLORS.map(color => `
+                <button class="color-btn" onclick="selectColor('${color.name}')" data-color="${color.name}">
+                    <div class="color-dot" style="background: ${color.hex}; ${color.name === 'white' ? 'border-color: #333;' : ''}"></div>
+                    <span>${color.name.charAt(0).toUpperCase() + color.name.slice(1)}</span>
+                    <span class="shortcut">${color.key}</span>
+                </button>
+            `).join('');
+        }
+
+        function loadPin(index) {
+            if (index >= pins.length) {
+                showStatus('All pins reviewed!', 'success');
+                return;
+            }
+
+            currentIndex = index;
+            const pin = pins[index];
+
+            // Update image
+            document.getElementById('pinImage').src = pin.imageUrl;
+
+            // Update info
+            document.getElementById('currentColor').textContent = pin.aiAnalysis?.color?.[0] || 'none';
+            document.getElementById('pinTitle').textContent = pin.title || 'Untitled';
+
+            // Update progress
+            document.getElementById('progressText').textContent = `${index + 1} / ${pins.length}`;
+            document.getElementById('progressFill').style.width = `${((index + 1) / pins.length) * 100}%`;
+
+            // Reset selection
+            selectedColor = null;
+            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('saveBtn').disabled = true;
+        }
+
+        function selectColor(colorName) {
+            selectedColor = colorName;
+
+            // Update UI
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.color === colorName);
+            });
+
+            document.getElementById('saveBtn').disabled = false;
+        }
+
+        async function saveAndNext() {
+            if (!selectedColor) return;
+
+            const pin = pins[currentIndex];
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                // Update pin color
+                const response = await fetch(`${API_BASE}/update-pin-color`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pinId: pin.id || pin.pinId,
+                        color: selectedColor
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update pin');
+                }
+
+                showStatus(`✅ Saved: ${selectedColor}`, 'success');
+
+                // Load next pin
+                setTimeout(() => {
+                    loadPin(currentIndex + 1);
+                    saveBtn.textContent = 'Save & Next';
+                }, 300);
+
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save & Next';
+            }
+        }
+
+        function skipPin() {
+            loadPin(currentIndex + 1);
+        }
+
+        function setupKeyboard() {
+            document.addEventListener('keydown', (e) => {
+                // Prevent if typing in input
+                if (e.target.tagName === 'INPUT') return;
+
+                // Number keys for colors
+                const color = COLORS.find(c => c.key === e.key.toUpperCase());
+                if (color) {
+                    e.preventDefault();
+                    selectColor(color.name);
+                }
+
+                // Enter to save
+                if (e.key === 'Enter' && selectedColor) {
+                    e.preventDefault();
+                    saveAndNext();
+                }
+
+                // Space to skip
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    skipPin();
+                }
+            });
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    status.classList.remove('show');
+                }, 2000);
+            }
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+
+</html>
