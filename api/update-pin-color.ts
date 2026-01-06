@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(200).json({
             success: true,
             pinId,
-            color: color.toLowerCase()
+            colors: colorArray.map((c: string) => c.toLowerCase())
         });
 
     } catch (error) {
