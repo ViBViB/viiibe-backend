@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Re-categorization Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .pin-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .pin-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .current-color {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .current-color span {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .color-btn {
+            padding: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .color-btn:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-skip {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-skip:hover {
+            background: #7f8c8d;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎨 Color Re-categorization Tool</h1>
+        <div class="progress" id="progress">Loading...</div>
+        <div id="content">
+            <div class="loading">Loading pins...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://viiibe-backend-hce5.vercel.app/api';
+        const COLORS = [
+            { name: 'red', hex: '#ef4444' }, { name: 'pink', hex: '#ec4899' }, { name: 'orange', hex: '#f97316' },
+            { name: 'yellow', hex: '#eab308' }, { name: 'green', hex: '#22c55e' }, { name: 'blue', hex: '#3b82f6' },
+            { name: 'purple', hex: '#a855f7' }, { name: 'brown', hex: '#92400e' }, { name: 'black', hex: '#000000' },
+            { name: 'white', hex: '#ffffff' }, { name: 'gray', hex: '#6b7280' }, { name: 'beige', hex: '#d4a574' }
+        ];
+
+        let currentOffset = parseInt(localStorage.getItem('color_offset') || '0');
+        let totalPins = 0;
+        let currentPin = null;
+        let modifiedCount = parseInt(localStorage.getItem('color_modified') || '0');
+
+        function saveProgress() {
+            localStorage.setItem('color_offset', currentOffset.toString());
+            localStorage.setItem('color_modified', modifiedCount.toString());
+        }
+
+        async function loadNextPin() {
+            try {
+                const response = await fetch(`${API_BASE}/pins?action=recategorize&offset=${currentOffset}&limit=1&_t=${Date.now()}`);
+                const data = await response.json();
+                totalPins = data.total;
+
+                if (!data.hasMore && data.pins.length === 0) {
+                    document.getElementById('content').innerHTML = '<div class="loading"><h2>🎉 All Done!</h2><p>Modified: ' + modifiedCount + ' pins</p></div>';
+                    return;
+                }
+
+                if (data.pins.length > 0) {
+                    currentPin = data.pins[0];
+                    renderPin(currentPin);
+                    updateProgress();
+                    saveProgress();
+                }
+            } catch (error) {
+                alert('Error loading pin: ' + error.message);
+            }
+        }
+
+        function renderPin(pin) {
+            const colors = pin.aiAnalysis?.color || [];
+            const currentColor = colors[0] || 'none';
+
+            document.getElementById('content').innerHTML = `
+                <div>
+                    <img src="${pin.imageUrl}" class="pin-image">
+                    <div class="pin-title">${pin.title}</div>
+                    <div class="current-color">Current: <span>${currentColor}</span> | All: ${colors.join(', ')}</div>
+                    <div class="color-grid">
+                        ${COLORS.map(c => `
+                            <button class="color-btn" onclick="saveColor('${c.name}')">
+                                <div class="color-dot" style="background: ${c.hex}"></div>
+                                <span>${c.name}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="actions">
+                        <button class="btn-skip" onclick="skipPin()">Skip</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateProgress() {
+            document.getElementById('progress').innerHTML = `Pin ${currentOffset + 1} of ${totalPins} | Modified: ${modifiedCount}`;
+        }
+
+        async function skipPin() {
+            currentOffset++;
+            saveProgress();
+            await loadNextPin();
+        }
+
+        async function saveColor(color) {
+            try {
+                const response = await fetch(`${API_BASE}/update-pin-color`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pinId: currentPin.pinId, color: color })
+                });
+
+                if (!response.ok) throw new Error('Failed to update');
+
+                modifiedCount++;
+                currentOffset++;
+                saveProgress();
+                await loadNextPin();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadNextPin);
+    </script>
+</body>
+
+</html>
