@@ -159,21 +159,26 @@
 
         async function loadNextPin() {
             try {
-                const response = await fetch(`${API_BASE}/pins?action=recategorize&offset=${currentOffset}&limit=1&_t=${Date.now()}`);
+                const response = await fetch(`${API_BASE}/pins?limit=2000&_t=${Date.now()}`);
                 const data = await response.json();
-                totalPins = data.total;
 
-                if (!data.hasMore && data.pins.length === 0) {
+                if (!data.pins || data.pins.length === 0) {
                     document.getElementById('content').innerHTML = '<div class="loading"><h2>🎉 All Done!</h2><p>Modified: ' + modifiedCount + ' pins</p></div>';
                     return;
                 }
 
-                if (data.pins.length > 0) {
-                    currentPin = data.pins[0];
-                    renderPin(currentPin);
-                    updateProgress();
-                    saveProgress();
+                totalPins = data.pins.length;
+
+                if (currentOffset >= totalPins) {
+                    document.getElementById('content').innerHTML = '<div class="loading"><h2>🎉 All Done!</h2><p>Modified: ' + modifiedCount + ' pins</p></div>';
+                    return;
                 }
+
+                currentPin = data.pins[currentOffset];
+                currentPin.pinId = currentPin.id; // Ensure pinId is set
+                renderPin(currentPin);
+                updateProgress();
+                saveProgress();
             } catch (error) {
                 alert('Error loading pin: ' + error.message);
             }
