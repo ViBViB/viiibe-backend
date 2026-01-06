@@ -26,11 +26,7 @@ export default async function handler(req, res) {
         }
 
         // Get current tags
-        const tags = await kv.get(`pin-tags:${pinId}`);
-
-        if (!tags) {
-            return res.status(404).json({ error: 'Pin not found' });
-        }
+        const tags = await kv.get(`pin-tags:${pinId}`) || {};
 
         // Update color (keep as array for consistency)
         const updatedTags = {
