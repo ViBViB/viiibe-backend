@@ -146,6 +146,33 @@
             padding: 40px;
             color: #666;
         }
+
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: #ecf0f1;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            background: #3498db;
+            animation: loading 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+
+            0%,
+            100% {
+                transform: translateX(-100%);
+            }
+
+            50% {
+                transform: translateX(100%);
+            }
+        }
     </style>
 </head>
 
@@ -154,7 +181,10 @@
         <h1>🎨 Color Re-categorization Tool</h1>
         <div class="progress" id="progress">Loading...</div>
         <div id="content">
-            <div class="loading">Loading pins...</div>
+            <div class="loading">Loading all pins...<div class="loading-bar">
+                    <div class="loading-bar-fill"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -167,43 +197,64 @@
             { name: 'white', hex: '#ffffff' }, { name: 'gray', hex: '#6b7280' }, { name: 'beige', hex: '#d4a574' }
         ];
 
+        let allPins = []; // Store all pins in memory
         let currentOffset = parseInt(localStorage.getItem('color_offset') || '0');
-        let totalPins = 0;
-        let currentPin = null;
         let modifiedCount = parseInt(localStorage.getItem('color_modified') || '0');
         let selectedColors = new Set();
+        let nextImagePreloaded = false;
 
         function saveProgress() {
             localStorage.setItem('color_offset', currentOffset.toString());
             localStorage.setItem('color_modified', modifiedCount.toString());
         }
 
-        async function loadNextPin() {
+        // Pre-load next image for instant display
+        function preloadNextImage() {
+            if (currentOffset + 1 < allPins.length) {
+                const nextPin = allPins[currentOffset + 1];
+                const img = new Image();
+                img.src = nextPin.imageUrl;
+                nextImagePreloaded = true;
+            }
+        }
+
+        async function loadAllPins() {
             try {
-                selectedColors.clear();
                 const response = await fetch(`${API_BASE}/pins?limit=2000&_t=${Date.now()}`);
                 const data = await response.json();
 
                 if (!data.pins || data.pins.length === 0) {
-                    document.getElementById('content').innerHTML = '<div class="loading"><h2>🎉 All Done!</h2><p>Modified: ' + modifiedCount + ' pins</p></div>';
+                    document.getElementById('content').innerHTML = '<div class="loading"><h2>🎉 No pins found!</h2></div>';
                     return;
                 }
 
-                totalPins = data.pins.length;
+                allPins = data.pins.map(pin => ({
+                    ...pin,
+                    pinId: pin.id
+                }));
 
-                if (currentOffset >= totalPins) {
-                    document.getElementById('content').innerHTML = '<div class="loading"><h2>🎉 All Done!</h2><p>Modified: ' + modifiedCount + ' pins</p></div>';
-                    return;
-                }
-
-                currentPin = data.pins[currentOffset];
-                currentPin.pinId = currentPin.id;
-                renderPin(currentPin);
-                updateProgress();
-                saveProgress();
+                console.log(`✅ Loaded ${allPins.length} pins into memory`);
+                loadCurrentPin();
             } catch (error) {
-                alert('Error loading pin: ' + error.message);
+                alert('Error loading pins: ' + error.message);
             }
+        }
+
+        function loadCurrentPin() {
+            selectedColors.clear();
+
+            if (currentOffset >= allPins.length) {
+                document.getElementById('content').innerHTML = '<div class="loading"><h2>🎉 All Done!</h2><p>Modified: ' + modifiedCount + ' pins</p></div>';
+                return;
+            }
+
+            const currentPin = allPins[currentOffset];
+            renderPin(currentPin);
+            updateProgress();
+            saveProgress();
+
+            // Pre-load next image
+            preloadNextImage();
         }
 
         function toggleColor(colorName) {
@@ -262,20 +313,21 @@
         }
 
         function updateProgress() {
-            document.getElementById('progress').innerHTML = `Pin ${currentOffset + 1} of ${totalPins} | Modified: ${modifiedCount}`;
+            document.getElementById('progress').innerHTML = `Pin ${currentOffset + 1} of ${allPins.length} | Modified: ${modifiedCount}`;
         }
 
         async function skipPin() {
             currentOffset++;
-            saveProgress();
-            await loadNextPin();
+            loadCurrentPin();
         }
 
         async function saveColors() {
             if (selectedColors.size === 0) return;
 
             try {
+                const currentPin = allPins[currentOffset];
                 const colorsArray = Array.from(selectedColors);
+
                 const response = await fetch(`${API_BASE}/update-pin-color`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -289,14 +341,14 @@
 
                 modifiedCount++;
                 currentOffset++;
-                saveProgress();
-                await loadNextPin();
+                loadCurrentPin(); // Instant because pins are in memory
             } catch (error) {
                 alert('Error: ' + error.message);
             }
         }
 
-        window.addEventListener('DOMContentLoaded', loadNextPin);
+        // Load all pins on page load
+        window.addEventListener('DOMContentLoaded', loadAllPins);
     </script>
 </body>
 
