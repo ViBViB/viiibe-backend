@@ -14,25 +14,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-        const { pinId, color } = req.body;
+        const { pinId, color, colors } = req.body;
 
-        if (!pinId || !color) {
-            return res.status(400).json({ error: 'Missing pinId or color' });
+        if (!pinId || (!color && !colors)) {
+            return res.status(400).json({ error: 'Missing pinId or color/colors' });
         }
 
-        // Validate color
+        // Support both single color and multiple colors
+        const colorArray = colors || [color];
+
+        // Validate colors
         const validColors = ['red', 'pink', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown', 'black', 'white', 'gray', 'beige'];
-        if (!validColors.includes(color.toLowerCase())) {
-            return res.status(400).json({ error: 'Invalid color' });
+        const invalidColors = colorArray.filter((c: string) => !validColors.includes(c.toLowerCase()));
+
+        if (invalidColors.length > 0) {
+            return res.status(400).json({ error: `Invalid colors: ${invalidColors.join(', ')}` });
         }
 
         // Get current tags
         const tags = await kv.get(`pin-tags:${pinId}`) || {};
 
-        // Update color (keep as array for consistency)
+        // Update colors (store as array)
         const updatedTags = {
             ...tags,
-            color: [color.toLowerCase()],
+            color: colorArray.map((c: string) => c.toLowerCase()),
             manuallyReviewed: true,
             reviewedAt: new Date().toISOString()
         };
