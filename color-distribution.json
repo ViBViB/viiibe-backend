@@ -1,0 +1,586 @@
+{
+  "totalPins": 1746,
+  "colors": {
+    "blue": {
+      "count": 348,
+      "asSecondary": 137,
+      "asTertiary": 41,
+      "examples": [
+        {
+          "pinId": "1008947122789322687",
+          "title": "Esto contiene una imagen de: Try High-Converting Website Design- Wordpress Real Estate Theme Homirx",
+          "colors": [
+            "blue",
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/97/83/83/97838376a7d389f10e73ea61ebb6b716.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1008947122789322687/"
+        },
+        {
+          "pinId": "1034913189402273056",
+          "title": "Esto contiene: Create Your Home Services Website Hassle-Free",
+          "colors": [
+            "blue",
+            "pink",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/61/05/e0/6105e0d6fcdc3ce3fedbdd904f034339.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1034913189402273056/"
+        },
+        {
+          "pinId": "1039135314038725911",
+          "title": "Esto contiene una imagen de: Premium Solar Energy Website Interface. Sunify",
+          "colors": [
+            "blue",
+            "orange",
+            "beige"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/4e/8b/ef/4e8befbbf973f916238098d6f044632f.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1039135314038725911/"
+        }
+      ]
+    },
+    "brown": {
+      "count": 198,
+      "asSecondary": 133,
+      "asTertiary": 43,
+      "examples": [
+        {
+          "pinId": "1017532109542032303",
+          "title": "Esto contiene: Hotel WordPress Theme",
+          "colors": [
+            "brown",
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/9a/5f/11/9a5f113f12488ddd3bb35a7a9cfe2734.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1017532109542032303/"
+        },
+        {
+          "pinId": "1029635533572211994",
+          "title": "Esto contiene: Healthcare Website Design Inspiration, Health Care Website Design, Healthcare Landing Page, Medical Landing Page, Healthcare Website Graphics, Medical Site Design, Responsive Medical Website Layout, Medical Website Design Landing Pages, Design Sites",
+          "colors": [
+            "brown",
+            "gray",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/6a/40/77/6a40777818fd8b9be9793fdb176dd151.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1029635533572211994/"
+        },
+        {
+          "pinId": "1033928026965005009",
+          "title": "Pinterest",
+          "colors": [
+            "brown",
+            "pink",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/7c/31/3e/7c313eb13c5dfa8409041e47857581a0.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1033928026965005009/"
+        }
+      ]
+    },
+    "cyan": {
+      "count": 167,
+      "asSecondary": 86,
+      "asTertiary": 25,
+      "examples": [
+        {
+          "pinId": "1066579124265037210",
+          "title": "Esto contiene una imagen de: You will get design a professional and unique website homepage or landing page",
+          "colors": [
+            "cyan",
+            "blue",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/20/a1/50/20a150a099433c1a5c5460db855b11b2.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1066579124265037210/"
+        },
+        {
+          "pinId": "1068408711623109855",
+          "title": "Esto contiene una imagen de: Looking to create a healthcare website that attracts and engages patients?",
+          "colors": [
+            "cyan",
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/16/6a/e9/166ae95098ea0bdccb17dec307e67d4b.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1068408711623109855/"
+        },
+        {
+          "pinId": "1078189967054025731",
+          "title": "Search HTML5 responsive website templates | Webflow",
+          "colors": [
+            "cyan",
+            "red",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/f1/73/b4/f173b4c4ecd5fe9fc7b3965d5ecdf6f7.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1078189967054025731/"
+        }
+      ]
+    },
+    "white": {
+      "count": 161,
+      "asSecondary": 389,
+      "asTertiary": 438,
+      "examples": [
+        {
+          "pinId": "101894010313898060",
+          "title": "Pinterest",
+          "colors": [
+            "white",
+            "black",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/a8/e8/9f/a8e89f2aeccd4cc2882a1f82399aec41.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/101894010313898060/"
+        },
+        {
+          "pinId": "102738435243564477",
+          "title": "Esto contiene una imagen de: ",
+          "colors": [
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/85/3e/76/853e7687d3db9af73899c8143e6583df.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/102738435243564477/"
+        },
+        {
+          "pinId": "1038501995330864364",
+          "title": "Esto contiene una imagen de: Virtus - NGO Website Case Study",
+          "colors": [
+            "white",
+            "gray",
+            "black"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/c9/06/1d/c9061dffb47f545b279b155b9b38264b.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1038501995330864364/"
+        }
+      ]
+    },
+    "green": {
+      "count": 161,
+      "asSecondary": 92,
+      "asTertiary": 47,
+      "examples": [
+        {
+          "pinId": "100416266686509866",
+          "title": "Esto contiene una imagen de: Website 💡",
+          "colors": [
+            "green",
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/d7/4b/65/d74b65124e2829974724f968e06f933b.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/100416266686509866/"
+        },
+        {
+          "pinId": "10344274144209171",
+          "title": "Esto contiene una imagen de: Create a grain farm website! | Web page design contest",
+          "colors": [
+            "green",
+            "brown",
+            "yellow"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/8a/55/43/8a5543f4f528c73d02bf295fb6b2142f.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/10344274144209171/"
+        },
+        {
+          "pinId": "1039135314038272880",
+          "title": "Esto contiene una imagen de: SaaS Website Template | Features Page Design Inspiration Advisora -",
+          "colors": [
+            "green",
+            "brown",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/9d/ad/e1/9dade11766fc8fac4322df733be46dad.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1039135314038272880/"
+        }
+      ]
+    },
+    "red": {
+      "count": 159,
+      "asSecondary": 117,
+      "asTertiary": 53,
+      "examples": [
+        {
+          "pinId": "100064422967649525",
+          "title": "Esto contiene una imagen de: e-Learning Website Design - Course X.",
+          "colors": [
+            "red",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/71/b3/1e/71b31e7ca9fbf7e91875da768b9880c7.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/100064422967649525/"
+        },
+        {
+          "pinId": "10062799163897960",
+          "title": "Esto contiene una imagen de: Hero Section",
+          "colors": [
+            "red",
+            "cyan",
+            "green"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/d4/4c/ed/d44ced5e9edc75fbf22a4f23dd78b752.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/10062799163897960/"
+        },
+        {
+          "pinId": "10203536651827197",
+          "title": "Esto contiene una imagen de: Dark Portfolio Website Template for Creatives",
+          "colors": [
+            "red",
+            "brown",
+            "orange"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/e2/5f/58/e25f5822ea618d2bbaed22d5c7f70c27.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/10203536651827197/"
+        }
+      ]
+    },
+    "yellow": {
+      "count": 150,
+      "asSecondary": 99,
+      "asTertiary": 53,
+      "examples": [
+        {
+          "pinId": "10062799163432884",
+          "title": "Esto contiene una imagen de: 【ジンテック株式会社】公式Webサイトリニューアル",
+          "colors": [
+            "yellow",
+            "cyan",
+            "orange"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/40/0d/9f/400d9f10298222e0896fc7449c7e1eb1.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/10062799163432884/"
+        },
+        {
+          "pinId": "101119954127865491",
+          "title": "Esto contiene una imagen de: Environment Protection Community Website",
+          "colors": [
+            "yellow",
+            "green",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/6d/9c/15/6d9c15bf5073f7ba5b8bd1891fec169e.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/101119954127865491/"
+        },
+        {
+          "pinId": "102738435244578924",
+          "title": "Launch Your Shopify Empire",
+          "colors": [
+            "yellow",
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/5d/68/02/5d6802ee7ac5ee14daab4d51200c0956.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/102738435244578924/"
+        }
+      ]
+    },
+    "pink": {
+      "count": 139,
+      "asSecondary": 160,
+      "asTertiary": 61,
+      "examples": [
+        {
+          "pinId": "100557004175420131",
+          "title": "Esto contiene: I will automate microsoft excel vba, macros, formulas spreadsheet, ms excel dashboard | Fiverr Solutions | Image",
+          "colors": [
+            "pink",
+            "yellow",
+            "brown"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/cc/78/0e/cc780e88c569c5fd2102e2db0e74b7a2.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/100557004175420131/"
+        },
+        {
+          "pinId": "100557004175687442",
+          "title": "Landing Page Design Tips for High Conversions",
+          "colors": [
+            "pink",
+            "blue",
+            "black"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/4f/2d/09/4f2d0915109c63e601c1649c5f9d69e4.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/100557004175687442/"
+        },
+        {
+          "pinId": "100627372920382446",
+          "title": "Esto contiene una imagen de: Home Care Website | Bracha Designs",
+          "colors": [
+            "pink",
+            "white",
+            "black"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/19/64/36/1964362547571dcfd3e11421f6cd762d.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/100627372920382446/"
+        }
+      ]
+    },
+    "orange": {
+      "count": 121,
+      "asSecondary": 82,
+      "asTertiary": 51,
+      "examples": [
+        {
+          "pinId": "100979216640543388",
+          "title": "Esto contiene una imagen de: How to make a university website that aces the test",
+          "colors": [
+            "orange",
+            "brown",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/d7/e9/25/d7e925c8a436b155fdafaefc22df5208.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/100979216640543388/"
+        },
+        {
+          "pinId": "10203536651749768",
+          "title": "Esto contiene una imagen de: Blog de Instagram: Estrategias para crecer",
+          "colors": [
+            "orange",
+            "black",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/50/d1/92/50d1920c1582fb37052273b54cd8f56b.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/10203536651749768/"
+        },
+        {
+          "pinId": "1029002214871226835",
+          "title": "Esto contiene: Organic & Vegan Bakery Landing Page Design - Healthy Inspiration",
+          "colors": [
+            "orange",
+            "brown",
+            "red"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/72/80/50/7280506d44a3e1135dff3dc60c71613d.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1029002214871226835/"
+        }
+      ]
+    },
+    "gray": {
+      "count": 54,
+      "asSecondary": 160,
+      "asTertiary": 286,
+      "examples": [
+        {
+          "pinId": "104216178871598260",
+          "title": "Esto contiene una imagen de: Dark mode components",
+          "colors": [
+            "gray",
+            "black"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/b4/32/e1/b432e1df8408572b9f081cb03fd665d3.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/104216178871598260/"
+        },
+        {
+          "pinId": "11399805366718842",
+          "title": "Esto contiene una imagen de: Minimal Website Design for Real Estate Agency - MotoCMS",
+          "colors": [
+            "gray",
+            "black",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/2a/cc/ae/2accaeada05a53d34f8d6ed7332161a7.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/11399805366718842/"
+        },
+        {
+          "pinId": "1266706140721566",
+          "title": "Esto contiene una imagen de: ",
+          "colors": [
+            "gray",
+            "black",
+            "beige"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/00/59/e7/0059e7327356d988c76ebb8bf3b3de88.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1266706140721566/"
+        }
+      ]
+    },
+    "black": {
+      "count": 46,
+      "asSecondary": 147,
+      "asTertiary": 193,
+      "examples": [
+        {
+          "pinId": "10133167906487120",
+          "title": "Esto contiene una imagen de: portfolio",
+          "colors": [
+            "black",
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/37/58/4b/37584beb8832e33e22ef6def5b854abc.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/10133167906487120/"
+        },
+        {
+          "pinId": "108297566036766234",
+          "title": "Esto contiene: Feature Page Design, Hair Salon Website Design, Hair Stylist Marketing, Beauty Salon Website, Minimalistic Website Design, Minimalistic Website, Google Sites Templates, Coffee Site, Website Design Landing Page",
+          "colors": [
+            "black",
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/29/c3/d2/29c3d2db222032c275c53d4bd4ac33d1.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/108297566036766234/"
+        },
+        {
+          "pinId": "1099089484091565390",
+          "title": "Esto contiene una imagen de: 60-Slide Startup Pitch Deck Template | Canva Editable Business Plan Presentation",
+          "colors": [
+            "black",
+            "white",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/f8/4a/c9/f84ac908593b6bc7fe2c609a6de14f94.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1099089484091565390/"
+        }
+      ]
+    },
+    "lime": {
+      "count": 29,
+      "asSecondary": 33,
+      "asTertiary": 20,
+      "examples": [
+        {
+          "pinId": "102949541478436864",
+          "title": "8 Best Electric Vehicle WordPress Theme 2025",
+          "colors": [
+            "lime"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/e9/57/2a/e9572a35569b2b83b66431970eace777.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/102949541478436864/"
+        },
+        {
+          "pinId": "105060603802023847",
+          "title": "Esto contiene una imagen de: High-End Design for High-End Results",
+          "colors": [
+            "lime",
+            "black",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/26/64/ba/2664babf13c124e8c9e884e0c26d9627.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/105060603802023847/"
+        },
+        {
+          "pinId": "1055599907818243",
+          "title": "Esto contiene una imagen de: Landing page for a digital agency | Tilda - Анастасия Медведева",
+          "colors": [
+            "lime",
+            "yellow",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/0e/b4/ab/0eb4ab69dab71ae1b339cf9855a2ae82.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1055599907818243/"
+        }
+      ]
+    },
+    "purple": {
+      "count": 7,
+      "asSecondary": 10,
+      "asTertiary": 4,
+      "examples": [
+        {
+          "pinId": "1055599905996996",
+          "title": "Esto contiene una imagen de: ",
+          "colors": [
+            "purple",
+            "blue"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/6c/16/6d/6c166dfd428100ec4fe6cf9e61cc25a6.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/1055599905996996/"
+        },
+        {
+          "pinId": "160159330492150722",
+          "title": "Esto contiene una imagen de: Free SaaS Website UI Kit for Framer and Figma",
+          "colors": [
+            "purple",
+            "blue",
+            "black"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/03/88/47/0388479c20ab68571bb8ccb29e697c89.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/160159330492150722/"
+        },
+        {
+          "pinId": "22729173110098014",
+          "title": "Esto contiene una imagen de: ",
+          "colors": [
+            "purple",
+            "cyan",
+            "pink"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/46/6a/98/466a987041041dd06fde53b04236aaf1.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/22729173110098014/"
+        }
+      ]
+    },
+    "beige": {
+      "count": 4,
+      "asSecondary": 50,
+      "asTertiary": 134,
+      "examples": [
+        {
+          "pinId": "18718154695258800",
+          "title": "Esto contiene una imagen de: ",
+          "colors": [
+            "beige",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/10/11/8a/10118abea2c98a2fefbd2f510e4742d8.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/18718154695258800/"
+        },
+        {
+          "pinId": "4503668373367071",
+          "title": "Esto contiene una imagen de: Upnow Studio",
+          "colors": [
+            "beige",
+            "white"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/26/3b/6e/263b6ee2cf202e4a7f1bb46197077f55.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/4503668373367071/"
+        },
+        {
+          "pinId": "5277724560018557",
+          "title": "Esto contiene una imagen de: Self-discipline. Online store - Anastasiia Hodubiak",
+          "colors": [
+            "beige",
+            "gray"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/a6/95/ea/a695ea5730e2ecdc56655116b747ceef.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/5277724560018557/"
+        }
+      ]
+    },
+    "colorful": {
+      "count": 2,
+      "asSecondary": 1,
+      "asTertiary": 0,
+      "examples": [
+        {
+          "pinId": "4011087180827939",
+          "title": "Esto contiene una imagen de: Designing the Perfect Getaway: UI for Travel Sites",
+          "colors": [
+            "colorful",
+            "brown",
+            "blue"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/3e/b1/1f/3eb11f07a2a485c29dadd98c371ac552.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/4011087180827939/"
+        },
+        {
+          "pinId": "619667230012906715",
+          "title": "Esto contiene una imagen de: Travel Website UI",
+          "colors": [
+            "colorful",
+            "brown",
+            "blue"
+          ],
+          "imageUrl": "https://i.pinimg.com/736x/da/3b/2e/da3b2eadfd1884ee0dc582a8ff88d988.jpg",
+          "pinterestUrl": "https://cl.pinterest.com/pin/619667230012906715/"
+        }
+      ]
+    }
+  },
+  "timestamp": "2026-01-06T01:42:05.905Z"
+}

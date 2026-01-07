@@ -1,0 +1,173 @@
+[
+    {
+        "pinId": "100064422967649525",
+        "title": "Esto contiene una imagen de: e-Learning Website Design - Cou",
+        "imageUrl": "https://i.pinimg.com/736x/71/b3/1e/71b31e7ca9fbf7e91875da768b9880c7.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "orange",
+            "green",
+            "white"
+        ],
+        "confidence": 0.94,
+        "reasoning": "UI ONLY: Orange 'Book a Demo' button is most prominent CTA (~35%), green 'Sign Up' button and navbar underline (~30%), white cards and background (~30%). Sage green background is decorative, not UI.",
+        "changeType": "reordered_primary"
+    },
+    {
+        "pinId": "100416266686509866",
+        "title": "Esto contiene una imagen de: Website 💡",
+        "imageUrl": "https://i.pinimg.com/736x/d7/4b/65/d74b65124e2829974724f968e06f933b.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "white",
+            "green",
+            "brown"
+        ],
+        "confidence": 0.93,
+        "reasoning": "UI ONLY: White CTA button in hero (~40%), green navbar and section backgrounds (~35%), brown buttons in cards (~20%). Dark green hero background with leaf graphic is decorative.",
+        "changeType": "reordered_primary"
+    },
+    {
+        "pinId": "100557004175420131",
+        "title": "Esto contiene: I will automate microsoft excel vba, macros, ",
+        "imageUrl": "https://i.pinimg.com/736x/cc/78/0e/cc780e88c569c5fd2102e2db0e74b7a2.jpg",
+        "currentColors": [
+            "pink",
+            "yellow",
+            "brown"
+        ],
+        "newColors": [
+            "pink",
+            "yellow",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "UI ONLY: Bright pink card (~40%), yellow card (~35%), white text and UI elements (~20%). Black background is decorative, not UI. Brown was incorrect.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "100557004175687442",
+        "title": "Landing Page Design Tips for High Conversions",
+        "imageUrl": "https://i.pinimg.com/736x/4f/2d/09/4f2d0915109c63e601c1649c5f9d69e4.jpg",
+        "currentColors": [
+            "blue"
+        ],
+        "newColors": [
+            "white",
+            "blue",
+            "black"
+        ],
+        "confidence": 0.96,
+        "reasoning": "UI ONLY: White sections and cards dominate (~45%), blue hero section and accents (~35%), black text (~15%). Light blue sky in hero image is decorative background.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "100627372920382446",
+        "title": "Esto contiene una imagen de: Home Care Website | Bracha Desi",
+        "imageUrl": "https://i.pinimg.com/736x/d7/4b/65/d74b65124e2829974724f968e06f933b.jpg",
+        "currentColors": [
+            "pink",
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "pink",
+            "brown",
+            "white"
+        ],
+        "confidence": 0.92,
+        "reasoning": "UI ONLY: Light pink section background (~40%), brown buttons and footer (~35%), white cards and sections (~20%). Hero photo is decorative. Black is minimal in UI.",
+        "changeType": "reordered_secondary"
+    },
+    {
+        "pinId": "10062799163432884",
+        "title": "Esto contiene una imagen de: 【ジンテック株式会社】公式Webサイトリニューアル",
+        "imageUrl": "https://i.pinimg.com/736x/40/0d/9f/400d9f10298222e0896fc7449c7e1eb1.jpg",
+        "currentColors": [
+            "blue"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "black"
+        ],
+        "confidence": 0.95,
+        "reasoning": "UI ONLY: Blue diagonal section and accents (~45%), white sections and cards (~40%), black buttons and text (~10%). Hero photo with factory is decorative background.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "10062799163897960",
+        "title": "Esto contiene una imagen de: Hero Section",
+        "imageUrl": "https://i.pinimg.com/736x/d4/4c/ed/d44ced5e9edc75fbf22a4f23dd78b752.jpg",
+        "currentColors": [
+            "black",
+            "red",
+            "green"
+        ],
+        "newColors": [
+            "orange",
+            "blue",
+            "green"
+        ],
+        "confidence": 0.90,
+        "reasoning": "UI ONLY: Orange/red card backgrounds (~40%), blue card (~30%), green card (~25%). Black background is decorative. The 'red' cards are actually orange.",
+        "changeType": "major_correction"
+    },
+    {
+        "pinId": "1008947122789322687",
+        "title": "Esto contiene una imagen de: Try High-Converting Website Des",
+        "imageUrl": "https://i.pinimg.com/736x/97/83/83/97838376a7d389f10e73ea61ebb6b716.jpg",
+        "currentColors": [
+            "blue",
+            "gray",
+            "black"
+        ],
+        "newColors": [
+            "blue",
+            "orange",
+            "white"
+        ],
+        "confidence": 0.94,
+        "reasoning": "UI ONLY: Dark blue navy sections (~45%), orange CTA buttons (~30%), white text and cards (~20%). Gray background is decorative. Orange buttons are key UI elements.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "100979216640543388",
+        "title": "Esto contiene una imagen de: How to make a university websit",
+        "imageUrl": "https://i.pinimg.com/736x/d7/e9/25/d7e925c8a436b155fdafaefc22df5208.jpg",
+        "currentColors": [
+            "yellow",
+            "green"
+        ],
+        "newColors": [
+            "yellow",
+            "white",
+            "gray"
+        ],
+        "confidence": 0.93,
+        "reasoning": "UI ONLY: Yellow 'Learn More' button (~40%), white navbar and text (~35%), gray text elements (~20%). Burgundy/maroon background is decorative. Hero photo with campus is decorative.",
+        "changeType": "major_correction"
+    },
+    {
+        "pinId": "101119954127865491",
+        "title": "Esto contiene una imagen de: Environment Protection Communit",
+        "imageUrl": "https://i.pinimg.com/736x/6d/9c/15/6d9c15bf5073f7ba5b8bd1891fec169e.jpg",
+        "currentColors": [
+            "green",
+            "purple",
+            "beige"
+        ],
+        "newColors": [
+            "green",
+            "white",
+            "gray"
+        ],
+        "confidence": 0.91,
+        "reasoning": "UI ONLY: Green 'Schedule a Consultation' button (~45%), white text and card backgrounds (~35%), gray text for stats (~15%). Purple mountains and pink sky are decorative illustration, not UI.",
+        "changeType": "major_correction"
+    }
+]

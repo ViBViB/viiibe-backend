@@ -1,0 +1,163 @@
+[
+    {
+        "pinId": "100064422967649525",
+        "title": "Esto contiene una imagen de: e-Learning Website Design - Cou",
+        "imageUrl": "https://i.pinimg.com/736x/71/b3/1e/71b31e7ca9fbf7e91875da768b9880c7.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "green",
+            "beige",
+            "orange"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Dominant sage green background (~60%), beige/cream sections (~25%), orange accent button (~10%)"
+    },
+    {
+        "pinId": "100416266686509866",
+        "title": "Esto contiene una imagen de: Website 💡",
+        "imageUrl": "https://i.pinimg.com/736x/d7/4b/65/d74b65124e2829974724f968e06f933b.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "green",
+            "beige",
+            "brown"
+        ],
+        "confidence": 0.92,
+        "reasoning": "Dark green hero section (~50%), beige/cream middle section (~40%), brown accents in text/images (~10%)"
+    },
+    {
+        "pinId": "100557004175420131",
+        "title": "Esto contiene: I will automate microsoft excel vba, macros, ",
+        "imageUrl": "https://i.pinimg.com/736x/cc/78/0e/cc780e88c569c5fd2102e2db0e74b7a2.jpg",
+        "currentColors": [
+            "pink",
+            "yellow",
+            "brown"
+        ],
+        "newColors": [
+            "black",
+            "pink",
+            "yellow"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Black background (~40%), bright pink card (~30%), yellow card (~25%). Current classification missed the dominant black."
+    },
+    {
+        "pinId": "100557004175687442",
+        "title": "Landing Page Design Tips for High Conversions",
+        "imageUrl": "https://i.pinimg.com/736x/4f/2d/09/4f2d0915109c63e601c1649c5f9d69e4.jpg",
+        "currentColors": [
+            "blue"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "black"
+        ],
+        "confidence": 0.96,
+        "reasoning": "Light blue hero background (~45%), white sections (~40%), black text and elements (~15%)"
+    },
+    {
+        "pinId": "100627372920382446",
+        "title": "Esto contiene una imagen de: Home Care Website | Bracha Desi",
+        "imageUrl": "https://i.pinimg.com/736x/19/64/36/1964362547571dcfd3e11421f6cd762d.jpg",
+        "currentColors": [
+            "pink",
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "pink",
+            "white",
+            "brown"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Light pink section (~40%), white background (~35%), brown/dark footer (~20%). Black is minimal, brown is more prominent."
+    },
+    {
+        "pinId": "10062799163432884",
+        "title": "Esto contiene una imagen de: 【ジンテック株式会社】公式Webサイトリニューアル",
+        "imageUrl": "https://i.pinimg.com/736x/40/0d/9f/400d9f10298222e0896fc7449c7e1eb1.jpg",
+        "currentColors": [
+            "blue"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "beige"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Strong blue hero section (~50%), white sections (~30%), light beige/cream sections (~20%)"
+    },
+    {
+        "pinId": "10062799163897960",
+        "title": "Esto contiene una imagen de: Hero Section",
+        "imageUrl": "https://i.pinimg.com/736x/d4/4c/ed/d44ced5e9edc75fbf22a4f23dd78b752.jpg",
+        "currentColors": [
+            "black",
+            "red",
+            "green"
+        ],
+        "newColors": [
+            "black",
+            "orange",
+            "green"
+        ],
+        "confidence": 0.91,
+        "reasoning": "Black background (~50%), orange/red accent cards (~30%), green accent (~15%). The 'red' is actually more orange."
+    },
+    {
+        "pinId": "1008947122789322687",
+        "title": "Esto contiene una imagen de: Try High-Converting Website Des",
+        "imageUrl": "https://i.pinimg.com/736x/97/83/83/97838376a7d389f10e73ea61ebb6b716.jpg",
+        "currentColors": [
+            "blue",
+            "gray",
+            "black"
+        ],
+        "newColors": [
+            "blue",
+            "gray",
+            "white"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Dark blue navy sections (~45%), gray background (~30%), white sections (~20%). Black is minimal, white is more prominent."
+    },
+    {
+        "pinId": "100979216640543388",
+        "title": "Esto contiene una imagen de: How to make a university websit",
+        "imageUrl": "https://i.pinimg.com/736x/d7/e9/25/d7e925c8a436b155fdafaefc22df5208.jpg",
+        "currentColors": [
+            "yellow",
+            "green"
+        ],
+        "newColors": [
+            "red",
+            "yellow",
+            "green"
+        ],
+        "confidence": 0.90,
+        "reasoning": "Burgundy/maroon header (~35%), yellow accent button (~30%), green elements (~25%). Current classification missed the dominant red/burgundy."
+    },
+    {
+        "pinId": "101119954127865491",
+        "title": "Esto contiene una imagen de: Environment Protection Communit",
+        "imageUrl": "https://i.pinimg.com/736x/6d/9c/15/6d9c15bf5073f7ba5b8bd1891fec169e.jpg",
+        "currentColors": [
+            "green",
+            "purple",
+            "beige"
+        ],
+        "newColors": [
+            "green",
+            "purple",
+            "pink"
+        ],
+        "confidence": 0.92,
+        "reasoning": "Vibrant green landscape (~50%), purple mountains (~30%), pink/salmon sky (~15%). The 'beige' is actually more pink/salmon."
+    }
+]

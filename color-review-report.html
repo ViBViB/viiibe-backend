@@ -1,0 +1,2811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Review Report - RED</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .stat {
+            background: #1a1a1a;
+            padding: 20px 32px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat.correct .stat-value { color: #10b981; }
+        .stat.reclassify .stat-value { color: #f59e0b; }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #333;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .section-count {
+            background: #333;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: #667eea;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #0a0a0a;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .color-comparison {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .color-group {
+            flex: 1;
+        }
+
+        .color-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        .color-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .color-tag {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid;
+        }
+
+        .color-tag.old {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .color-tag.new {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .color-tag.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .reasoning {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #0a0a0a;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .card-footer {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .btn-pinterest {
+            background: #e60023;
+            color: white;
+        }
+
+        .btn-pinterest:hover {
+            background: #c5001e;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 Color Review Report</h1>
+            <p style="font-size: 18px; color: #888; margin-top: 8px;">
+                Reviewing pins classified as <strong style="color: #667eea;">RED</strong>
+            </p>
+            
+            <div class="stats">
+                <div class="stat correct">
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat reclassify">
+                    <div class="stat-value">77</div>
+                    <div class="stat-label">To Reclassify</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" style="color: #667eea;">84</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterPins('all')">All (84)</button>
+                <button class="filter-btn" onclick="filterPins('reclassify')">To Reclassify (77)</button>
+                <button class="filter-btn" onclick="filterPins('correct')">Correct (7)</button>
+            </div>
+        </header>
+
+        <div class="section" id="reclassify-section">
+            <div class="section-header">
+                <div class="section-title">🔄 Pins to Reclassify</div>
+                <div class="section-count">77</div>
+            </div>
+            
+                <div class="grid">
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/d4/4c/ed/d44ced5e9edc75fbf22a4f23dd78b752.jpg" alt="Esto contiene una imagen de: Hero Section" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Hero Section</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">cyan</span><span class="color-tag old">green</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black occupies the background of the design, dominating the largest portion of visual space. White is used for the text, which stands out prominently against the black background.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/10062799163897960/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/e2/5f/58/e25f5822ea618d2bbaed22d5c7f70c27.jpg" alt="Esto contiene una imagen de: Dark Portfolio Website Template for Creatives" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Dark Portfolio Website Template for Creatives</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">orange</span><span class="color-tag new">purple</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is the background and occupies the majority of the design. Orange is prominently used in headers and highlighted elements. Purple is used in the larger secondary section, making it a significant part of the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/10203536651827197/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/19/42/57/194257229f26cfeea6a89e29bd721e8b.jpg" alt="Esto contiene una imagen de: Fashion Ecommerce Website | Clothing Store Website | Figma | UIUX Design | Web Design | Design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Fashion Ecommerce Website | Clothing Store Website | Figma | UIUX Design | Web Design | Design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">brown</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Brown is used prominently in the clothing and header band, covering a significant portion of the design. White is used as the background color across the page, making it another dominant color.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/104638391337753274/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/originals/96/32/72/9632726e7f1d982429092b0eaae4fcc1.jpg" alt="Esto contiene una imagen de: Patisserie – Elegant & Romantic Landing Page Design 🎂" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Patisserie – Elegant & Romantic Landing Page Design 🎂</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">pink</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Pink is dominant in the background and decorative elements, occupying a large portion of the visual space. Beige is used throughout the design for texts, backgrounds, and macarons, covering a significant portion as well.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/10555380371570487/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/ae/43/4c/ae434c20549da3b2ac0cce76661fbbe0.jpg" alt="Esto contiene una imagen de: Bloom Hair — Web design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Bloom Hair — Web design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">orange</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">pink</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is dominant in the background and text areas. Pink is prominent in the design of the bottle and some text sections.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/107453141106084748/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/a1/3e/8e/a13e8e1517790dd41744aef98ca2d645.jpg" alt="Esto contiene una imagen de: — 𝓗 𝗈𝗇𝖾𝗒𝗆𝗈𝗈𝗇  𝓐 𝗏𝖾𝗇𝗎𝖾" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: — 𝓗 𝗈𝗇𝖾𝗒𝗆𝗈𝗈𝗇  𝓐 𝗏𝖾𝗇𝗎𝖾</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">beige</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">beige</span><span class="color-tag new">brown</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Beige is the background color occupying most of the space. Brown is the second-most prominent color used in multiple sections. Red is evident in various elements and occupies significant space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/1090434128545498314/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/23/8b/95/238b958702971f0055f899984b8e0bf7.jpg" alt="Popcorn - Invite-only US phone plan" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Popcorn - Invite-only US phone plan</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">The background of the design is predominantly white, covering the majority of the visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/110901209570655807/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/55/db/cc/55dbccc0123b22a298aec873382fc527.jpg" alt="Esto contiene una imagen de: Dark Portfolio Website Template for Creatives" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Dark Portfolio Website Template for Creatives</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">orange</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black occupies the background and frames the panels. Orange is used prominently in backgrounds and accents. White appears in the text and some elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/1139340405759318820/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/9f/28/f1/9f28f10906b4c6b7f89944cf18db21bf.jpg" alt="Esto contiene una imagen de: Fitness - 10+ Niche Multipurpose HTML Landing Page Template" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Fitness - 10+ Niche Multipurpose HTML Landing Page Template</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">black</span><span class="color-tag new">orange</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is dominant in the background and textual areas. Black is used in large sections for backgrounds and text. Orange accents are prominent in buttons and details.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/115123334220728762/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/6e/1b/0d/6e1b0d785ebfc4da6d980a0be856978b.jpg" alt="Esto contiene una imagen de: TurnKey Lender Website Design And Development | Vide Infra" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: TurnKey Lender Website Design And Development | Vide Infra</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White occupies the background space in the design, making it the most prominent color.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/11540542793897656/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/a1/06/73/a106737c6b3f483a8cba9ff14c8f16b5.jpg" alt="Esto contiene una imagen de: wordpress real estate website" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: wordpress real estate website</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">beige</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the dominant background color, occupying the majority of the design space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/11822017767063785/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/65/1c/e4/651ce47c0e0dc7e15cf727244315f935.jpg" alt="Esto contiene una imagen de: Nexio - Home Page Design Inspiration | Website Template | design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Nexio - Home Page Design Inspiration | Website Template | design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">pink</span><span class="color-tag new">gray</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is dominant in the background and header areas. Pink is present in the gradient and accent elements. Gray is used in text and some background elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/11892386513341868/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/5a/a4/1d/5aa41d55f33fe4b10cf071a4fc2e4bb2.jpg" alt="Esto contiene una imagen de: Architecture Firm Website" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Architecture Firm Website</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">gray</span><span class="color-tag new">red</span><span class="color-tag new">black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Gray is the background and text color in various sections, red is dominant in the large section of the building, and black is used extensively in the text and some background areas.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/128563764360734632/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/b6/c1/32/b6c1324afbd494aecf43f9bb96effe4b.jpg" alt="idée pour mais projet" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">idée pour mais projet</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">blue</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">navy</span><span class="color-tag new">orange</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White occupies the background, creating a clean look. Navy is used prominently in text and elements, contrasting against the light background. Orange is a key feature in the design, drawing attention in the background and elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/1337074889286435/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/7a/03/61/7a0361ae338188d9d3c484e0fa435144.jpg" alt="Pin en Web design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Pin en Web design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span><span class="color-tag old">orange</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">pink</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">The background of the main left section is predominantly pink, and the right section contains a substantial beige background, both occupying large portions of the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/138556126022595696/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/17/c3/bf/17c3bf5868ba7f79d8a89b0cc09054d4.jpg" alt="Esto contiene una imagen de: MSL Interiors Design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: MSL Interiors Design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">beige</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">pink</span><span class="color-tag new">light blue</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the most dominant color as it is the background for most of the sections. Pink is prominent due to the furniture images. Light blue is significant in the header and some areas of the background.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/1477812373410457/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/6a/de/69/6ade69b0396bbb2fb1e636aceb06a079.jpg" alt="Esto contiene una imagen de: IRCTC Website Redesign – Passenger Details & Seat Selection Page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: IRCTC Website Redesign – Passenger Details & Seat Selection Page</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">orange</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White occupies the majority of the design as the background color, providing a clean and minimalistic look.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/159596380539486792/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/30/38/8f/30388f6a9cd0d30c0a75f997143d4fb5.jpg" alt="Esto contiene: Logistics Company PSD Template" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene: Logistics Company PSD Template</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">gray</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Gray is dominant in the background, providing a neutral tone that covers large areas. Red is used extensively in headers and highlighted sections, making it prominent.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/165366617562129980/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/e1/69/c3/e169c3f94470db68603af916eab6eefb.jpg" alt="Esto contiene una imagen de: Creative Ai Website UI" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Creative Ai Website UI</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">purple</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">pink</span><span class="color-tag new">blue</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is dominant in the background and text areas. Pink occupies a significant portion in the central and right visual elements. Blue is also highly prominent in the right visual section.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/16888567448228660/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/71/6d/17/716d17054496eb12098b990de2538522.jpg" alt="Esto contiene una imagen de: Unipix: Your University's Digital Gateway" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Unipix: Your University's Digital Gateway</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the background color for the majority of sections, including text areas. Red is prominent in header and footer sections.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/176133035424116691/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/84/9a/f4/849af404bc550537cb3ddd4f2d5db0a2.jpg" alt="Esto contiene una imagen de: Holiniq Haircare Website - HALO LAB" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Holiniq Haircare Website - HALO LAB</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">beige</span><span class="color-tag new">white</span><span class="color-tag new">orange</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Beige is the background color and occupies a large portion of the design. White is prominently used in the text areas and backgrounds of the main content. Orange is used in buttons and accents, making it a dominant highlight color.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/178595941468082921/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/68/76/93/687693316770e4479919d1946616c2ef.jpg" alt="Esto contiene una imagen de: E-commerce Design: Practices for a User-Friendly Shopping |" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: E-commerce Design: Practices for a User-Friendly Shopping |</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is dominant as the background and container color, while beige is used in large header sections and container backgrounds.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/179862578865293543/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/8f/49/f0/8f49f086198b0771c49f24c0004b535a.jpg" alt="Esto contiene una imagen de: Inspiratie voor lay-out van webontwerp" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Inspiratie voor lay-out van webontwerp</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">gray</span><span class="color-tag new">blue</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is dominant as the background color throughout the design. Gray is prominent in the headers and sections. Blue is used consistently for text and graphic elements, giving it significant visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/1829656091603414/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/bf/3b/00/bf3b00acb6cd4ff0c58932f0278af87c.jpg" alt="Esto contiene una imagen de: Fitness" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Fitness</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is dominant in the background of most sections, and red is prominent in the top section and clothing, covering significant visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/18718154693282217/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/bf/bf/99/bfbf99c54f1e724e4bac17b16261ae9e.jpg" alt="Esto contiene: Beautiful WordPress themes - Ecommerce web design; Webpage design; Branding website design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene: Beautiful WordPress themes - Ecommerce web design; Webpage design; Branding website design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">beige</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">The background and larger areas are dominated by beige and white tones, covering the majority of the visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/187532771978979672/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/36/c5/60/36c56093cb14930799325b3c2f35051b.jpg" alt="Esto contiene una imagen de: Portfolio Framer template" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Portfolio Framer template</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">white</span><span class="color-tag new">gray</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is dominant as the background color. White is used extensively for text and some design elements. Gray appears in the image background and some text.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/2040762328813024/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/ea/3d/9f/ea3d9f5a72747a3da49dc1e71841a072.jpg" alt="Esto contiene una imagen de: 25 Best SaaS WordPress Themes 2025 For Agencies" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: 25 Best SaaS WordPress Themes 2025 For Agencies</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">purple</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">blue</span><span class="color-tag new">pink</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Blue is the most dominant color in the header background gradient. Pink follows as it's prominently mixed in the gradient. White is used extensively in the background of the lower sections of the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/20477373299461813/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/bb/ca/f8/bbcaf82c3331017115c714bc7d5d519c.jpg" alt="Esto contiene una imagen de: Darnit2.Construction company. Web-design & Animation" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Darnit2.Construction company. Web-design & Animation</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is used as the background and throughout the design, making it the most dominant color. Red occupies a significant portion of the design with the prominent red rectangle.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/211174972053313/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/00/55/08/00550891d36951f4772b40f0d2f32ac6.jpg" alt="Esto contiene una imagen de: " class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: </div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">beige</span><span class="color-tag old">gray</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">pink</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White occupies the background and most of the text areas, while pink is used prominently in the text and accent elements. Both colors clearly cover more than 30% of the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/21814379441966574/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/9d/14/24/9d14241effb067500a13babbed5dc0cc.jpg" alt="Esto contiene una imagen de: Your Website, Designed for Impact" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Your Website, Designed for Impact</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">black</span><span class="color-tag new">orange</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the background color used throughout most of the design, black is used for text and several key UI elements, and orange highlights certain sections and text, making each of these colors occupy significant portions of the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/235172411786809050/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/93/cb/e9/93cbe903d8c3d2aadd63ee00e5627af1.jpg" alt="Esto contiene: Fitness Website Design, Fitness Landing Page, Gym Web Design, Fitness Coach Website, Gym Website Design, Gym Landing Page Design, Sports Training Facility, Fitness Site, Health And Wellness Center" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene: Fitness Website Design, Fitness Landing Page, Gym Web Design, Fitness Coach Website, Gym Website Design, Gym Landing Page Design, Sports Training Facility, Fitness Site, Health And Wellness Center</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">lime</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is used extensively in the background and text, occupying a major portion of the space. Lime is prominently used in text and buttons, providing a highlight against the dark background.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/235946467972618467/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/86/b9/f3/86b9f3c597a39bd5f9f1121a33afc5c6.jpg" alt="Дизайн концепция Landing Page on TILDA для автомобильного бюро Карпов" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Дизайн концепция Landing Page on TILDA для автомобильного бюро Карпов</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">gray</span><span class="color-tag new">white</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Gray dominates the background and header areas, white is prominent in the sections and surrounding spaces, and red is used in several key areas including the car and text accents.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/24769866695270534/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/96/0c/b7/960cb7ee64d26d6ac0a22f3f72f4ceff.jpg" alt="Esto contiene una imagen de: Gymat - Fitness and Gym WordPress Theme" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Gymat - Fitness and Gym WordPress Theme</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">red</span><span class="color-tag new">black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the dominant background color, covering a substantial portion of the design. Red is used prominently in headings and accents, occupying a significant area. Black is used in text and imagery, contributing to a large portion of the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/25262447904469190/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/ac/61/83/ac6183b3c66a715cdf925fb1f45593b4.jpg" alt="Esto contiene una imagen de: 15+ Best WordPress Themes For Interior Designers (2025)" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: 15+ Best WordPress Themes For Interior Designers (2025)</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">gray</span><span class="color-tag new">green</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is used for most of the backgrounds creating a clean look. Gray is visible in the box backgrounds and subtle text areas. Green from the sofa and plants is a focal color contributing significantly to the design's aesthetics.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/26106872837282358/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/9b/90/89/9b90892da58e1cae80b6bc7e9d95939a.jpg" alt="Esto contiene una imagen de: Ramen website design by PIXIE DIXIE STUDIO" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Ramen website design by PIXIE DIXIE STUDIO</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">brown</span><span class="color-tag new">green</span><span class="color-tag new">pink</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Brown is dominant in the background and elements such as chopsticks. Green is prominent in the circle elements and some food highlights. Pink covers large portions of the background and UI elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/27092035251432090/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/5f/5f/95/5f5f95c0f38f11388b2607a8af0b247c.jpg" alt="Esto contiene una imagen de: Linora | Interior Studio | Landing Page - Klymash Studio" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Linora | Interior Studio | Landing Page - Klymash Studio</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span><span class="color-tag old">beige</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">beige</span><span class="color-tag new">brown</span><span class="color-tag new">gray</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Beige dominates the background and objects like the sofa, brown is prominent in the furniture and decoration, and gray is evident in the header area.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/296815431714000226/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/0b/17/3e/0b173e186495b353d60615a36f1bbbaa.jpg" alt="Esto contiene una imagen de: 20+ Best Construction Website Templates (2025)" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: 20+ Best Construction Website Templates (2025)</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">black</span><span class="color-tag new">green</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is dominant in the background and text areas. Black is prominent in the sections dividing visual elements. Green is evident in the landscape image occupying a significant area.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/30962316183337721/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/55/d8/dc/55d8dc0883d0a64f371875b76912f597.jpg" alt="Esto contiene una imagen de: Healthcare Dashboard UI Design ✨" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Healthcare Dashboard UI Design ✨</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">pink</span><span class="color-tag new">blue</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White dominates the background of the design, pink is prominent in the anatomical illustrations, and blue is used in text and some interface elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/311100286781409330/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/60/92/66/609266902d167aca26aef00edb8c9aaa.jpg" alt="Esto contiene una imagen de: "Modern E-commerce Design for Furniture Store: A Stylish Concept Guide"" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: "Modern E-commerce Design for Furniture Store: A Stylish Concept Guide"</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">orange</span><span class="color-tag new">white</span><span class="color-tag new">black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Orange is the most prominent color in the design, used extensively in backgrounds and accents. White is prevalent in the negative space and some elements. Black is used for text and contrasting elements throughout the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/319403798595596316/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/eb/cb/eb/ebcbeb3d1d715896d57cd4bafff52dc2.jpg" alt="Esto contiene una imagen de: NaftaGaz - Awwwards Honorable Mention" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: NaftaGaz - Awwwards Honorable Mention</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">gray</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Gray is dominant in the sky gradient and background elements, while red is prominent in the large letter and the man's attire.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/3307399720612178/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/70/6f/35/706f35556e721463a14ce533d5c93f6d.jpg" alt="Esto contiene una imagen de: " class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: </div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">The background of the design is predominantly white, occupying more than 30% of the visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/3307399721391104/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/0d/a3/e3/0da3e33e9766b8d645604062c0b72115.jpg" alt="Esto contiene una imagen de: Vestox Webflow Project - HALO LAB" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Vestox Webflow Project - HALO LAB</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is used prominently in the background and text sections occupying a significant portion of the design. White is dominant in the background of the main content areas, providing contrast to the text and other elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/3307399721880666/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/ef/95/8e/ef958ecf0b75c1b42ce8b0a6eec4dc4a.jpg" alt="Pinterest" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Pinterest</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">pink</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White occupies the background and most text areas, while pink is dominant in the main content and design elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/33917803439758545/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/27/b4/97/27b497020615ed8eefae96dc6eaa0ae9.jpg" alt="Esto contiene una imagen de: Streamline Your Cargo: Delivery Made Easy" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Streamline Your Cargo: Delivery Made Easy</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">black</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the most prominent color, seen in the background and text sections. Black is used extensively in text and some interface elements. Red is dominant in the container image and some text elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/342906959155603821/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/bc/13/34/bc133461ff9e73cd0f526cce750b83d4.jpg" alt="Esto contiene una imagen de: Gym & Personal Trainer Website Design Inspiration - 2024 Website Template" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Gym & Personal Trainer Website Design Inspiration - 2024 Website Template</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is the predominant color in the design, covering most of the background and main sections.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/346495765098848893/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/0f/69/64/0f6964d0ce3f9ade227629ea89a8fbe3.jpg" alt="Esto contiene una imagen de: Modern Restaurant Website Design | Creative UI/UX for Food Lovers 🍽️" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Modern Restaurant Website Design | Creative UI/UX for Food Lovers 🍽️</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">green</span><span class="color-tag old">brown</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">orange</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is prominent as the background color and text area, occupying the majority of the design. Orange is the accent color used in elements like text highlights and the meal being displayed.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/34691859627592468/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/48/b9/3f/48b93f02567576772331a9a47b941d24.jpg" alt="Esto contiene una imagen de: " class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: </div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">beige</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the background for most of the text and sections, making it very dominant. Beige is prominent due to the sand and neutral clothing in the images.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/35114072091193943/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/b9/a7/cd/b9a7cde1ca1b10f0439babbcff1812fb.jpg" alt="Furniture Website Design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Furniture Website Design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">orange</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Orange is the most dominant color, appearing in large areas such as backgrounds and text highlights. Beige is prevalent in the large background area, providing a neutral contrast to the orange elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/35465915812783982/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/c6/4b/0b/c64b0bf6bc7dae8706615e4b6cbeb108.jpg" alt="Esto contiene una imagen de: " class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: </div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">blue</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White dominates the background and large sections of text areas, contributing to a significant portion. Blue is prominent in buttons, headings, and other UI elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/375698793937250744/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/04/f9/4c/04f94c5a8565048f401069eccd019282.jpg" alt="Esto contiene una imagen de: Streamline Your Medical Website Creation" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Streamline Your Medical Website Creation</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">pink</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">gray</span><span class="color-tag new">white</span><span class="color-tag new">blue</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Gray is prominent in the background and text boxes. White is used extensively in the background. Blue appears dominantly in buttons and text accents.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/381539399710731457/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/16/40/43/164043c09e68e4c24edaed372c6f56fb.jpg" alt="Esto contiene una imagen de: web design - jin kyoung kwon" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: web design - jin kyoung kwon</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">gray</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the background color, occupying the majority of the space, and gray is used prominently in large sections and graphic elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/3870349672608552/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/55/25/c0/5525c05c106a13109b3961ce4a838224.jpg" alt="Esto contiene una imagen de: Fitness - Hero section" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Fitness - Hero section</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">The background is predominantly white, occupying the majority of the visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/430445676906689916/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/5d/c2/1c/5dc21c940dacb5fff44343e3b0f9d8ec.jpg" alt="Esto contiene una imagen de: bus landing page design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: bus landing page design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">orange</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White occupies the background of the page, and the orange sections occupy a large part of the design, especially in the header and footer areas.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/438960294959870596/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/27/87/4b/27874b1751acb0773535cdfb6066cae1.jpg" alt="Esto contiene una imagen de: Homepage of Ramco project by Litnevski Studio." class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Homepage of Ramco project by Litnevski Studio.</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White occupies the majority of the design, used extensively in the background and text areas.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/45317539995771606/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/1c/93/c4/1c93c42b7468d9d5dbf72522373a3157.jpg" alt="Esto contiene una imagen de: Portfolio website hero layouts, pages and templates for Framer" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Portfolio website hero layouts, pages and templates for Framer</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">orange</span><span class="color-tag new">black</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Orange is dominant in the design's backgrounds and elements, black is mainly used for text and backgrounds, and beige occupies the lower section and some areas in the middle.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/4574037117620820/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/f7/1a/83/f71a83931bdeed51f5062357eadd4d30.jpg" alt="Esto contiene una imagen de: Christy JKT48" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Christy JKT48</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is dominant in the background of the design, occupying most of the visual space. Red is prominent as the circular background behind the person and in the text and accents.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/633387442826525/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/de/c3/10/dec31047484db66e91aa0622e714876e.jpg" alt="Esto contiene una imagen de: TheLoke - Clean & Modern Multi-Purpose eCommerce PSD Template Preview" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: TheLoke - Clean & Modern Multi-Purpose eCommerce PSD Template Preview</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">gray</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the primary background color occupying most of the design. Gray is present as a secondary background in some sections.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/65091157109677351/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/67/21/c4/6721c44be367f71ef56c16451adf57b4.jpg" alt="Esto contiene: Smart Logistics Landing Page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene: Smart Logistics Landing Page</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">orange</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">gray</span><span class="color-tag new">orange</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Gray is dominant in the background and text areas, occupying a significant portion of the design. Orange is prominent in the containers and overall visual space, making it another dominant color.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/66709638230176170/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/65/cd/fa/65cdfaa5c78603eb19a9ebcbc66776f0.jpg" alt="Esto contiene una imagen de: Orange and White Scrapbook Creative Portfolio Presentation" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Orange and White Scrapbook Creative Portfolio Presentation</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">beige</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">orange</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Orange is the most dominant color used extensively in text and accents throughout the design. Beige is used as the background color, occupying a large portion of the space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/6685099442080933/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/2d/4b/c6/2d4bc67dda542a220c5588a10daacc4e.jpg" alt="Esto contiene una imagen de: PORTFOLIO 2024 - Bảo Trân (yuiikunb)" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: PORTFOLIO 2024 - Bảo Trân (yuiikunb)</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">beige</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">pink</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Pink occupies the majority of the text and background gradient. Beige is dominant in the lower background area.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/694187730103241855/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/37/7b/63/377b630782c03001239b426982c7e3ba.jpg" alt="Pin en Work" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Pin en Work</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">beige</span><span class="color-tag new">white</span><span class="color-tag new">brown</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Beige is the background color, occupying most of the space. White is prominent in text areas and part of the clothing. Brown is found in the pants and parts of the design elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/7459155629136933/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/72/07/30/720730875a554e743deb7c896ea52570.jpg" alt="Feedsauce - Landing Page Design | Lapa Ninja" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Feedsauce - Landing Page Design | Lapa Ninja</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is the background color that dominates the majority of the design, providing a neutral backdrop for the colorful elements and text.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/7810999347121091/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/50/18/fd/5018fd24996b760123483913bc9a2bd5.jpg" alt="Esto contiene una imagen de: Fashion Ecommerce Website | Clothing Store Website | Figma | UIUX Design | Web" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Fashion Ecommerce Website | Clothing Store Website | Figma | UIUX Design | Web</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">brown</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the background color of the image, taking up the majority of the space. Brown is prominent in the top banner and the jacket shown in the images, making it a significant part of the visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/785737466279209479/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/90/f4/98/90f498373f0080432b28e3c08e6ffbe8.jpg" alt="Esto contiene una imagen de: Get a FREE Transportation Services Layout Pack for Divi" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Get a FREE Transportation Services Layout Pack for Divi</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">orange</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">The top section is dominated by orange, which covers a large portion of the design. White is the background color for most text areas and occupies significant space in multiple sections.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/7881368093091744/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/c5/cd/8e/c5cd8efb86ea25d7f913ad11e884e049.jpg" alt="Esto contiene una imagen de: Triply - Tour Booking WordPress Theme" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Triply - Tour Booking WordPress Theme</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">brown</span><span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Brown is prevalent in the mountains and trees in the large background image at the top. Beige is dominant in the background of the lower sections of the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/7951736836942115/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/8a/92/d5/8a92d5732b7d26567fedc8ad7a369514.jpg" alt="Esto contiene una imagen de: Wayels - Courier System Dashboard" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Wayels - Courier System Dashboard</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the dominant background color in the design, occupying the majority of the visual space including large sections such as the background and content areas.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/8162843068928581/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/43/31/28/433128521bd49dd0517ad5073e49e2d4.jpg" alt="Pinterest" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Pinterest</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">beige</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">The background of the design is primarily beige, occupying the majority of the visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/82331501726313095/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/b8/d6/48/b8d6487ffff8f79cc2d4042ca9a06808.jpg" alt="Esto contiene una imagen de: TIB consulting engineering #webdesign #programming #coding" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: TIB consulting engineering #webdesign #programming #coding</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">blue</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">blue</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Blue is the background color covering a significant portion of the design. White is used extensively for text areas and borders, occupying a large visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/8233211826546892/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/a3/53/a3/a353a3726cc87bdd8edad9f0c6eb6d30.jpg" alt="Esto contiene una imagen de: " class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: </div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the most dominant color due to the large background area and surrounding elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/828240187705009461/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/57/2c/f2/572cf230dc0bd0c1044110749322036e.jpg" alt="Esto contiene una imagen de: Alex" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Alex</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">gray</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the background color, occupying a significant portion of the design. Black is used prominently for the text and other elements, making it a dominant color.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/8373949302399728/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/61/4a/6a/614a6ace26d9e0bc63548e355696ae6c.jpg" alt="Esto contiene una imagen de: Digital Banking Website Design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Digital Banking Website Design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">gray</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Gray occupies a significant portion at the top and bottom sections. White dominates the central content area.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/85075880456827486/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/b4/53/c1/b453c16caf677be0b4f920c5adb63c46.jpg" alt="Esto contiene una imagen de: Best Transportation Service Responsive Website Design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Best Transportation Service Responsive Website Design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is dominant in the top and bottom sections and the image background. White is prominent in the text areas and forms the background of the mid-section.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/8725793024667582/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/fb/05/13/fb0513b8aebef2767eb9fd36cb064ed6.jpg" alt="Esto contiene una imagen de: Fitkit - Gym and Fitness Center WordPress Theme" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Fitkit - Gym and Fitness Center WordPress Theme</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">white</span><span class="color-tag new">red</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black is used extensively in the background and text areas, occupying a large portion of the design. White is also prominent as the background color in various sections, especially where text is placed. Red is used significantly in headings, buttons, and accents throughout the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/897201557044508308/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/ae/38/5f/ae385f3a688957de378342997296072a.jpg" alt="Esto contiene una imagen de: Landing Page - Piotr Adam Kwiatkowski" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Landing Page - Piotr Adam Kwiatkowski</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">red</span><span class="color-tag new">blue</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is the most dominant color, used as the background for large sections. Red is prominent in the shoe, background accents, and text. Blue is visible in the surrounding border, taking up a significant portion of the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/914862416356021/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/de/85/df/de85dfd1ab32b8424bfc3b604ea54f8b.jpg" alt="Esto contiene una imagen de: Emergency Plumber Website Layout | Fast Response Service Design" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Emergency Plumber Website Layout | Fast Response Service Design</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">white</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">white</span><span class="color-tag new">orange</span><span class="color-tag new">navy</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">White is prominent as the background color, occupying a large portion of the design. Orange is used in large shapes and elements, and navy appears in the text and circular elements, both contributing significantly to the overall visual space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/921267667534920608/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/02/30/fc/0230fc5f3323d475ba1372f84b23a2dc.jpg" alt="Esto contiene: Webdesign inspiration" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene: Webdesign inspiration</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">black</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">black</span><span class="color-tag new">pink</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Black dominates the background, creating a strong contrast. Pink is prominent in the text and design elements, used extensively for emphasis.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/96264510779099144/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="reclassify">
+                            <img src="https://i.pinimg.com/736x/30/8e/db/308edbc85391476b6a6484487b32d191.jpg" alt="Esto contiene una imagen de: Harmoni - Fitness & Gym | Home Page Design Inspiration" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Harmoni - Fitness & Gym | Home Page Design Inspiration</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Old Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag old">red</span><span class="color-tag old">beige</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-group">
+                                        <div class="color-label">New Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag new">beige</span><span class="color-tag new">gray</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Beige occupies a large portion of the central background, while gray is dominant in the margins and some text areas.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/9781324186626587/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            
+        </div>
+
+        <div class="section" id="correct-section">
+            <div class="section-header">
+                <div class="section-title">✅ Correctly Classified</div>
+                <div class="section-count">7</div>
+            </div>
+            
+                <div class="grid">
+                    
+                        <div class="card" data-type="correct">
+                            <img src="https://i.pinimg.com/736x/93/c3/da/93c3dad02854b97af026466f433fa816.jpg" alt="Esto contiene una imagen de: Mr. Handyman website landingpage" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Mr. Handyman website landingpage</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag correct">red</span><span class="color-tag correct">white</span><span class="color-tag correct">navy</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Red is used extensively in the background and accent sections. White occupies a substantial portion of the text and background areas. Navy is used in the footer and various sections, providing a strong contrast.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/163466661470564628/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="correct">
+                            <img src="https://i.pinimg.com/736x/35/2e/70/352e701d36914aa6b9e079fd73bbe69e.jpg" alt="Esto contiene una imagen de: 24 Inspirational Squarespace Websites for Restaurants — Applet Studio" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: 24 Inspirational Squarespace Websites for Restaurants — Applet Studio</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag correct">red</span><span class="color-tag correct">beige</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Red is the most prominent color, used in large text blocks and backgrounds. Beige appears as a significant background color throughout the design.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/281543726412809/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="correct">
+                            <img src="https://i.pinimg.com/736x/b1/41/d3/b141d35d2fabcb20bd4493536818f2c5.jpg" alt="Esto contiene una imagen de: " class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: </div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag correct">red</span><span class="color-tag correct">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Red is dominant with large sections and text, while white is prominent in background areas and text.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/30962316181567137/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="correct">
+                            <img src="https://i.pinimg.com/736x/fc/ba/2e/fcba2e879083727fe04a76315dca53cf.jpg" alt="Esto contiene una imagen de: 🔮Oleksii Yurchenko's 1.png | Download PNG image" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: 🔮Oleksii Yurchenko's 1.png | Download PNG image</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag correct">red</span><span class="color-tag correct">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Red is dominant due to the large red sections at the top and bottom, while white occupies a significant portion as background in the middle sections.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/323203710778069786/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="correct">
+                            <img src="https://i.pinimg.com/736x/9d/56/48/9d5648615a0d830794201d562adc329d.jpg" alt="Esto contiene una imagen de: Piterra" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Piterra</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag correct">red</span><span class="color-tag correct">black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Red occupies a majority of the design as the background and key elements are in red. Black is used as the main color for the content area taking more than 30% of the space.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/36662184461705366/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="correct">
+                            <img src="https://i.pinimg.com/736x/c2/06/5f/c2065f21d570ecff7a10d20014f6c8c3.jpg" alt="Esto contiene una imagen de: TRUEPATH | LOGISTICS COMPANY WEBSITE" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: TRUEPATH | LOGISTICS COMPANY WEBSITE</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag correct">red</span><span class="color-tag correct">black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">The design prominently features a rich red color dominating the background, and black is used extensively in the text and some background elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/5136987070561161/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card" data-type="correct">
+                            <img src="https://i.pinimg.com/736x/f6/a5/33/f6a5334e41c8703dd65d54e6c3e7bcf0.jpg" alt="Esto contiene una imagen de: Портфолио ux ui designer" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Esto contiene una imagen de: Портфолио ux ui designer</div>
+                                
+                                <div class="color-comparison">
+                                    <div class="color-group">
+                                        <div class="color-label">Colors</div>
+                                        <div class="color-tags">
+                                            <span class="color-tag correct">red</span><span class="color-tag correct">white</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reasoning">Red is the dominant background color occupying most of the design. White is used prominently for text and certain design elements.</div>
+
+                                <div class="card-footer">
+                                    <a href="https://cl.pinterest.com/pin/806707352047362997/" target="_blank" class="btn btn-pinterest">
+                                        View on Pinterest
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            
+        </div>
+    </div>
+
+    <script>
+        function filterPins(type) {
+            const cards = document.querySelectorAll('.card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Update button states
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter cards
+            cards.forEach(card => {
+                if (type === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = card.dataset.type === type ? 'block' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

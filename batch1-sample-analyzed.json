@@ -1,0 +1,263 @@
+[
+    {
+        "pinId": "101190322938748220",
+        "title": "Vibrant Crypto Finance Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/d4/43/2a/d4432a4d89d1e7e74c3ba44f9dd34e63.jpg",
+        "currentColors": [
+            "green",
+            "white",
+            "purple"
+        ],
+        "newColors": [
+            "green",
+            "white",
+            "purple"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Green UI sections (~40%), white background and cards (~35%), purple accent cards (~20%). All are solid UI colors, not decorative backgrounds.",
+        "changeType": "no_change"
+    },
+    {
+        "pinId": "10133167906487120",
+        "title": "Portfolio 2024",
+        "imageUrl": "https://i.pinimg.com/736x/37/58/4b/37584beb8832e33e22ef6def5b854abc.jpg",
+        "currentColors": [
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "white",
+            "black"
+        ],
+        "confidence": 0.96,
+        "reasoning": "White background (~60%), black text and illustration (~40%). Monochrome design. The illustration is part of the UI design, not decorative background.",
+        "changeType": "no_change"
+    },
+    {
+        "pinId": "1017532109542032303",
+        "title": "Hotel WordPress Theme",
+        "imageUrl": "https://i.pinimg.com/736x/9a/5f/11/9a5f113f12488ddd3bb35a7a9cfe2734.jpg",
+        "currentColors": [
+            "white",
+            "brown"
+        ],
+        "newColors": [
+            "white",
+            "yellow",
+            "brown"
+        ],
+        "confidence": 0.93,
+        "reasoning": "White background and sections (~50%), yellow CTA button 'Schedule a Tour' (~30%), brown text and accents (~15%). Hero photos are decorative, excluded.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "101894010313898060",
+        "title": "Notion Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/a8/e8/9f/a8e89f2aeccd4cc2882a1f82399aec41.jpg",
+        "currentColors": [
+            "black",
+            "white"
+        ],
+        "newColors": [
+            "white",
+            "red",
+            "yellow"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White background (~50%), red accent squares in title (~25%), yellow accents (~15%). Black illustrations are decorative. Focus on UI color blocks.",
+        "changeType": "major_correction"
+    },
+    {
+        "pinId": "10203536651749768",
+        "title": "Blog de Instagram",
+        "imageUrl": "https://i.pinimg.com/736x/50/d1/92/50d1920c1582fb37052273b54cd8f56b.jpg",
+        "currentColors": [
+            "gray",
+            "brown"
+        ],
+        "newColors": [
+            "white",
+            "blue",
+            "black"
+        ],
+        "confidence": 0.92,
+        "reasoning": "White background (~50%), blue accent elements (~25%), black text (~20%). The photo is decorative. Gray/brown were incorrect.",
+        "changeType": "major_correction"
+    },
+    {
+        "pinId": "10203536651827197",
+        "title": "Dark Portfolio Website",
+        "imageUrl": "https://i.pinimg.com/736x/e2/5f/58/e25f5822ea618d2bbaed22d5c7f70c27.jpg",
+        "currentColors": [
+            "black",
+            "orange",
+            "purple"
+        ],
+        "newColors": [
+            "black",
+            "orange",
+            "purple"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Black website background (~50%), orange accent cards (~25%), purple accent card (~20%). Black is solid UI background, not decorative.",
+        "changeType": "no_change"
+    },
+    {
+        "pinId": "102738435243564477",
+        "title": "Modern Bank Card Website",
+        "imageUrl": "https://i.pinimg.com/736x/85/3e/76/853e7687d3db9af73899c8143e6583df.jpg",
+        "currentColors": [
+            "gray",
+            "black",
+            "purple",
+            "green"
+        ],
+        "newColors": [
+            "white",
+            "green",
+            "purple"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White background (~50%), green accent button (~25%), purple accent elements (~20%). Black checkered footer is decorative pattern.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "102738435244578924",
+        "title": "Coaching Services Website",
+        "imageUrl": "https://i.pinimg.com/736x/5d/68/02/5d6802ee7ac5ee14daab4d51200c0956.jpg",
+        "currentColors": [
+            "gray",
+            "white"
+        ],
+        "newColors": [
+            "white",
+            "beige",
+            "gray"
+        ],
+        "confidence": 0.93,
+        "reasoning": "White sections (~45%), beige/cream sections (~35%), gray text (~15%). Hero photos are decorative, excluded.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "1029002214871226835",
+        "title": "Organic Bakery Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/72/80/50/7280506d44a3e1135dff3dc60c71613d.jpg",
+        "currentColors": [
+            "beige",
+            "brown"
+        ],
+        "newColors": [
+            "beige",
+            "brown",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Beige/cream background (~45%), brown buttons and accents (~35%), white text (~15%). Product photos are decorative, excluded.",
+        "changeType": "added_tertiary"
+    },
+    {
+        "pinId": "102949541478436864",
+        "title": "Electric Vehicle Website",
+        "imageUrl": "https://i.pinimg.com/736x/e9/57/2a/e9572a35569b2b83b66431970eace777.jpg",
+        "currentColors": [
+            "green",
+            "black"
+        ],
+        "newColors": [
+            "green",
+            "white",
+            "black"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Green UI sections and buttons (~45%), white background and sections (~35%), black buttons and text (~15%). Product photos are decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "1029635533572211994",
+        "title": "Healthcare Website Design",
+        "imageUrl": "https://i.pinimg.com/736x/6a/40/77/6a40777818fd8b9be9793fdb176dd151.jpg",
+        "currentColors": [
+            "beige",
+            "white",
+            "yellow"
+        ],
+        "newColors": [
+            "beige",
+            "orange",
+            "white"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Beige/cream background (~45%), orange CTA buttons (~30%), white sections (~20%). Yellow accents are actually orange. Hero photos are decorative.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "1030620696018633333",
+        "title": "Pineapple Promo Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/3f/fe/9b/3ffe9b7682db85f18cd1bb55bd568521.jpg",
+        "currentColors": [
+            "yellow",
+            "orange",
+            "gray"
+        ],
+        "newColors": [
+            "orange",
+            "yellow",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Orange UI sections and buttons (~45%), yellow accents (~30%), white background (~20%). Product photos are decorative, excluded.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "103231016456731574",
+        "title": "Agritech Website Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/ac/d3/cc/acd3ccf39164f3c286f65da6834ddd71.jpg",
+        "currentColors": [
+            "green",
+            "black"
+        ],
+        "newColors": [
+            "green",
+            "beige",
+            "white"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Green CTA button (~40%), beige/cream sections (~35%), white sections (~20%). Hero photo with landscape is decorative, excluded. Black was incorrect.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "1033928026965005009",
+        "title": "Fashion E-commerce Website",
+        "imageUrl": "https://i.pinimg.com/736x/7c/31/3e/7c313eb13c5dfa8409041e47857581a0.jpg",
+        "currentColors": [
+            "beige",
+            "pink",
+            "blue"
+        ],
+        "newColors": [
+            "beige",
+            "pink",
+            "white"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Beige/tan background (~45%), pink discount section '30% OFF' (~30%), white text and sections (~20%). Product photos are decorative.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "10344274144209171",
+        "title": "Grain Farm Website",
+        "imageUrl": "https://i.pinimg.com/736x/8a/55/43/8a5543f4f528c73d02bf295fb6b2142f.jpg",
+        "currentColors": [
+            "beige",
+            "green"
+        ],
+        "newColors": [
+            "beige",
+            "yellow",
+            "brown"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Beige/cream background (~50%), yellow/gold accents in branding (~25%), brown buttons (~20%). Hero photo with farm equipment is decorative. Green equipment in photo excluded.",
+        "changeType": "corrected_secondary"
+    }
+]

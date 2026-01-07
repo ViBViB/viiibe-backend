@@ -1,0 +1,868 @@
+[
+    {
+        "pinId": "100064422967649525",
+        "title": "e-Learning Website Design",
+        "imageUrl": "https://i.pinimg.com/736x/71/b3/1e/71b31e7ca9fbf7e91875da768b9880c7.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "green",
+            "beige",
+            "orange"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Green UI sections (~45%), beige/cream background (~35%), orange accent button (~15%). Hero illustration is decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "100416266686509866",
+        "title": "Website Design",
+        "imageUrl": "https://i.pinimg.com/736x/d7/4b/65/d74b65124e2829974724f968e06f933b.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "green",
+            "beige",
+            "brown"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Dark green hero section (~40%), beige/cream middle section (~35%), brown accents (~20%). Hero photo is decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "100557004175420131",
+        "title": "Excel Services Website",
+        "imageUrl": "https://i.pinimg.com/736x/cc/78/0e/cc780e88c569c5fd2102e2db0e74b7a2.jpg",
+        "currentColors": [
+            "pink",
+            "yellow",
+            "brown"
+        ],
+        "newColors": [
+            "black",
+            "pink",
+            "yellow"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Black background (~50%), pink accent cards (~25%), yellow accent cards (~20%). All solid UI colors.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "100557004175687442",
+        "title": "Landing Page Design",
+        "imageUrl": "https://i.pinimg.com/736x/4f/2d/09/4f2d0915109c63e601c1649c5f9d69e4.jpg",
+        "currentColors": [
+            "blue"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "black"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Light blue hero background (~45%), white sections (~35%), black text/elements (~15%).",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "100627372920382446",
+        "title": "Home Care Website",
+        "imageUrl": "https://i.pinimg.com/736x/19/64/36/1964362547571dcfd3e11421f6cd762d.jpg",
+        "currentColors": [
+            "pink",
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "pink",
+            "white",
+            "brown"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Light pink section (~40%), white background (~40%), brown footer (~15%). Hero photos are decorative.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "10062799163432884",
+        "title": "Japanese Website Redesign",
+        "imageUrl": "https://i.pinimg.com/736x/40/0d/9f/400d9f10298222e0896fc7449c7e1eb1.jpg",
+        "currentColors": [
+            "blue"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "beige"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Strong blue hero section (~45%), white sections (~35%), light beige/cream sections (~15%).",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "10062799163897960",
+        "title": "Hero Section Design",
+        "imageUrl": "https://i.pinimg.com/736x/d4/4c/ed/d44ced5e9edc75fbf22a4f23dd78b752.jpg",
+        "currentColors": [
+            "black",
+            "red",
+            "green"
+        ],
+        "newColors": [
+            "black",
+            "orange",
+            "green"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Black background (~50%), orange/red accent cards (~30%), green accent (~15%). Red is actually orange.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "1008947122789322687",
+        "title": "Real Estate Website",
+        "imageUrl": "https://i.pinimg.com/736x/97/83/83/97838376a7d389f10e73ea61ebb6b716.jpg",
+        "currentColors": [
+            "blue",
+            "gray",
+            "black"
+        ],
+        "newColors": [
+            "blue",
+            "gray",
+            "white"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Dark blue navy sections (~40%), gray background (~35%), white sections (~20%).",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "100979216640543388",
+        "title": "University Website",
+        "imageUrl": "https://i.pinimg.com/736x/d7/e9/25/d7e925c8a436b155fdafaefc22df5208.jpg",
+        "currentColors": [
+            "yellow",
+            "green"
+        ],
+        "newColors": [
+            "white",
+            "blue",
+            "yellow"
+        ],
+        "confidence": 0.92,
+        "reasoning": "White background (~50%), blue accents (~25%), yellow accents (~20%). Hero photo is decorative.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "101119954127865491",
+        "title": "Environment Protection Website",
+        "imageUrl": "https://i.pinimg.com/736x/6d/9c/15/6d9c15bf5073f7ba5b8bd1891fec169e.jpg",
+        "currentColors": [
+            "green",
+            "purple",
+            "beige"
+        ],
+        "newColors": [
+            "green",
+            "purple",
+            "pink"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Green landscape UI (~40%), purple mountains UI (~30%), pink/salmon sky UI (~25%). Illustration is part of the design.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "101190322938748220",
+        "title": "Vibrant Crypto Finance Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/d4/43/2a/d4432a4d89d1e7e74c3ba44f9dd34e63.jpg",
+        "currentColors": [
+            "green",
+            "white",
+            "purple"
+        ],
+        "newColors": [
+            "green",
+            "white",
+            "purple"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Green UI sections (~40%), white background and cards (~35%), purple accent cards (~20%). All are solid UI colors.",
+        "changeType": "no_change"
+    },
+    {
+        "pinId": "10133167906487120",
+        "title": "Portfolio 2024",
+        "imageUrl": "https://i.pinimg.com/736x/37/58/4b/37584beb8832e33e22ef6def5b854abc.jpg",
+        "currentColors": [
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "white",
+            "black"
+        ],
+        "confidence": 0.96,
+        "reasoning": "White background (~60%), black text and illustration (~40%). Monochrome design.",
+        "changeType": "no_change"
+    },
+    {
+        "pinId": "1017532109542032303",
+        "title": "Hotel WordPress Theme",
+        "imageUrl": "https://i.pinimg.com/736x/9a/5f/11/9a5f113f12488ddd3bb35a7a9cfe2734.jpg",
+        "currentColors": [
+            "white",
+            "brown"
+        ],
+        "newColors": [
+            "white",
+            "yellow",
+            "brown"
+        ],
+        "confidence": 0.93,
+        "reasoning": "White background and sections (~50%), yellow CTA button (~30%), brown text and accents (~15%). Hero photos are decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "101894010313898060",
+        "title": "Notion Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/a8/e8/9f/a8e89f2aeccd4cc2882a1f82399aec41.jpg",
+        "currentColors": [
+            "black",
+            "white"
+        ],
+        "newColors": [
+            "white",
+            "red",
+            "yellow"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White background (~50%), red accent squares in title (~25%), yellow accents (~15%). Black illustrations are decorative.",
+        "changeType": "major_correction"
+    },
+    {
+        "pinId": "10203536651749768",
+        "title": "Blog de Instagram",
+        "imageUrl": "https://i.pinimg.com/736x/50/d1/92/50d1920c1582fb37052273b54cd8f56b.jpg",
+        "currentColors": [
+            "gray",
+            "brown"
+        ],
+        "newColors": [
+            "white",
+            "blue",
+            "black"
+        ],
+        "confidence": 0.92,
+        "reasoning": "White background (~50%), blue accent elements (~25%), black text (~20%). The photo is decorative.",
+        "changeType": "major_correction"
+    },
+    {
+        "pinId": "10203536651827197",
+        "title": "Dark Portfolio Website",
+        "imageUrl": "https://i.pinimg.com/736x/e2/5f/58/e25f5822ea618d2bbaed22d5c7f70c27.jpg",
+        "currentColors": [
+            "black",
+            "orange",
+            "purple"
+        ],
+        "newColors": [
+            "black",
+            "orange",
+            "purple"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Black website background (~50%), orange accent cards (~25%), purple accent card (~20%). Black is solid UI background.",
+        "changeType": "no_change"
+    },
+    {
+        "pinId": "102738435243564477",
+        "title": "Modern Bank Card Website",
+        "imageUrl": "https://i.pinimg.com/736x/85/3e/76/853e7687d3db9af73899c8143e6583df.jpg",
+        "currentColors": [
+            "gray",
+            "black",
+            "purple",
+            "green"
+        ],
+        "newColors": [
+            "white",
+            "green",
+            "purple"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White background (~50%), green accent button (~25%), purple accent elements (~20%). Black checkered footer is decorative.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "102738435244578924",
+        "title": "Coaching Services Website",
+        "imageUrl": "https://i.pinimg.com/736x/5d/68/02/5d6802ee7ac5ee14daab4d51200c0956.jpg",
+        "currentColors": [
+            "gray",
+            "white"
+        ],
+        "newColors": [
+            "white",
+            "beige",
+            "gray"
+        ],
+        "confidence": 0.93,
+        "reasoning": "White sections (~45%), beige/cream sections (~35%), gray text (~15%). Hero photos are decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "1029002214871226835",
+        "title": "Organic Bakery Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/72/80/50/7280506d44a3e1135dff3dc60c71613d.jpg",
+        "currentColors": [
+            "beige",
+            "brown"
+        ],
+        "newColors": [
+            "beige",
+            "brown",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Beige/cream background (~45%), brown buttons and accents (~35%), white text (~15%). Product photos are decorative.",
+        "changeType": "added_tertiary"
+    },
+    {
+        "pinId": "102949541478436864",
+        "title": "Electric Vehicle Website",
+        "imageUrl": "https://i.pinimg.com/736x/e9/57/2a/e9572a35569b2b83b66431970eace777.jpg",
+        "currentColors": [
+            "green",
+            "black"
+        ],
+        "newColors": [
+            "green",
+            "white",
+            "black"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Green UI sections and buttons (~45%), white background and sections (~35%), black buttons and text (~15%). Product photos are decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "1029635533572211994",
+        "title": "Healthcare Website Design",
+        "imageUrl": "https://i.pinimg.com/736x/6a/40/77/6a40777818fd8b9be9793fdb176dd151.jpg",
+        "currentColors": [
+            "beige",
+            "white",
+            "yellow"
+        ],
+        "newColors": [
+            "beige",
+            "orange",
+            "white"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Beige/cream background (~45%), orange CTA buttons (~30%), white sections (~20%). Yellow accents are actually orange.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "1030620696018633333",
+        "title": "Pineapple Promo Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/3f/fe/9b/3ffe9b7682db85f18cd1bb55bd568521.jpg",
+        "currentColors": [
+            "yellow",
+            "orange",
+            "gray"
+        ],
+        "newColors": [
+            "orange",
+            "yellow",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Orange UI sections and buttons (~45%), yellow accents (~30%), white background (~20%). Product photos are decorative.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "103231016456731574",
+        "title": "Agritech Website Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/ac/d3/cc/acd3ccf39164f3c286f65da6834ddd71.jpg",
+        "currentColors": [
+            "green",
+            "black"
+        ],
+        "newColors": [
+            "green",
+            "beige",
+            "white"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Green CTA button (~40%), beige/cream sections (~35%), white sections (~20%). Hero photo with landscape is decorative.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "1033928026965005009",
+        "title": "Fashion E-commerce Website",
+        "imageUrl": "https://i.pinimg.com/736x/7c/31/3e/7c313eb13c5dfa8409041e47857581a0.jpg",
+        "currentColors": [
+            "beige",
+            "pink",
+            "blue"
+        ],
+        "newColors": [
+            "beige",
+            "pink",
+            "white"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Beige/tan background (~45%), pink discount section '30% OFF' (~30%), white text and sections (~20%). Product photos are decorative.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "10344274144209171",
+        "title": "Grain Farm Website",
+        "imageUrl": "https://i.pinimg.com/736x/8a/55/43/8a5543f4f528c73d02bf295fb6b2142f.jpg",
+        "currentColors": [
+            "beige",
+            "green"
+        ],
+        "newColors": [
+            "beige",
+            "yellow",
+            "brown"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Beige/cream background (~50%), yellow/gold accents in branding (~25%), brown buttons (~20%). Hero photo with farm equipment is decorative.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "1034913189402273056",
+        "title": "Home Services Website",
+        "imageUrl": "https://i.pinimg.com/736x/61/05/e0/6105e0d6fcdc3ce3fedbdd904f034339.jpg",
+        "currentColors": [
+            "blue",
+            "yellow"
+        ],
+        "newColors": [
+            "blue",
+            "yellow",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Blue UI sections (~45%), yellow accent badges (~30%), white background (~20%). Hero photos are decorative.",
+        "changeType": "added_tertiary"
+    },
+    {
+        "pinId": "1036390933010151679",
+        "title": "Olipop Juice Products",
+        "imageUrl": "https://i.pinimg.com/736x/94/0f/7c/940f7cac20e61b54ae451d3b08ee4304.jpg",
+        "currentColors": [
+            "purple",
+            "orange",
+            "beige",
+            "yellow",
+            "red"
+        ],
+        "newColors": [
+            "purple",
+            "beige",
+            "yellow"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Purple product label (~35%), beige/cream background (~35%), yellow accents (~25%). Product photos are decorative. Too many colors in current.",
+        "changeType": "simplified"
+    },
+    {
+        "pinId": "1038501995330864364",
+        "title": "Virtus NGO Website",
+        "imageUrl": "https://i.pinimg.com/736x/c9/06/1d/c9061dffb47f545b279b155b9b38264b.jpg",
+        "currentColors": [
+            "black",
+            "white"
+        ],
+        "newColors": [
+            "white",
+            "black"
+        ],
+        "confidence": 0.95,
+        "reasoning": "White UI sections (~55%), black background and text (~40%). Reordered to prioritize white.",
+        "changeType": "reordered"
+    },
+    {
+        "pinId": "1039135314038272880",
+        "title": "SaaS Website - Advisora",
+        "imageUrl": "https://i.pinimg.com/736x/9d/ad/e1/9dade11766fc8fac4322df733be46dad.jpg",
+        "currentColors": [
+            "green",
+            "beige"
+        ],
+        "newColors": [
+            "green",
+            "beige",
+            "orange"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Dark green sections (~45%), beige/cream background (~35%), orange CTA button (~15%). Hero photos are decorative.",
+        "changeType": "added_tertiary"
+    },
+    {
+        "pinId": "1039135314038433649",
+        "title": "Education HTML Template",
+        "imageUrl": "https://i.pinimg.com/736x/11/75/e4/1175e4a0b7b54c00467bdac215cc09ec.jpg",
+        "currentColors": [
+            "blue",
+            "white"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "yellow"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Blue UI sections (~45%), white background (~40%), yellow accent elements (~10%). Hero photo is decorative.",
+        "changeType": "added_tertiary"
+    },
+    {
+        "pinId": "1039135314038725911",
+        "title": "Solar Energy Website - Sunify",
+        "imageUrl": "https://i.pinimg.com/736x/4e/8b/ef/4e8befbbf973f916238098d6f044632f.jpg",
+        "currentColors": [
+            "brown",
+            "white"
+        ],
+        "newColors": [
+            "white",
+            "orange",
+            "brown"
+        ],
+        "confidence": 0.93,
+        "reasoning": "White background (~45%), orange accent sections (~30%), brown/dark sections (~20%). Hero photos are decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "103934703898381255",
+        "title": "Polestar Automotive",
+        "imageUrl": "https://i.pinimg.com/736x/db/cc/8e/dbcc8e2fe6606b542d0f1bed8db6d0ce.jpg",
+        "currentColors": [
+            "gray",
+            "blue",
+            "black"
+        ],
+        "newColors": [
+            "white",
+            "beige",
+            "black"
+        ],
+        "confidence": 0.92,
+        "reasoning": "White/beige sections (~50%), black text and accents (~40%). Hero photo is decorative. Gray/blue were incorrect.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "10414642883024625",
+        "title": "Healis Clinic Website",
+        "imageUrl": "https://i.pinimg.com/736x/8e/4f/21/8e4f21838f1b7a4a23410d41eda53fe0.jpg",
+        "currentColors": [
+            "blue",
+            "gray"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "gray"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Light blue background (~45%), white sections (~35%), gray accents (~15%). Hero photos are decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "10414642883071169",
+        "title": "Digital Banking Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/68/98/06/689806a82cf313886be0055c475ac2ba.jpg",
+        "currentColors": [
+            "beige",
+            "brown",
+            "black"
+        ],
+        "newColors": [
+            "beige",
+            "brown",
+            "yellow"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Beige background (~45%), brown sections (~30%), yellow accent elements (~20%). Product photo is decorative.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "104216178871598260",
+        "title": "Dark Mode Components",
+        "imageUrl": "https://i.pinimg.com/736x/b4/32/e1/b432e1df8408572b9f081cb03fd665d3.jpg",
+        "currentColors": [
+            "black"
+        ],
+        "newColors": [
+            "black",
+            "blue",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Black background (~50%), blue accent slider (~25%), white text (~20%). Design tool UI.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "104216178873160123",
+        "title": "Construction Company Website",
+        "imageUrl": "https://i.pinimg.com/736x/c3/a4/5f/c3a45f2ca8740763599a8e27371c830b.jpg",
+        "currentColors": [
+            "gray",
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "white",
+            "gray",
+            "black"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White background (~50%), gray sections (~30%), black text (~15%). Hero photos are decorative.",
+        "changeType": "reordered"
+    },
+    {
+        "pinId": "1044764813569476753",
+        "title": "Financial Advisory Services",
+        "imageUrl": "https://i.pinimg.com/736x/1d/95/0d/1d950d058da30507740bb0593f3663cd.jpg",
+        "currentColors": [
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "white",
+            "black"
+        ],
+        "confidence": 0.96,
+        "reasoning": "White background (~60%), black text and elements (~35%). Monochrome design.",
+        "changeType": "no_change"
+    },
+    {
+        "pinId": "104497653849231890",
+        "title": "Luxury Real Estate Website",
+        "imageUrl": "https://i.pinimg.com/736x/27/89/cb/2789cb03c7f3d72c5544f55ddd9f67ca.jpg",
+        "currentColors": [
+            "black",
+            "brown",
+            "beige"
+        ],
+        "newColors": [
+            "black",
+            "beige",
+            "white"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Black/dark navy background (~50%), beige sections (~30%), white text (~15%). Hero photos are decorative.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "1045749975986553163",
+        "title": "Sanaris Healthcare Template",
+        "imageUrl": "https://i.pinimg.com/736x/33/de/31/33de31c682cac80691f8060230dd99b0.jpg",
+        "currentColors": [
+            "black",
+            "white"
+        ],
+        "newColors": [
+            "beige",
+            "white",
+            "black"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Beige/tan background (~45%), white sections (~35%), black text (~15%). Hero photos are decorative.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "104638391337753274",
+        "title": "Fashion Ecommerce Website",
+        "imageUrl": "https://i.pinimg.com/736x/19/42/57/194257229f26cfeea6a89e29bd721e8b.jpg",
+        "currentColors": [
+            "beige",
+            "brown",
+            "white",
+            "gray"
+        ],
+        "newColors": [
+            "beige",
+            "brown",
+            "white"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Beige/cream background (~45%), brown accents (~30%), white sections (~20%). Product photos are decorative.",
+        "changeType": "simplified"
+    },
+    {
+        "pinId": "1048423988264396631",
+        "title": "Fitness Motivating App",
+        "imageUrl": "https://i.pinimg.com/736x/23/e5/ee/23e5ee33980ddaca361dbfbdb1f6da40.jpg",
+        "currentColors": [
+            "gray",
+            "orange"
+        ],
+        "newColors": [
+            "beige",
+            "orange",
+            "white"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Beige/cream background (~45%), orange accents (~30%), white sections (~20%). Hero photos are decorative.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "10485011665833757",
+        "title": "Interior Design Portfolio",
+        "imageUrl": "https://i.pinimg.com/736x/3a/95/e3/3a95e30d2645f271fb630ff1d7c5fd5a.jpg",
+        "currentColors": [
+            "gray",
+            "green",
+            "white"
+        ],
+        "newColors": [
+            "white",
+            "green",
+            "gray"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White background (~50%), green accent sections (~30%), gray text (~15%). Hero photos are decorative.",
+        "changeType": "reordered"
+    },
+    {
+        "pinId": "10485011673809052",
+        "title": "Sport Website Concept",
+        "imageUrl": "https://i.pinimg.com/736x/8f/39/6c/8f396c2a12a7f88fc829b9582918a6cd.jpg",
+        "currentColors": [
+            "green",
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "white",
+            "green",
+            "yellow"
+        ],
+        "confidence": 0.93,
+        "reasoning": "White background (~50%), green accent elements (~25%), yellow/lime accents (~20%). Hero illustration is decorative.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "1048564725788169646",
+        "title": "Digital Agency HTML Template",
+        "imageUrl": "https://i.pinimg.com/736x/5e/19/b5/5e19b56ea73458169a0542a49e8b06d8.jpg",
+        "currentColors": [
+            "orange",
+            "gray",
+            "black"
+        ],
+        "newColors": [
+            "white",
+            "orange",
+            "black"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White background (~50%), orange accent elements (~30%), black text (~15%). Hero photos are decorative.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "1049972100629429464",
+        "title": "SaaS AI Brand Homepage",
+        "imageUrl": "https://i.pinimg.com/736x/4a/d2/4e/4ad24ef44e81c9753d8d9140627e2676.jpg",
+        "currentColors": [
+            "gray"
+        ],
+        "newColors": [
+            "white",
+            "green",
+            "black"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White background (~50%), green accent badges (~25%), black text and elements (~20%).",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "1049972100635821785",
+        "title": "ESG Reporting Platform",
+        "imageUrl": "https://i.pinimg.com/736x/fd/13/d5/fd13d572d1498c5e706e170b265912e8.jpg",
+        "currentColors": [
+            "gray",
+            "green"
+        ],
+        "newColors": [
+            "white",
+            "green",
+            "gray"
+        ],
+        "confidence": 0.95,
+        "reasoning": "White background (~50%), green accent buttons and charts (~30%), gray text (~15%).",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "105060603802023847",
+        "title": "Financial Solutions Website",
+        "imageUrl": "https://i.pinimg.com/736x/26/64/ba/2664babf13c124e8c9e884e0c26d9627.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "green",
+            "white",
+            "black"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Dark green background (~50%), white sections and cards (~30%), black text (~15%). Hero photos are decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "105271710035648663",
+        "title": "Creative Portfolio HTML Template",
+        "imageUrl": "https://i.pinimg.com/736x/c3/f9/aa/c3f9aa223d97cdfb75175d48f896ce9a.jpg",
+        "currentColors": [
+            "orange",
+            "beige",
+            "black"
+        ],
+        "newColors": [
+            "beige",
+            "orange",
+            "black"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Beige/cream background (~45%), orange accent elements (~30%), black text and sections (~20%).",
+        "changeType": "reordered"
+    },
+    {
+        "pinId": "10555380371570487",
+        "title": "Patisserie Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/96/32/72/9632726e7f1d982429092b0eaae4fcc1.jpg",
+        "currentColors": [
+            "pink",
+            "beige"
+        ],
+        "newColors": [
+            "pink",
+            "beige",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Pink sections (~40%), beige/cream background (~35%), white sections (~20%). Product photos are decorative.",
+        "changeType": "added_tertiary"
+    },
+    {
+        "pinId": "1055599904697412",
+        "title": "Ecommerce Design Gallery",
+        "imageUrl": "https://i.pinimg.com/736x/98/ee/54/98ee548ecafc075395f5d8bc22d46a3e.jpg",
+        "currentColors": [
+            "yellow",
+            "orange",
+            "pink"
+        ],
+        "newColors": [
+            "yellow",
+            "beige",
+            "pink"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Yellow/beige background (~45%), beige sections (~30%), pink accents (~20%). Product photos are decorative.",
+        "changeType": "corrected_secondary"
+    }
+]

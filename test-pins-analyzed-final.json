@@ -1,0 +1,173 @@
+[
+    {
+        "pinId": "100064422967649525",
+        "title": "e-Learning Website Design",
+        "imageUrl": "https://i.pinimg.com/736x/71/b3/1e/71b31e7ca9fbf7e91875da768b9880c7.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "green",
+            "orange",
+            "white"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Green UI background (~50%), orange 'Book a Demo' button (~30%), white cards and sections (~15%). Sage green is solid UI background color, not decorative.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "100416266686509866",
+        "title": "Financial Website",
+        "imageUrl": "https://i.pinimg.com/736x/d7/4b/65/d74b65124e2829974724f968e06f933b.jpg",
+        "currentColors": [
+            "green"
+        ],
+        "newColors": [
+            "green",
+            "white",
+            "beige"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Dark green UI sections and navbar (~45%), white CTA button and sections (~35%), beige/cream middle section (~15%). Green hero has decorative leaf graphic but green itself is UI background.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "100557004175420131",
+        "title": "Dashboard UI",
+        "imageUrl": "https://i.pinimg.com/736x/cc/78/0e/cc780e88c569c5fd2102e2db0e74b7a2.jpg",
+        "currentColors": [
+            "pink",
+            "yellow",
+            "brown"
+        ],
+        "newColors": [
+            "black",
+            "pink",
+            "yellow"
+        ],
+        "confidence": 0.96,
+        "reasoning": "Black/dark gray dashboard background (~45%), bright pink card (~30%), yellow card (~20%). Black is solid UI background of the application, not decorative.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "100557004175687442",
+        "title": "Real Estate Landing Page",
+        "imageUrl": "https://i.pinimg.com/736x/4f/2d/09/4f2d0915109c63e601c1649c5f9d69e4.jpg",
+        "currentColors": [
+            "blue"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "black"
+        ],
+        "confidence": 0.95,
+        "reasoning": "Light blue UI sections (~40%), white cards and sections (~40%), black text (~15%). Blue sky in hero photo is decorative, but blue sections are UI.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "100627372920382446",
+        "title": "Home Care Website",
+        "imageUrl": "https://i.pinimg.com/736x/19/64/36/1964362547571dcfd3e11421f6cd762d.jpg",
+        "currentColors": [
+            "pink",
+            "white",
+            "black"
+        ],
+        "newColors": [
+            "pink",
+            "white",
+            "brown"
+        ],
+        "confidence": 0.93,
+        "reasoning": "Light pink section background (~40%), white cards and sections (~35%), brown buttons and footer (~20%). Hero photo is decorative. Black is minimal.",
+        "changeType": "corrected_tertiary"
+    },
+    {
+        "pinId": "10062799163432884",
+        "title": "Japanese Corporate Website",
+        "imageUrl": "https://i.pinimg.com/736x/40/0d/9f/400d9f10298222e0896fc7449c7e1eb1.jpg",
+        "currentColors": [
+            "blue"
+        ],
+        "newColors": [
+            "blue",
+            "white",
+            "beige"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Blue diagonal section and accents (~45%), white sections and cards (~35%), beige/cream sections (~15%). Factory photo is decorative background.",
+        "changeType": "added_secondary"
+    },
+    {
+        "pinId": "10062799163897960",
+        "title": "Portfolio Website - Dark Theme",
+        "imageUrl": "https://i.pinimg.com/736x/d4/4c/ed/d44ced5e9edc75fbf22a4f23dd78b752.jpg",
+        "currentColors": [
+            "black",
+            "red",
+            "green"
+        ],
+        "newColors": [
+            "black",
+            "orange",
+            "blue"
+        ],
+        "confidence": 0.92,
+        "reasoning": "Black website background (~50%), orange card backgrounds (~25%), blue card (~20%). Black is solid UI background of the site, not decorative. Red cards are actually orange.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "1008947122789322687",
+        "title": "Real Estate Website",
+        "imageUrl": "https://i.pinimg.com/736x/97/83/83/97838376a7d389f10e73ea61ebb6b716.jpg",
+        "currentColors": [
+            "blue",
+            "gray",
+            "black"
+        ],
+        "newColors": [
+            "blue",
+            "orange",
+            "white"
+        ],
+        "confidence": 0.94,
+        "reasoning": "Dark blue navy sections (~45%), orange CTA buttons (~30%), white text and cards (~20%). Gray background is decorative. Orange buttons are prominent UI elements.",
+        "changeType": "corrected_secondary"
+    },
+    {
+        "pinId": "100979216640543388",
+        "title": "University Website",
+        "imageUrl": "https://i.pinimg.com/736x/d7/e9/25/d7e925c8a436b155fdafaefc22df5208.jpg",
+        "currentColors": [
+            "yellow",
+            "green"
+        ],
+        "newColors": [
+            "white",
+            "yellow",
+            "gray"
+        ],
+        "confidence": 0.94,
+        "reasoning": "White navbar and text (~45%), yellow 'Learn More' button (~35%), gray text elements (~15%). Burgundy/maroon background is decorative mockup frame, not UI. Hero photo is decorative.",
+        "changeType": "corrected_primary"
+    },
+    {
+        "pinId": "101119954127865491",
+        "title": "Environment Website",
+        "imageUrl": "https://i.pinimg.com/736x/6d/9c/15/6d9c15bf5073f7ba5b8bd1891fec169e.jpg",
+        "currentColors": [
+            "green",
+            "purple",
+            "beige"
+        ],
+        "newColors": [
+            "green",
+            "white",
+            "gray"
+        ],
+        "confidence": 0.92,
+        "reasoning": "Green 'Schedule a Consultation' button (~45%), white text and backgrounds (~35%), gray text for stats (~15%). Purple mountains and pink sky are decorative illustration, not UI.",
+        "changeType": "corrected_secondary"
+    }
+]
