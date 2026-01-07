@@ -125,9 +125,12 @@ async function handleRecategorize(req: VercelRequest, res: VercelResponse) {
         const tags = await kv.get(`pin-tags:${pinId}`);
 
         // Include pins with industry "Uncategorized" OR pins without tags at all
+        // BUT exclude pins that have been AI-analyzed OR manually reviewed (to avoid duplicate work)
         const industry = tags ? ((tags as any).industry?.[0] || 'Uncategorized') : 'Uncategorized';
+        const aiAnalyzed = tags ? ((tags as any).aiAnalyzed || false) : false;
+        const manuallyReviewed = tags ? ((tags as any).manuallyReviewed || false) : false;
 
-        if (industry === 'Uncategorized' || !tags) {
+        if ((industry === 'Uncategorized' || !tags) && !aiAnalyzed && !manuallyReviewed) {
             uncategorizedPins.push({
                 pinId,
                 imageUrl: (pin as any).imageUrl,
