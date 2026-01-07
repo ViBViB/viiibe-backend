@@ -32,11 +32,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         // Get current tags
-        const tags = await kv.get(`pin-tags:${pinId}`) || {};
+        const tags: any = await kv.get(`pin-tags:${pinId}`) || {};
 
         // Update colors (store as array)
         const updatedTags = {
-            ...tags,
+            ...(tags as object),
             color: colorArray.map((c: string) => c.toLowerCase()),
             manuallyReviewed: true,
             reviewedAt: new Date().toISOString()
