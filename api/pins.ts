@@ -91,7 +91,8 @@ async function handleCount(req: VercelRequest, res: VercelResponse) {
 
 /**
  * Handle recategorization request
- * Returns ONLY pins with industry "Uncategorized" OR pins without tags for manual review
+ * Returns pins that need COLOR curation (not industry categorization)
+ * Excludes pins that have been AI-analyzed OR manually reviewed for colors
  */
 async function handleRecategorize(req: VercelRequest, res: VercelResponse) {
     const { offset = '0', limit = '1' } = req.query;
@@ -114,8 +115,8 @@ async function handleRecategorize(req: VercelRequest, res: VercelResponse) {
     // IMPORTANT: Sort keys to ensure consistent ordering across requests
     pinKeys.sort();
 
-    // Filter to get ONLY Uncategorized pins (including pins without tags)
-    const uncategorizedPins = [];
+    // Filter to get pins that need color curation
+    const pinsNeedingColorCuration = [];
 
     for (const key of pinKeys) {
         const pin = await kv.get(key);
@@ -124,32 +125,29 @@ async function handleRecategorize(req: VercelRequest, res: VercelResponse) {
         const pinId = (pin as any).id;
         const tags = await kv.get(`pin-tags:${pinId}`);
 
-        // Include pins with industry "Uncategorized" OR pins without tags at all
-        // BUT exclude pins that have been AI-analyzed OR manually reviewed (to avoid duplicate work)
-        const industry = tags ? ((tags as any).industry?.[0] || 'Uncategorized') : 'Uncategorized';
+        // Exclude pins that have been AI-analyzed OR manually reviewed for colors
         const aiAnalyzed = tags ? ((tags as any).aiAnalyzed || false) : false;
         const manuallyReviewed = tags ? ((tags as any).manuallyReviewed || false) : false;
 
-        if ((industry === 'Uncategorized' || !tags) && !aiAnalyzed && !manuallyReviewed) {
-            uncategorizedPins.push({
+        // Include pins that haven't been processed for colors yet
+        if (!aiAnalyzed && !manuallyReviewed) {
+            pinsNeedingColorCuration.push({
                 pinId,
                 imageUrl: (pin as any).imageUrl,
                 title: (pin as any).title || 'Untitled',
-                currentIndustry: industry,
-                allTags: tags || {},
-                hasNoTags: !tags  // Flag to indicate this pin was never analyzed
+                aiAnalysis: tags || {}
             });
         }
     }
 
     // Apply pagination to filtered results
-    const paginatedPins = uncategorizedPins.slice(offsetNum, offsetNum + limitNum);
+    const paginatedPins = pinsNeedingColorCuration.slice(offsetNum, offsetNum + limitNum);
 
     return res.status(200).json({
         pins: paginatedPins,
-        total: uncategorizedPins.length,
+        total: pinsNeedingColorCuration.length,
         offset: offsetNum,
-        hasMore: offsetNum + limitNum < uncategorizedPins.length
+        hasMore: offsetNum + limitNum < pinsNeedingColorCuration.length
     });
 }
 
