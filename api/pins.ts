@@ -219,8 +219,9 @@ async function handleGetSavedPins(req: VercelRequest, res: VercelResponse) {
     const limitParam = req.query.limit;
     const limit = limitParam ? Math.min(parseInt(limitParam as string, 10), 2000) : 2000;
 
-    // Only fetch the pins we need (up to limit)
-    const keysToFetch = allKeys.slice(0, limit);
+    // IMPORTANT: If color filter is active, we need to load ALL pins to filter correctly
+    // Otherwise we might miss pins with that color if they're beyond the first 2000
+    const keysToFetch = (color && typeof color === 'string') ? allKeys : allKeys.slice(0, limit);
     let pins = [];
 
     for (const key of keysToFetch) {
