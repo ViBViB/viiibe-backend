@@ -220,7 +220,7 @@
 
         async function loadAllPins() {
             try {
-                const response = await fetch(`${API_BASE}/pins?limit=2000&_t=${Date.now()}`);
+                const response = await fetch(`${API_BASE}/pins?action=recategorize&limit=2000&_t=${Date.now()}`);
                 const data = await response.json();
 
                 if (!data.pins || data.pins.length === 0) {
