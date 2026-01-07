@@ -230,7 +230,7 @@
 
                 allPins = data.pins.map(pin => ({
                     ...pin,
-                    pinId: pin.id
+                    pinId: pin.pinId || pin.id  // Use pinId if available, otherwise use id
                 }));
 
                 console.log(`✅ Loaded ${allPins.length} pins into memory`);
