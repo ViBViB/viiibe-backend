@@ -251,12 +251,26 @@ export async function applyVisualFilter(colorName: string) {
             // Re-append in new order AND filter out low scores
             let visibleCount = 0;
             const visibleUrls: string[] = [];
-            scores.forEach(item => {
+            scores.forEach((item, newIndex) => {
                 if (item.container) {
                     // Threshold: Score must be > 0.15 to be considered a match (stricter filtering)
                     if (item.score > 0.15) {
                         grid.appendChild(item.container);
                         visibleUrls.push(item.url);
+
+                        // CRITICAL FIX: Update click handler with new index
+                        item.container.onclick = () => {
+                            currIdx = newIndex;
+                            const dImg = document.getElementById('detailsImg') as HTMLImageElement;
+                            if (dImg) {
+                                dImg.src = ''; // Clear previous
+                                showView('details');
+                                // Use the URL from visibleUrls array
+                                const fullResUrl = visibleUrls[newIndex].replace('/736x/', '/originals/');
+                                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
+                            }
+                        };
+
                         visibleCount++;
                     } else {
                         item.container.remove(); // Remove from DOM
