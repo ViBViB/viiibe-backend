@@ -259,7 +259,7 @@ async function handleGetSavedPins(req: VercelRequest, res: VercelResponse) {
         total: totalPins, // Total pins in KV
         returned: pins.length, // Pins actually returned
         limit,
-        ...(color && { filteredBy: `color: ${color}` }),
+        filteredBy: color ? `color: ${color}` : undefined,
         pins
     });
 }
