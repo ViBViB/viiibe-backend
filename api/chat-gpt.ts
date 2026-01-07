@@ -132,7 +132,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Build messages array
         const messages: Message[] = [
             { role: 'system', content: SYSTEM_PROMPT },
-            ...history,
+            ...(history as Message[]),
             { role: 'user', content: message },
         ];
 

@@ -46,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
 
             // Update industry
-            await kv.set(`pin-tags:${pinId}`, { ...tags, industry: [newCategory] });
+            await kv.set(`pin-tags:${pinId}`, { ...(tags as object), industry: [newCategory] });
 
             results.push({ pinId, success: true, newCategory });
             console.log(`✅ Recategorized ${pinId} → ${newCategory}`);

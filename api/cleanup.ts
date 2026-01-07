@@ -70,7 +70,7 @@ async function unifyTransport(res: VercelResponse) {
                 i.toLowerCase() === 'transport' ? 'Transportation' : i
             );
 
-            await kv.set(`pin-tags:${pinId}`, { ...tags, industry: newIndustries });
+            await kv.set(`pin-tags:${pinId}`, { ...(tags as object), industry: newIndustries });
             updated++;
             console.log(`✅ Updated pin ${pinId}: Transport → Transportation`);
         }
