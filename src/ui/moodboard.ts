@@ -208,10 +208,11 @@ export function showMoodboard(data: any) {
             parent.postMessage({ pluginMessage: { type: 'fetch-image', url: pin.image, target: 'grid' } }, '*');
         });
 
+        // Visual filter disabled - API now handles color filtering
         // Apply Visual Filtering if color intent exists
-        if (data.intent && data.intent.colors && data.intent.colors.length > 0) {
-            applyVisualFilter(data.intent.colors[0]);
-        }
+        // if (data.intent && data.intent.colors && data.intent.colors.length > 0) {
+        //     applyVisualFilter(data.intent.colors[0]);
+        // }
 
     } else {
         grid.innerHTML = '<p style="text-align:center; width:100%; margin-top: 20px;">No pins found.</p>';

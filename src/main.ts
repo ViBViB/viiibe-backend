@@ -597,15 +597,15 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // Continue to next step when most images are loaded (80%)
                                 if (loadedCount >= Math.ceil(totalImages * 0.8)) {
                                     updateProgress(4);
-                                    // Apply Visual Filtering if color intent exists
-                                    if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
-                                        updateProgress(5);
-                                        applyVisualFilter(msg.data.intent.colors[0]);
-                                    } else {
-                                        updateProgress(5);
-                                        updateProgress(6);
-                                        updateProgress(7);
-                                    }
+                                    // Visual filter disabled - API now handles color filtering
+                                    // if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
+                                    //     updateProgress(5);
+                                    //     applyVisualFilter(msg.data.intent.colors[0]);
+                                    // } else {
+                                    updateProgress(5);
+                                    updateProgress(6);
+                                    updateProgress(7);
+                                    // }
                                 }
                             };
 
@@ -637,14 +637,15 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // Still continue if enough images loaded
                                 if (loadedCount >= Math.ceil(totalImages * 0.8)) {
                                     updateProgress(4);
-                                    if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
-                                        updateProgress(5);
-                                        applyVisualFilter(msg.data.intent.colors[0]);
-                                    } else {
-                                        updateProgress(5);
-                                        updateProgress(6);
-                                        updateProgress(7);
-                                    }
+                                    // Visual filter disabled
+                                    // if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
+                                    //     updateProgress(5);
+                                    //     applyVisualFilter(msg.data.intent.colors[0]);
+                                    // } else {
+                                    updateProgress(5);
+                                    updateProgress(6);
+                                    updateProgress(7);
+                                    // }
                                 }
                             };
 
@@ -671,14 +672,15 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (loadedCount < Math.ceil(totalImages * 0.8)) {
                                 console.warn(`Timeout: Only ${loadedCount}/${totalImages} images loaded, continuing anyway`);
                                 updateProgress(4);
-                                if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
-                                    updateProgress(5);
-                                    applyVisualFilter(msg.data.intent.colors[0]);
-                                } else {
-                                    updateProgress(5);
-                                    updateProgress(6);
-                                    updateProgress(7);
-                                }
+                                // Visual filter disabled
+                                // if (msg.data.intent && msg.data.intent.colors && msg.data.intent.colors.length > 0) {
+                                //     updateProgress(5);
+                                //     applyVisualFilter(msg.data.intent.colors[0]);
+                                // } else {
+                                updateProgress(5);
+                                updateProgress(6);
+                                updateProgress(7);
+                                // }
                             }
                         }, 10000);
                     } else {
