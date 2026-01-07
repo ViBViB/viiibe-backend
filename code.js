@@ -455,7 +455,16 @@ async function searchSavedPins(query, intent, randomize = false) {
   try {
     console.log("🔍 Searching saved pins for:", query);
 
-    const response = await fetch(SAVED_PINS_URL);
+    // Build API URL with color filter if present
+    let apiUrl = SAVED_PINS_URL;
+    if (intent && intent.colors && intent.colors.length > 0) {
+      // Use the first color for API filtering
+      const primaryColor = intent.colors[0];
+      apiUrl = `${SAVED_PINS_URL}?color=${primaryColor}`;
+      console.log(`🎨 Using API color filter: ${primaryColor}`);
+    }
+
+    const response = await fetch(apiUrl);
 
     if (!response.ok) {
       console.error("❌ Failed to fetch saved pins:", response.status);
