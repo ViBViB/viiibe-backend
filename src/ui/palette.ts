@@ -122,24 +122,51 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
 
     const primaryHex = hslToHex(primaryPixel.h, primaryPixel.s, primaryPixel.l);
 
-    // Accent = second most dominant chromatic color (different from primary)
+    // Accent = most vibrant chromatic color (different from primary)
     let accentHex, accentPrim;
-    const accentCluster = clusters.find(c =>
+
+    // Find all chromatic clusters (excluding primary cluster)
+    const chromaticClusters = clusters.filter(c =>
         !c.isAchromatic &&
-        Math.abs(c.h - primaryPixel.h) > 40 &&
-        c.avgS > 30
+        c !== primaryCluster && // Exclude primary cluster
+        c.avgS > 20 // Must have some saturation
     );
 
+    // Sort by vibrancy (saturation * pixel count)
+    chromaticClusters.sort((a, b) => {
+        const vibrancyA = a.avgS * a.pixels.length;
+        const vibrancyB = b.avgS * b.pixels.length;
+        return vibrancyB - vibrancyA;
+    });
+
+    console.log('🎨 Chromatic clusters for accent:', chromaticClusters.map(c => ({
+        h: Math.round(c.h),
+        s: Math.round(c.avgS),
+        l: Math.round(c.avgL),
+        pixels: c.pixels.length,
+        vibrancy: Math.round(c.avgS * c.pixels.length)
+    })));
+
+    // Find first cluster that's visually distinct from primary
+    const accentCluster = chromaticClusters.find(c => {
+        const hueDiff = Math.abs(c.h - primaryPixel.h);
+        const normalizedHueDiff = Math.min(hueDiff, 360 - hueDiff); // Handle wrap-around
+        return normalizedHueDiff > 30; // At least 30° different
+    });
+
     if (accentCluster) {
+        // Pick most saturated pixel from accent cluster
         const accentPixel = accentCluster.pixels.reduce((prev: any, curr: any) =>
             curr.s > prev.s ? curr : prev
         );
         accentHex = hslToHex(accentPixel.h, accentPixel.s, accentPixel.l);
         accentPrim = `Accent-Context-${Math.round(accentPixel.h)}`;
+        console.log('✅ Found accent:', { h: accentPixel.h, s: accentPixel.s, l: accentPixel.l, hex: accentHex });
     } else {
-        // Fallback: use neutral gray instead of generating fake color
+        // Fallback: use neutral gray
         accentHex = hslToHex(0, 0, 65);
         accentPrim = 'Neutral-400';
+        console.log('⚠️ No suitable accent found, using neutral gray');
     }
 
     // Secondary = variation of primary
