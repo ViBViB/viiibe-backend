@@ -431,7 +431,12 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
         imageScores = imagePixels.map(({ img, index, pixels }) => {
             // Count pixels that match the intent color
             const intentPixels = pixels.filter(p => {
-                if (p.s < 20) return false; // Must be chromatic
+                // For achromatic colors (black/white), don't require high saturation
+                if (colorIntent === 'black' || colorIntent === 'white') {
+                    return doesColorMatchIntent(p.h, p.s, p.l, colorIntent);
+                }
+                // For chromatic colors, require saturation
+                if (p.s < 20) return false;
                 return doesColorMatchIntent(p.h, p.s, p.l, colorIntent);
             });
 
@@ -559,8 +564,18 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
             percentage: percentage,
             h: Math.round(avgH),
             s: Math.round(avgS),
-            l: Math.round(avgL)
+            l: Math.round(avgL),
+            intentMatch: cluster.intentMatch || false
         };
+    });
+
+    // SORT BY PERCENTAGE DESCENDING (but keep intent matches first)
+    colorMap.sort((a, b) => {
+        // Intent matches always first
+        if (a.intentMatch && !b.intentMatch) return -1;
+        if (!a.intentMatch && b.intentMatch) return 1;
+        // Then by percentage descending
+        return b.percentage - a.percentage;
     });
 
     // Extract neutrals
