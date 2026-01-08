@@ -561,14 +561,15 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
     // If user is searching for black/white, include achromatic colors
     let topColors;
     if (colorIntent === 'black' || colorIntent === 'white') {
-        // Combine chromatic and achromatic, then take top 4
-        const allColors = [...chromatic, ...achromatic];
-        allColors.sort((a, b) => {
-            if (a.intentMatch && !b.intentMatch) return -1;
-            if (!a.intentMatch && b.intentMatch) return 1;
-            return b.pixelCount - a.pixelCount;
-        });
-        topColors = allColors.slice(0, 4);
+        // For black/white: Show intent color FIRST + top 3 chromatic accents
+        const intentColors = achromatic.filter(c => c.intentMatch);
+        const accentColors = chromatic; // All chromatic are potential accents
+
+        // Take top 1 intent + top 3 accents
+        topColors = [
+            ...intentColors.slice(0, 1),
+            ...accentColors.slice(0, 3)
+        ];
     } else {
         // Normal: only chromatic colors
         topColors = chromatic.slice(0, 4);
@@ -597,12 +598,13 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
         };
     });
 
-    // SORT BY PERCENTAGE DESCENDING (but keep intent matches first)
-    colorMap.sort((a, b) => {
-        // Intent matches always first
+    // Filter out very low percentages (< 1%)
+    const filteredColorMap = colorMap.filter(c => c.percentage >= 1);
+
+    // SORT: Intent first, then percentage descending
+    filteredColorMap.sort((a, b) => {
         if (a.intentMatch && !b.intentMatch) return -1;
         if (!a.intentMatch && b.intentMatch) return 1;
-        // Then by percentage descending
         return b.percentage - a.percentage;
     });
 
@@ -623,9 +625,9 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
         { name: 'Error', hex: hslToHex(0, 80, 55) }
     ];
 
-    console.log('🗺️ Color Map:', colorMap);
+    console.log('🗺️ Color Map:', filteredColorMap);
 
-    return { colorMap, neutrals, statusColors };
+    return { colorMap: filteredColorMap, neutrals, statusColors };
 }
 
 export async function extractAndGeneratePalette() {
