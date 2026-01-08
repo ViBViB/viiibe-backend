@@ -480,22 +480,42 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
         }
     });
 
-    // Calculate stats
+    // Calculate stats with color intent boost
     clusters.forEach(c => {
         const pixelCount = c.pixels.length;
         const avgS = c.pixels.reduce((sum: number, p: any) => sum + p.s, 0) / pixelCount;
         const avgL = c.pixels.reduce((sum: number, p: any) => sum + p.l, 0) / pixelCount;
+        const avgH = c.isAchromatic ? 0 : c.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / pixelCount;
+
         c.avgS = avgS;
         c.avgL = avgL;
+        c.avgH = avgH;
         c.pixelCount = pixelCount;
+
+        // APPLY COLOR INTENT BOOST IN FINAL CLUSTERING TOO
+        if (colorIntent && !c.isAchromatic && doesColorMatchIntent(avgH, avgS, avgL, colorIntent)) {
+            c.intentMatch = true;
+            console.log(`🎯 PHASE 3: Final cluster matches "${colorIntent}":`, {
+                h: Math.round(avgH),
+                s: Math.round(avgS),
+                l: Math.round(avgL),
+                pixels: pixelCount
+            });
+        }
     });
 
     // Get chromatic and achromatic
     const chromatic = clusters.filter(c => !c.isAchromatic && c.avgS > 20);
     const achromatic = clusters.filter(c => c.isAchromatic || c.avgS <= 20);
 
-    // Sort chromatic by dominance
-    chromatic.sort((a, b) => b.pixelCount - a.pixelCount);
+    // Sort chromatic: INTENT MATCHES FIRST, then by dominance
+    chromatic.sort((a, b) => {
+        // Intent matches always come first
+        if (a.intentMatch && !b.intentMatch) return -1;
+        if (!a.intentMatch && b.intentMatch) return 1;
+        // Otherwise sort by pixel count
+        return b.pixelCount - a.pixelCount;
+    });
 
     // Top 4 colors for map
     const topColors = chromatic.slice(0, 4);
