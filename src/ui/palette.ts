@@ -321,18 +321,57 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
     ];
 }
 
+// Helper: Calculate color diversity score for an image
+function calculateColorDiversity(pixels: any[]): number {
+    if (pixels.length === 0) return 0;
+
+    // Count unique hue ranges (grouped in 30° buckets)
+    const hueRanges = new Set<number>();
+    const chromaticPixels = pixels.filter(p => p.s > 20); // Only chromatic
+
+    chromaticPixels.forEach(p => {
+        hueRanges.add(Math.floor(p.h / 30));
+    });
+
+    // Calculate saturation variance (higher = more contrast)
+    const avgS = pixels.reduce((sum, p) => sum + p.s, 0) / pixels.length;
+    const variance = pixels.reduce((sum, p) => sum + Math.pow(p.s - avgS, 2), 0) / pixels.length;
+
+    // Score = hue diversity × saturation contrast
+    return hueRanges.size * Math.sqrt(variance);
+}
+
 // New function: Extract color distribution map (top 4 colors with percentages)
 async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[]): Promise<any> {
-    const candidates: any[] = [];
+    console.log(`🗺️ Analyzing ${images.length} images for color diversity...`);
 
-    console.log(`🗺️ Extracting color map from ${images.length} images...`);
+    // STEP 1: Score each image by color diversity
+    const imageScores: Array<{ img: HTMLImageElement, index: number, score: number }> = [];
 
     for (let i = 0; i < images.length; i++) {
         const img = images[i] as HTMLImageElement;
         if (img.src) {
             const pixels = await getSamplePixels(img);
-            candidates.push(...pixels);
+            const score = calculateColorDiversity(pixels);
+            imageScores.push({ img, index: i, score });
         }
+    }
+
+    // STEP 2: Select top 4 most colorful images
+    imageScores.sort((a, b) => b.score - a.score);
+    const topImages = imageScores.slice(0, 4);
+
+    console.log(`🗺️ Selected top 4 most colorful images:`, topImages.map(s => ({
+        index: s.index,
+        score: Math.round(s.score)
+    })));
+
+    // STEP 3: Extract pixels from ONLY these 4 images
+    const candidates: any[] = [];
+
+    for (const { img } of topImages) {
+        const pixels = await getSamplePixels(img);
+        candidates.push(...pixels);
     }
 
     if (candidates.length === 0) return { colorMap: [], neutrals: [], statusColors: [] };
