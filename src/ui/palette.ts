@@ -33,9 +33,64 @@ function hexToRgb(hex: string) {
     return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 0, g: 0, b: 0 };
 }
 
-export async function calculatePaletteFromImages(images: NodeListOf<Element> | HTMLImageElement[]): Promise<any[]> {
+// Detect color intent from user query
+function detectColorIntent(query: string): string | null {
+    const lowerQuery = query.toLowerCase();
+    const colorKeywords = ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'cyan', 'black', 'white'];
+
+    for (const color of colorKeywords) {
+        if (lowerQuery.includes(color)) {
+            console.log(`🎨 Detected color intent from query: "${color}"`);
+            return color;
+        }
+    }
+
+    return null;
+}
+
+// Check if a color cluster matches the user's intent
+function doesColorMatchIntent(h: number, s: number, l: number, intent: string): boolean {
+    const COLOR_RANGES: { [key: string]: any } = {
+        'red': { hMin: 345, hMax: 15 },
+        'orange': { hMin: 15, hMax: 40 },
+        'yellow': { hMin: 40, hMax: 70 },
+        'green': { hMin: 70, hMax: 160 },
+        'cyan': { hMin: 160, hMax: 190 },
+        'blue': { hMin: 190, hMax: 260 },
+        'purple': { hMin: 260, hMax: 300 },
+        'pink': { hMin: 300, hMax: 345 },
+        'black': { lMax: 25 },
+        'white': { lMin: 80 }
+    };
+
+    const range = COLOR_RANGES[intent];
+    if (!range) return false;
+
+    // Check lightness-based colors (black, white)
+    if (range.lMax !== undefined && l <= range.lMax) return true;
+    if (range.lMin !== undefined && l >= range.lMin) return true;
+
+    // Check hue-based colors
+    if (range.hMin !== undefined && range.hMax !== undefined) {
+        if (s < 20) return false; // Must have some saturation for chromatic colors
+
+        if (range.hMin > range.hMax) {
+            // Wrap around (like red: 345-15)
+            return h >= range.hMin || h <= range.hMax;
+        } else {
+            return h >= range.hMin && h <= range.hMax;
+        }
+    }
+
+    return false;
+}
+
+export async function calculatePaletteFromImages(images: NodeListOf<Element> | HTMLImageElement[], userQuery?: string): Promise<any[]> {
     // Analyze ALL images, not just first 6
     const candidates: any[] = [];
+
+    // Extract color intent from user query
+    const colorIntent = detectColorIntent(userQuery || '');
 
     console.log(`🎨 Analyzing ${images.length} images for palette generation...`);
 
@@ -103,6 +158,21 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
         c.avgS = avgSaturation;
         c.avgL = avgLightness;
         c.isBackground = isBackgroundColor;
+
+        // Boost score if cluster matches user's color intent
+        if (colorIntent && !c.isAchromatic) {
+            const matchesIntent = doesColorMatchIntent(c.h, c.avgS, c.avgL, colorIntent);
+            if (matchesIntent) {
+                c.score += 500; // Heavy boost for user-requested color
+                c.matchesIntent = true;
+                console.log(`🎯 Cluster matches user intent "${colorIntent}":`, {
+                    h: Math.round(c.h),
+                    s: Math.round(c.avgS),
+                    l: Math.round(c.avgL),
+                    boostedScore: Math.round(c.score)
+                });
+            }
+        }
     });
 
     // Sort by dominance score
@@ -238,6 +308,10 @@ export async function extractAndGeneratePalette() {
     const images = document.querySelectorAll('.pin-image');
     if (!container) return;
 
+    // Get user's search query for color intent detection
+    const searchTermsEl = document.getElementById('searchTermsDisplay');
+    const userQuery = searchTermsEl?.getAttribute('data-original-query') || '';
+
     if (images.length === 0) {
         container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#999;">Add images first.</p>';
         if (sourceContainer) sourceContainer.innerHTML = '';
@@ -261,7 +335,7 @@ export async function extractAndGeneratePalette() {
         }
     }
 
-    const palette = await calculatePaletteFromImages(images);
+    const palette = await calculatePaletteFromImages(images, userQuery);
     renderPaletteUI(palette);
 }
 
