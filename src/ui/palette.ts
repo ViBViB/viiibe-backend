@@ -544,8 +544,32 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
         return b.pixelCount - a.pixelCount;
     });
 
+    // Sort achromatic by dominance
+    achromatic.sort((a, b) => {
+        // Intent matches always come first
+        if (a.intentMatch && !b.intentMatch) return -1;
+        if (!a.intentMatch && b.intentMatch) return 1;
+        // Otherwise sort by pixel count
+        return b.pixelCount - a.pixelCount;
+    });
+
     // Top 4 colors for map
-    const topColors = chromatic.slice(0, 4);
+    // If user is searching for black/white, include achromatic colors
+    let topColors;
+    if (colorIntent === 'black' || colorIntent === 'white') {
+        // Combine chromatic and achromatic, then take top 4
+        const allColors = [...chromatic, ...achromatic];
+        allColors.sort((a, b) => {
+            if (a.intentMatch && !b.intentMatch) return -1;
+            if (!a.intentMatch && b.intentMatch) return 1;
+            return b.pixelCount - a.pixelCount;
+        });
+        topColors = allColors.slice(0, 4);
+    } else {
+        // Normal: only chromatic colors
+        topColors = chromatic.slice(0, 4);
+    }
+
     const totalPixels = contentPixels.length; // Use content pixels for percentage, not all candidates
 
     const colorMap = topColors.map((cluster, index) => {
