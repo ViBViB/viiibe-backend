@@ -276,12 +276,43 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
         console.log('⚠️ No vibrant colors found, using neutral gray');
     }
 
-    // Secondary = variation of primary
-    const secondaryHex = hslToHex(
-        (primaryPixel.h + 25) % 360,
-        Math.max(10, primaryPixel.s - 20),
-        Math.min(90, primaryPixel.l + 15)
+    // Secondary = second most dominant chromatic color from images
+    let secondaryHex, secondaryPrim;
+
+    // Find chromatic clusters excluding primary (less strict than accent)
+    const secondaryCandidates = clusters.filter(c =>
+        !c.isAchromatic &&
+        c !== primaryCluster &&
+        c.avgS > 20 // Lower threshold than accent
     );
+
+    // Sort by dominance (pixel count * saturation)
+    secondaryCandidates.sort((a, b) => {
+        const scoreA = a.pixels.length * (1 + a.avgS / 100);
+        const scoreB = b.pixels.length * (1 + b.avgS / 100);
+        return scoreB - scoreA;
+    });
+
+    if (secondaryCandidates.length > 0) {
+        // Use most dominant chromatic color (after primary)
+        const secondaryCluster = secondaryCandidates[0];
+        const secondaryPixel = secondaryCluster.pixels.reduce((prev: any, curr: any) =>
+            (curr.s - Math.abs(curr.l - 50) * 0.5) > (prev.s - Math.abs(prev.l - 50) * 0.5) ? curr : prev
+        );
+        secondaryHex = hslToHex(secondaryPixel.h, secondaryPixel.s, secondaryPixel.l);
+        secondaryPrim = `Brand-Alt-${Math.round(secondaryPixel.h)}`;
+        console.log('✅ Found secondary from images:', { h: secondaryPixel.h, s: secondaryPixel.s, l: secondaryPixel.l, hex: secondaryHex });
+    } else {
+        // Fallback: use lighter/darker variation of primary
+        const isLightPrimary = primaryPixel.l > 50;
+        secondaryHex = hslToHex(
+            primaryPixel.h,
+            Math.max(10, primaryPixel.s - 10),
+            isLightPrimary ? primaryPixel.l - 15 : primaryPixel.l + 15
+        );
+        secondaryPrim = 'Brand-Alt';
+        console.log('⚠️ No secondary color in images, using primary variation');
+    }
 
     // Foreground/Background based on primary lightness
     const isDarkPrimary = primaryPixel.l < 50;
@@ -290,7 +321,7 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
 
     return [
         { role: 'Primary', hex: primaryHex, primitive: `Brand-${Math.round(primaryPixel.h)}` },
-        { role: 'Secondary', hex: secondaryHex, primitive: 'Brand-Alt' },
+        { role: 'Secondary', hex: secondaryHex, primitive: secondaryPrim },
         { role: 'Accent', hex: accentHex, primitive: accentPrim },
         { role: 'Background', hex: backgroundHex, primitive: isDarkPrimary ? 'Base-Black' : 'Base-White' },
         { role: 'Foreground', hex: foregroundHex, primitive: isDarkPrimary ? 'Base-White' : 'Base-Black' },
