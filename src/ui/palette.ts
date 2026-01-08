@@ -34,10 +34,12 @@ function hexToRgb(hex: string) {
 }
 
 export async function calculatePaletteFromImages(images: NodeListOf<Element> | HTMLImageElement[]): Promise<any[]> {
-    const limit = Math.min(images.length, 6);
+    // Analyze ALL images, not just first 6
     const candidates: any[] = [];
 
-    for (let i = 0; i < limit; i++) {
+    console.log(`🎨 Analyzing ${images.length} images for palette generation...`);
+
+    for (let i = 0; i < images.length; i++) {
         const img = images[i] as HTMLImageElement;
         // Ensure image is loaded/has src
         if (img.src) {
@@ -89,17 +91,32 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
         const avgSaturation = c.pixels.reduce((sum: number, p: any) => sum + p.s, 0) / pixelCount;
         const avgLightness = c.pixels.reduce((sum: number, p: any) => sum + p.l, 0) / pixelCount;
 
-        // Dominance score = frequency + saturation bonus + achromatic bonus
+        // Detect background colors (very light grays/whites)
+        const isBackgroundColor = c.isAchromatic && avgLightness > 85;
+
+        // Dominance score = frequency + saturation bonus + achromatic bonus - background penalty
         c.score = (pixelCount * 2) + // Frequency is most important
             (avgSaturation / 10) + // Slight saturation bonus
-            (c.isAchromatic && (avgLightness < 25 || avgLightness > 75) ? 10 : 0); // Bonus for black/white
+            (c.isAchromatic && avgLightness < 25 ? 15 : 0) - // Bonus for true blacks
+            (isBackgroundColor ? 1000 : 0); // Heavy penalty for background whites/grays
 
         c.avgS = avgSaturation;
         c.avgL = avgLightness;
+        c.isBackground = isBackgroundColor;
     });
 
     // Sort by dominance score
     clusters.sort((a, b) => b.score - a.score);
+
+    console.log('🎯 Top 5 clusters by dominance:', clusters.slice(0, 5).map(c => ({
+        isAchromatic: c.isAchromatic,
+        isBackground: c.isBackground,
+        h: Math.round(c.isAchromatic ? 0 : c.h),
+        s: Math.round(c.avgS),
+        l: Math.round(c.avgL),
+        pixels: c.pixels.length,
+        score: Math.round(c.score)
+    })));
 
     // Primary = most dominant cluster
     const primaryCluster = clusters[0];
