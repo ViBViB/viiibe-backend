@@ -342,8 +342,14 @@ function calculateColorRepresentation(pixels: any[], targetHues: number[]): numb
 }
 
 // New function: Extract color distribution map (top 4 colors with percentages)
-async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[]): Promise<any> {
+async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[], userQuery?: string): Promise<any> {
     console.log(`🗺️ PHASE 1: Analyzing ALL ${images.length} images for global colors...`);
+
+    // Detect color intent from user query
+    const colorIntent = detectColorIntent(userQuery || '');
+    if (colorIntent) {
+        console.log(`🎯 User is searching for "${colorIntent}" - will prioritize this color`);
+    }
 
     // PHASE 1: Analyze ALL images to find global dominant colors
     const allPixels: any[] = [];
@@ -379,8 +385,35 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[])
         }
     });
 
-    // Sort by dominance and get top 4 hues
-    globalClusters.sort((a, b) => b.pixels.length - a.pixels.length);
+    // Calculate scores with color intent boost
+    globalClusters.forEach(c => {
+        const avgH = c.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / c.pixels.length;
+        const avgS = c.pixels.reduce((sum: number, p: any) => sum + p.s, 0) / c.pixels.length;
+        const avgL = c.pixels.reduce((sum: number, p: any) => sum + p.l, 0) / c.pixels.length;
+
+        // Base score = pixel count * saturation (favor vibrant colors)
+        let score = c.pixels.length * (1 + avgS / 100);
+
+        // MASSIVE BOOST if matches user intent
+        if (colorIntent && doesColorMatchIntent(avgH, avgS, avgL, colorIntent)) {
+            score *= 10000; // Ensure it's in top 4
+            c.matchesIntent = true;
+            console.log(`🎯 Cluster matches "${colorIntent}" intent:`, {
+                h: Math.round(avgH),
+                s: Math.round(avgS),
+                l: Math.round(avgL),
+                boostedScore: Math.round(score)
+            });
+        }
+
+        c.score = score;
+        c.avgH = avgH;
+        c.avgS = avgS;
+        c.avgL = avgL;
+    });
+
+    // Sort by score (includes intent boost)
+    globalClusters.sort((a, b) => b.score - a.score);
     const topGlobalHues = globalClusters.slice(0, 4).map(c => {
         const avgH = c.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / c.pixels.length;
         return avgH;
@@ -543,7 +576,7 @@ export async function extractAndGeneratePalette() {
         }
     }
 
-    const colorData = await extractColorMap(images);
+    const colorData = await extractColorMap(images, userQuery);
     renderColorMapUI(colorData);
 }
 
