@@ -1013,9 +1013,19 @@ header {
   font-size: 22px;
   font-weight: 600;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   color: #000;
   letter-spacing: -0.02em;
+}
+
+.agent-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #7D7D7D;
+  line-height: 1.5;
+  max-width: 480px;
 }
 
 .agent-input-wrapper {
