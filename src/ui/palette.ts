@@ -598,8 +598,8 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
         };
     });
 
-    // Filter out very low percentages (< 1%)
-    const filteredColorMap = colorMap.filter(c => c.percentage >= 1);
+    // Filter out very low percentages (< 1%), BUT keep intent colors
+    const filteredColorMap = colorMap.filter(c => c.percentage >= 1 || c.intentMatch);
 
     // SORT: Intent first, then percentage descending
     filteredColorMap.sort((a, b) => {
