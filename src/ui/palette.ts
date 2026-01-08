@@ -321,6 +321,105 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
     ];
 }
 
+// New function: Extract color distribution map (top 4 colors with percentages)
+async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[]): Promise<any> {
+    const candidates: any[] = [];
+
+    console.log(`🗺️ Extracting color map from ${images.length} images...`);
+
+    for (let i = 0; i < images.length; i++) {
+        const img = images[i] as HTMLImageElement;
+        if (img.src) {
+            const pixels = await getSamplePixels(img);
+            candidates.push(...pixels);
+        }
+    }
+
+    if (candidates.length === 0) return { colorMap: [], neutrals: [], statusColors: [] };
+
+    // Cluster pixels by hue (chromatic) or lightness (achromatic)
+    const clusters: any[] = [];
+    candidates.forEach(p => {
+        const isAchromatic = p.s < 15;
+
+        if (isAchromatic) {
+            let cluster = clusters.find(c => c.isAchromatic && Math.abs(c.avgL - p.l) < 20);
+            if (cluster) {
+                cluster.pixels.push(p);
+                cluster.avgL = (cluster.avgL * (cluster.pixels.length - 1) + p.l) / cluster.pixels.length;
+            } else {
+                clusters.push({ isAchromatic: true, avgL: p.l, pixels: [p], h: 0, s: p.s });
+            }
+        } else {
+            let cluster = clusters.find(c => !c.isAchromatic && Math.abs(c.h - p.h) < 15);
+            if (cluster) {
+                cluster.pixels.push(p);
+            } else {
+                clusters.push({ isAchromatic: false, h: p.h, pixels: [p] });
+            }
+        }
+    });
+
+    // Calculate stats
+    clusters.forEach(c => {
+        const pixelCount = c.pixels.length;
+        const avgS = c.pixels.reduce((sum: number, p: any) => sum + p.s, 0) / pixelCount;
+        const avgL = c.pixels.reduce((sum: number, p: any) => sum + p.l, 0) / pixelCount;
+        c.avgS = avgS;
+        c.avgL = avgL;
+        c.pixelCount = pixelCount;
+    });
+
+    // Get chromatic and achromatic
+    const chromatic = clusters.filter(c => !c.isAchromatic && c.avgS > 20);
+    const achromatic = clusters.filter(c => c.isAchromatic || c.avgS <= 20);
+
+    // Sort chromatic by dominance
+    chromatic.sort((a, b) => b.pixelCount - a.pixelCount);
+
+    // Top 4 colors for map
+    const topColors = chromatic.slice(0, 4);
+    const totalPixels = candidates.length;
+
+    const colorMap = topColors.map((cluster, index) => {
+        const pixel = cluster.pixels.reduce((prev: any, curr: any) =>
+            (curr.s - Math.abs(curr.l - 50) * 0.5) > (prev.s - Math.abs(prev.l - 50) * 0.5) ? curr : prev
+        );
+        const hex = hslToHex(pixel.h, pixel.s, pixel.l);
+        const percentage = Math.round((cluster.pixelCount / totalPixels) * 100);
+
+        return {
+            name: `Color ${index + 1}`,
+            hex: hex,
+            percentage: percentage,
+            h: Math.round(pixel.h),
+            s: Math.round(pixel.s),
+            l: Math.round(pixel.l)
+        };
+    });
+
+    // Extract neutrals
+    const neutrals: any[] = [];
+    const blackCluster = achromatic.find(c => c.avgL < 25);
+    if (blackCluster) neutrals.push({ name: 'Black', hex: '#111111' });
+
+    const whiteCluster = achromatic.find(c => c.avgL > 80);
+    if (whiteCluster) neutrals.push({ name: 'White', hex: '#FFFFFF' });
+
+    const grayCluster = achromatic.find(c => c.avgL >= 25 && c.avgL <= 80);
+    if (grayCluster) neutrals.push({ name: 'Gray', hex: hslToHex(0, 0, grayCluster.avgL) });
+
+    const statusColors = [
+        { name: 'Success', hex: hslToHex(140, 70, 45) },
+        { name: 'Warning', hex: hslToHex(35, 90, 55) },
+        { name: 'Error', hex: hslToHex(0, 80, 55) }
+    ];
+
+    console.log('🗺️ Color Map:', colorMap);
+
+    return { colorMap, neutrals, statusColors };
+}
+
 export async function extractAndGeneratePalette() {
     const container = document.getElementById('paletteGrid');
     const sourceContainer = document.getElementById('sourceImagesGrid');
@@ -338,12 +437,12 @@ export async function extractAndGeneratePalette() {
     }
 
     // Always Regen
-    container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#999;">Analyzing vibes...</p>';
+    container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#999;">Analyzing color distribution...</p>';
     if (sourceContainer) sourceContainer.innerHTML = '';
 
-    const limit = Math.min(images.length, 6);
+    // Show ALL source images
     if (sourceContainer) {
-        for (let i = 0; i < limit; i++) {
+        for (let i = 0; i < images.length; i++) {
             const img = images[i] as HTMLImageElement;
             if (img.src) {
                 const thumb = document.createElement('img');
@@ -354,8 +453,8 @@ export async function extractAndGeneratePalette() {
         }
     }
 
-    const palette = await calculatePaletteFromImages(images, userQuery);
-    renderPaletteUI(palette);
+    const colorData = await extractColorMap(images);
+    renderColorMapUI(colorData);
 }
 
 function getSamplePixels(imgEl: HTMLImageElement): Promise<any[]> {
@@ -408,6 +507,92 @@ function renderPaletteUI(palette: any[]) {
         const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
         const dot = yiq >= 128 ? '#000' : '#fff';
         div.innerHTML = `<div class="role-preview" style="background-color:${item.hex}"><div class="contrast-dot" style="background-color:${dot}"></div></div><div class="role-info"><span class="role-name">${item.role}</span><span class="role-hex">${item.hex}</span><span class="role-primitive">${item.primitive}</span></div>`;
+        container.appendChild(div);
+    });
+}
+
+function renderColorMapUI(data: any) {
+    const container = document.getElementById('paletteGrid');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    // Title
+    const title = document.createElement('h3');
+    title.textContent = 'Color Map';
+    title.style.cssText = 'grid-column: 1/-1; margin: 0 0 8px 0; font-size: 14px; font-weight: 600;';
+    container.appendChild(title);
+
+    const subtitle = document.createElement('p');
+    subtitle.textContent = 'Color distribution from moodboard';
+    subtitle.style.cssText = 'grid-column: 1/-1; margin: 0 0 16px 0; font-size: 12px; color: #999;';
+    container.appendChild(subtitle);
+
+    // Color Map Container (stacked stripes)
+    const mapContainer = document.createElement('div');
+    mapContainer.style.cssText = 'grid-column: 1/-1; display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; min-height: 300px;';
+
+    data.colorMap.forEach((color: any) => {
+        const stripe = document.createElement('div');
+        stripe.style.cssText = `
+            background-color: ${color.hex};
+            flex: 0 0 ${color.percentage}%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            min-height: 60px;
+            position: relative;
+        `;
+
+        // Determine text color based on background
+        const rgb = hexToRgb(color.hex);
+        const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
+        const textColor = yiq >= 128 ? '#000' : '#fff';
+
+        stripe.innerHTML = `
+            <div style="text-align: center; color: ${textColor};">
+                <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${color.percentage}%</div>
+                <div style="font-size: 11px; opacity: 0.8;">${color.hex}</div>
+            </div>
+        `;
+
+        mapContainer.appendChild(stripe);
+    });
+
+    container.appendChild(mapContainer);
+
+    // Neutrals section
+    if (data.neutrals.length > 0) {
+        const neutralsTitle = document.createElement('h4');
+        neutralsTitle.textContent = 'Neutrals';
+        neutralsTitle.style.cssText = 'grid-column: 1/-1; margin: 24px 0 8px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666;';
+        container.appendChild(neutralsTitle);
+
+        data.neutrals.forEach((neutral: any) => {
+            const div = document.createElement('div');
+            div.className = 'role-card';
+            const rgb = hexToRgb(neutral.hex);
+            const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
+            const dot = yiq >= 128 ? '#000' : '#fff';
+            div.innerHTML = `<div class="role-preview" style="background-color:${neutral.hex}"><div class="contrast-dot" style="background-color:${dot}"></div></div><div class="role-info"><span class="role-name">${neutral.name}</span><span class="role-hex">${neutral.hex}</span></div>`;
+            container.appendChild(div);
+        });
+    }
+
+    // Status colors section
+    const statusTitle = document.createElement('h4');
+    statusTitle.textContent = 'Status Colors';
+    statusTitle.style.cssText = 'grid-column: 1/-1; margin: 24px 0 8px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666;';
+    container.appendChild(statusTitle);
+
+    data.statusColors.forEach((status: any) => {
+        const div = document.createElement('div');
+        div.className = 'role-card';
+        const rgb = hexToRgb(status.hex);
+        const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
+        const dot = yiq >= 128 ? '#000' : '#fff';
+        div.innerHTML = `<div class="role-preview" style="background-color:${status.hex}"><div class="contrast-dot" style="background-color:${dot}"></div></div><div class="role-info"><span class="role-name">${status.name}</span><span class="role-hex">${status.hex}</span></div>`;
         container.appendChild(div);
     });
 }
