@@ -321,52 +321,89 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
     ];
 }
 
-// Helper: Calculate color diversity score for an image
-function calculateColorDiversity(pixels: any[]): number {
-    if (pixels.length === 0) return 0;
+// Helper: Calculate how well an image represents target colors
+function calculateColorRepresentation(pixels: any[], targetHues: number[]): number {
+    if (pixels.length === 0 || targetHues.length === 0) return 0;
 
-    // Count unique hue ranges (grouped in 30° buckets)
-    const hueRanges = new Set<number>();
-    const chromaticPixels = pixels.filter(p => p.s > 20); // Only chromatic
+    let score = 0;
+    const chromaticPixels = pixels.filter(p => p.s > 20);
 
-    chromaticPixels.forEach(p => {
-        hueRanges.add(Math.floor(p.h / 30));
+    // For each target hue, count how many pixels are close to it
+    targetHues.forEach(targetH => {
+        const matchingPixels = chromaticPixels.filter(p => {
+            const hueDiff = Math.abs(p.h - targetH);
+            const normalizedDiff = Math.min(hueDiff, 360 - hueDiff);
+            return normalizedDiff < 30; // Within 30° of target
+        });
+        score += matchingPixels.length;
     });
 
-    // Calculate saturation variance (higher = more contrast)
-    const avgS = pixels.reduce((sum, p) => sum + p.s, 0) / pixels.length;
-    const variance = pixels.reduce((sum, p) => sum + Math.pow(p.s - avgS, 2), 0) / pixels.length;
-
-    // Score = hue diversity × saturation contrast
-    return hueRanges.size * Math.sqrt(variance);
+    return score;
 }
 
 // New function: Extract color distribution map (top 4 colors with percentages)
 async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[]): Promise<any> {
-    console.log(`🗺️ Analyzing ${images.length} images for color diversity...`);
+    console.log(`🗺️ PHASE 1: Analyzing ALL ${images.length} images for global colors...`);
 
-    // STEP 1: Score each image by color diversity
-    const imageScores: Array<{ img: HTMLImageElement, index: number, score: number }> = [];
+    // PHASE 1: Analyze ALL images to find global dominant colors
+    const allPixels: any[] = [];
+    const imagePixels: Array<{ img: HTMLImageElement, index: number, pixels: any[] }> = [];
 
     for (let i = 0; i < images.length; i++) {
         const img = images[i] as HTMLImageElement;
         if (img.src) {
             const pixels = await getSamplePixels(img);
-            const score = calculateColorDiversity(pixels);
-            imageScores.push({ img, index: i, score });
+            allPixels.push(...pixels);
+            imagePixels.push({ img, index: i, pixels });
         }
     }
 
-    // STEP 2: Select top 4 most colorful images
+    if (allPixels.length === 0) return { colorMap: [], neutrals: [], statusColors: [] };
+
+    // Filter backgrounds from global analysis
+    const globalContentPixels = allPixels.filter(p => {
+        const isBackground = p.s < 10 && p.l > 85;
+        return !isBackground;
+    });
+
+    // Quick clustering to find global dominant hues
+    const globalClusters: any[] = [];
+    globalContentPixels.forEach(p => {
+        if (p.s > 20) { // Only chromatic
+            let cluster = globalClusters.find(c => Math.abs(c.h - p.h) < 15);
+            if (cluster) {
+                cluster.pixels.push(p);
+            } else {
+                globalClusters.push({ h: p.h, pixels: [p] });
+            }
+        }
+    });
+
+    // Sort by dominance and get top 4 hues
+    globalClusters.sort((a, b) => b.pixels.length - a.pixels.length);
+    const topGlobalHues = globalClusters.slice(0, 4).map(c => {
+        const avgH = c.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / c.pixels.length;
+        return avgH;
+    });
+
+    console.log(`🗺️ Global dominant hues:`, topGlobalHues.map(h => Math.round(h)));
+
+    // PHASE 2: Select 4 images that best represent these global colors
+    const imageScores = imagePixels.map(({ img, index, pixels }) => ({
+        img,
+        index,
+        score: calculateColorRepresentation(pixels, topGlobalHues)
+    }));
+
     imageScores.sort((a, b) => b.score - a.score);
     const topImages = imageScores.slice(0, 4);
 
-    console.log(`🗺️ Selected top 4 most colorful images:`, topImages.map(s => ({
+    console.log(`🗺️ PHASE 2: Selected 4 images that best represent global colors:`, topImages.map(s => ({
         index: s.index,
-        score: Math.round(s.score)
+        score: s.score
     })));
 
-    // STEP 3: Extract pixels from ONLY these 4 images
+    // PHASE 3: Extract final color map from these 4 representative images
     const candidates: any[] = [];
 
     for (const { img } of topImages) {
