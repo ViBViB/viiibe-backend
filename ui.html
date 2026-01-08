@@ -158,6 +158,28 @@
             flex: 1;
         }
 
+        .btn-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #8E8E8E;
+            border: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-icon:hover {
+            opacity: 0.85;
+        }
+
+        .btn-icon svg {
+            transform: rotate(45deg);
+        }
+
         .popular-row {
             display: flex;
             align-items: center;
@@ -1251,35 +1273,20 @@
         <div id="view-search" class="view centered">
             <div class="container search">
                 <div class="search-content">
-                    <h1 class="title">Tell us your vibe. <br>We'll find the pins for you.</h1>
+                    <h1 class="title">From vibe to build-ready</h1>
+                    <p class="subtitle">Describe the inspiration you need, and Viiibe! will generate a production-ready
+                        mood board with color palette, type scale, and Figma variables.</p>
                     <div class="input-row">
                         <div class="input-box">
-                            <input type="text" id="searchInput" placeholder="What type of inspiration you need?" />
+                            <input type="text" id="searchInput"
+                                placeholder="e.g., modern, premium; blue palette, sans typography." />
                         </div>
-                        <button type="button" id="createMoodboardButton" class="btn">Create Mood board</button>
-                    </div>
-
-                    <!-- MINI-PRD CTA -->
-                    <div class="mini-prd-cta">
-                        <span class="or-divider">or</span>
-                        <button type="button" id="startMiniPRDButton" class="btn-mini-prd">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
+                        <button type="button" id="createMoodboardButton" class="btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10 4V16M4 10H16" stroke="white" stroke-width="2" stroke-linecap="round" />
                             </svg>
-                            Crear con Moood! 💬
                         </button>
-                    </div>
-
-                    <div class="popular-row">
-                        <span class="popular-label">Popular:</span>
-                        <div class="chips">
-                            <div class="chip" data-category="landing">landing</div>
-                            <div class="chip" data-category="dashboard">dashboard</div>
-                            <div class="chip" data-category="typography">typography</div>
-                            <div class="chip" data-category="mobile app">mobile app</div>
-                        </div>
                     </div>
                 </div>
             </div>
