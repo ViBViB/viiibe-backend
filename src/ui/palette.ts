@@ -337,9 +337,20 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[])
 
     if (candidates.length === 0) return { colorMap: [], neutrals: [], statusColors: [] };
 
+    // FILTER OUT BACKGROUNDS FIRST (before clustering)
+    // This ensures percentages reflect actual content colors, not white/gray backgrounds
+    const contentPixels = candidates.filter(p => {
+        const isBackground = p.s < 10 && p.l > 85; // Very light, desaturated = background
+        return !isBackground;
+    });
+
+    console.log(`🗺️ Filtered ${candidates.length - contentPixels.length} background pixels, analyzing ${contentPixels.length} content pixels`);
+
+    if (contentPixels.length === 0) return { colorMap: [], neutrals: [], statusColors: [] };
+
     // Cluster pixels by hue (chromatic) or lightness (achromatic)
     const clusters: any[] = [];
-    candidates.forEach(p => {
+    contentPixels.forEach(p => {
         const isAchromatic = p.s < 15;
 
         if (isAchromatic) {
@@ -379,7 +390,7 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[])
 
     // Top 4 colors for map
     const topColors = chromatic.slice(0, 4);
-    const totalPixels = candidates.length;
+    const totalPixels = contentPixels.length; // Use content pixels for percentage, not all candidates
 
     const colorMap = topColors.map((cluster, index) => {
         // Use AVERAGE HSL of the cluster instead of most saturated pixel
