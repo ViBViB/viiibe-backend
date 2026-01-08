@@ -122,6 +122,15 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
 
     const primaryHex = hslToHex(primaryPixel.h, primaryPixel.s, primaryPixel.l);
 
+    console.log('🎯 Primary cluster:', {
+        isAchromatic: primaryCluster.isAchromatic,
+        h: Math.round(primaryPixel.h),
+        s: Math.round(primaryPixel.s),
+        l: Math.round(primaryPixel.l),
+        hex: primaryHex,
+        pixels: primaryCluster.pixels.length
+    });
+
     // Accent = most vibrant chromatic color (different from primary)
     let accentHex, accentPrim;
 
@@ -129,7 +138,9 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
     const chromaticClusters = clusters.filter(c =>
         !c.isAchromatic &&
         c !== primaryCluster && // Exclude primary cluster
-        c.avgS > 20 // Must have some saturation
+        c.avgS > 40 &&          // Must be vibrant (not washed out)
+        c.avgL > 25 &&          // Not too dark
+        c.avgL < 75             // Not too light
     );
 
     // Sort by vibrancy (saturation * pixel count)
@@ -151,7 +162,7 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
     const accentCluster = chromaticClusters.find(c => {
         const hueDiff = Math.abs(c.h - primaryPixel.h);
         const normalizedHueDiff = Math.min(hueDiff, 360 - hueDiff); // Handle wrap-around
-        return normalizedHueDiff > 30; // At least 30° different
+        return normalizedHueDiff > 60; // Must be clearly different (60° minimum)
     });
 
     if (accentCluster) {
@@ -162,11 +173,20 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
         accentHex = hslToHex(accentPixel.h, accentPixel.s, accentPixel.l);
         accentPrim = `Accent-Context-${Math.round(accentPixel.h)}`;
         console.log('✅ Found accent:', { h: accentPixel.h, s: accentPixel.s, l: accentPixel.l, hex: accentHex });
+    } else if (chromaticClusters.length > 0) {
+        // Fallback: use most vibrant color even if not 60° different
+        const fallbackCluster = chromaticClusters[0];
+        const accentPixel = fallbackCluster.pixels.reduce((prev: any, curr: any) =>
+            curr.s > prev.s ? curr : prev
+        );
+        accentHex = hslToHex(accentPixel.h, accentPixel.s, accentPixel.l);
+        accentPrim = `Accent-Vibrant-${Math.round(accentPixel.h)}`;
+        console.log('⚠️ Using most vibrant color as accent (not 60° different):', { h: accentPixel.h, s: accentPixel.s, l: accentPixel.l, hex: accentHex });
     } else {
-        // Fallback: use neutral gray
+        // No vibrant colors found, use neutral gray
         accentHex = hslToHex(0, 0, 65);
         accentPrim = 'Neutral-400';
-        console.log('⚠️ No suitable accent found, using neutral gray');
+        console.log('⚠️ No vibrant colors found, using neutral gray');
     }
 
     // Secondary = variation of primary
