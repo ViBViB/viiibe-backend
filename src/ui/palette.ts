@@ -163,7 +163,7 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
         if (colorIntent && !c.isAchromatic) {
             const matchesIntent = doesColorMatchIntent(c.h, c.avgS, c.avgL, colorIntent);
             if (matchesIntent) {
-                c.score += 500; // Heavy boost for user-requested color
+                c.score += 10000; // Massive boost to ensure user-requested color wins
                 c.matchesIntent = true;
                 console.log(`🎯 Cluster matches user intent "${colorIntent}":`, {
                     h: Math.round(c.h),
