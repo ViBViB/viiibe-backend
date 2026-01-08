@@ -382,19 +382,22 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[])
     const totalPixels = candidates.length;
 
     const colorMap = topColors.map((cluster, index) => {
-        const pixel = cluster.pixels.reduce((prev: any, curr: any) =>
-            (curr.s - Math.abs(curr.l - 50) * 0.5) > (prev.s - Math.abs(prev.l - 50) * 0.5) ? curr : prev
-        );
-        const hex = hslToHex(pixel.h, pixel.s, pixel.l);
+        // Use AVERAGE HSL of the cluster instead of most saturated pixel
+        // This gives us the actual representative color from the images
+        const avgH = cluster.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / cluster.pixels.length;
+        const avgS = cluster.avgS; // Already calculated
+        const avgL = cluster.avgL; // Already calculated
+
+        const hex = hslToHex(avgH, avgS, avgL);
         const percentage = Math.round((cluster.pixelCount / totalPixels) * 100);
 
         return {
             name: `Color ${index + 1}`,
             hex: hex,
             percentage: percentage,
-            h: Math.round(pixel.h),
-            s: Math.round(pixel.s),
-            l: Math.round(pixel.l)
+            h: Math.round(avgH),
+            s: Math.round(avgS),
+            l: Math.round(avgL)
         };
     });
 
