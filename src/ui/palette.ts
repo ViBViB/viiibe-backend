@@ -59,16 +59,20 @@ function doesColorMatchIntent(h: number, s: number, l: number, intent: string): 
         'blue': { hMin: 190, hMax: 260 },
         'purple': { hMin: 260, hMax: 300 },
         'pink': { hMin: 300, hMax: 345 },
-        'black': { lMax: 25 },
-        'white': { lMin: 80 }
+        'black': { lMax: 30, sMax: 20 }, // Low lightness AND low saturation
+        'white': { lMin: 80, sMax: 20 }  // High lightness AND low saturation
     };
 
     const range = COLOR_RANGES[intent];
     if (!range) return false;
 
     // Check lightness-based colors (black, white)
-    if (range.lMax !== undefined && l <= range.lMax) return true;
-    if (range.lMin !== undefined && l >= range.lMin) return true;
+    if (intent === 'black') {
+        return l <= range.lMax && s <= range.sMax;
+    }
+    if (intent === 'white') {
+        return l >= range.lMin && s <= range.sMax;
+    }
 
     // Check hue-based colors
     if (range.hMin !== undefined && range.hMax !== undefined) {
