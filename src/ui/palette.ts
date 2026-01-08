@@ -48,42 +48,118 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
 
     if (candidates.length === 0) return [];
 
+    // Cluster pixels by hue (for chromatic) or lightness (for achromatic)
     const clusters: any[] = [];
     candidates.forEach(p => {
-        let cluster = clusters.find(c => Math.abs(c.h - p.h) < 15);
-        if (cluster) {
-            cluster.pixels.push(p);
-            cluster.weight += (p.s > 30 ? 3 : 1);
-        }
-        else {
-            clusters.push({ h: p.h, pixels: [p], weight: 1 });
+        const isAchromatic = p.s < 15; // Low saturation = gray/black/white
+
+        if (isAchromatic) {
+            // Cluster achromatic colors by lightness
+            let cluster = clusters.find(c => c.isAchromatic && Math.abs(c.avgL - p.l) < 20);
+            if (cluster) {
+                cluster.pixels.push(p);
+                cluster.avgL = (cluster.avgL * (cluster.pixels.length - 1) + p.l) / cluster.pixels.length;
+            } else {
+                clusters.push({
+                    isAchromatic: true,
+                    avgL: p.l,
+                    pixels: [p],
+                    h: 0,
+                    s: p.s
+                });
+            }
+        } else {
+            // Cluster chromatic colors by hue
+            let cluster = clusters.find(c => !c.isAchromatic && Math.abs(c.h - p.h) < 15);
+            if (cluster) {
+                cluster.pixels.push(p);
+            } else {
+                clusters.push({
+                    isAchromatic: false,
+                    h: p.h,
+                    pixels: [p]
+                });
+            }
         }
     });
-    clusters.sort((a, b) => b.weight - a.weight);
 
-    let winner = clusters.find(c => c.pixels.some((p: any) => p.s > 20)) || clusters[0];
-    let primaryPixel = winner ? winner.pixels.reduce((prev: any, curr: any) => (curr.s - Math.abs(curr.l - 50) * 0.5) > (prev.s - Math.abs(prev.l - 50) * 0.5) ? curr : prev) : { h: 200, s: 0, l: 50 };
+    // Score clusters by dominance (frequency + visual weight)
+    clusters.forEach(c => {
+        const pixelCount = c.pixels.length;
+        const avgSaturation = c.pixels.reduce((sum: number, p: any) => sum + p.s, 0) / pixelCount;
+        const avgLightness = c.pixels.reduce((sum: number, p: any) => sum + p.l, 0) / pixelCount;
+
+        // Dominance score = frequency + saturation bonus + achromatic bonus
+        c.score = (pixelCount * 2) + // Frequency is most important
+            (avgSaturation / 10) + // Slight saturation bonus
+            (c.isAchromatic && (avgLightness < 25 || avgLightness > 75) ? 10 : 0); // Bonus for black/white
+
+        c.avgS = avgSaturation;
+        c.avgL = avgLightness;
+    });
+
+    // Sort by dominance score
+    clusters.sort((a, b) => b.score - a.score);
+
+    // Primary = most dominant cluster
+    const primaryCluster = clusters[0];
+    let primaryPixel;
+
+    if (primaryCluster.isAchromatic) {
+        // For achromatic, use average lightness
+        primaryPixel = {
+            h: 0,
+            s: 0,
+            l: primaryCluster.avgL
+        };
+    } else {
+        // For chromatic, pick most vibrant pixel in cluster
+        primaryPixel = primaryCluster.pixels.reduce((prev: any, curr: any) =>
+            (curr.s - Math.abs(curr.l - 50) * 0.5) > (prev.s - Math.abs(prev.l - 50) * 0.5)
+                ? curr : prev
+        );
+    }
+
     const primaryHex = hslToHex(primaryPixel.h, primaryPixel.s, primaryPixel.l);
 
-    let accentCluster = clusters.find(c => Math.abs(c.h - primaryPixel.h) > 40 && c.pixels.some((p: any) => p.s > 30));
+    // Accent = second most dominant chromatic color (different from primary)
     let accentHex, accentPrim;
+    const accentCluster = clusters.find(c =>
+        !c.isAchromatic &&
+        Math.abs(c.h - primaryPixel.h) > 40 &&
+        c.avgS > 30
+    );
+
     if (accentCluster) {
-        const accentPixel = accentCluster.pixels.reduce((prev: any, curr: any) => curr.s > prev.s ? curr : prev);
+        const accentPixel = accentCluster.pixels.reduce((prev: any, curr: any) =>
+            curr.s > prev.s ? curr : prev
+        );
         accentHex = hslToHex(accentPixel.h, accentPixel.s, accentPixel.l);
         accentPrim = `Accent-Context-${Math.round(accentPixel.h)}`;
     } else {
-        accentHex = hslToHex((primaryPixel.h + 180) % 360, 85, 60);
-        accentPrim = 'Accent-Pop';
+        // Fallback: use neutral gray instead of generating fake color
+        accentHex = hslToHex(0, 0, 65);
+        accentPrim = 'Neutral-400';
     }
 
-    const secondaryHex = hslToHex((primaryPixel.h + 25) % 360, Math.max(10, primaryPixel.s - 20), Math.min(90, primaryPixel.l + 15));
+    // Secondary = variation of primary
+    const secondaryHex = hslToHex(
+        (primaryPixel.h + 25) % 360,
+        Math.max(10, primaryPixel.s - 20),
+        Math.min(90, primaryPixel.l + 15)
+    );
+
+    // Foreground/Background based on primary lightness
+    const isDarkPrimary = primaryPixel.l < 50;
+    const foregroundHex = isDarkPrimary ? '#FFFFFF' : '#111111';
+    const backgroundHex = isDarkPrimary ? '#111111' : '#FFFFFF';
 
     return [
         { role: 'Primary', hex: primaryHex, primitive: `Brand-${Math.round(primaryPixel.h)}` },
         { role: 'Secondary', hex: secondaryHex, primitive: 'Brand-Alt' },
         { role: 'Accent', hex: accentHex, primitive: accentPrim },
-        { role: 'Background', hex: '#FFFFFF', primitive: 'Base-White' },
-        { role: 'Foreground', hex: '#111111', primitive: 'Base-Black' },
+        { role: 'Background', hex: backgroundHex, primitive: isDarkPrimary ? 'Base-Black' : 'Base-White' },
+        { role: 'Foreground', hex: foregroundHex, primitive: isDarkPrimary ? 'Base-White' : 'Base-Black' },
         { role: 'Neutral', hex: hslToHex(primaryPixel.h, 5, 50), primitive: 'Neutral-500' },
         { role: 'Border', hex: hslToHex(primaryPixel.h, 5, 90), primitive: 'Neutral-200' },
         { role: 'Success', hex: hslToHex(140, 70, 45), primitive: 'Green' },
