@@ -421,17 +421,39 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
 
     console.log(`🗺️ Global dominant hues:`, topGlobalHues.map(h => Math.round(h)));
 
-    // PHASE 2: Select 4 images that best represent these global colors
-    const imageScores = imagePixels.map(({ img, index, pixels }) => ({
-        img,
-        index,
-        score: calculateColorRepresentation(pixels, topGlobalHues)
-    }));
+    // PHASE 2: Select 4 images
+    let imageScores;
+
+    if (colorIntent) {
+        // When user has color intent, select images with MOST of that color
+        console.log(`🎯 PHASE 2: Selecting images with most "${colorIntent}" color...`);
+
+        imageScores = imagePixels.map(({ img, index, pixels }) => {
+            // Count pixels that match the intent color
+            const intentPixels = pixels.filter(p => {
+                if (p.s < 20) return false; // Must be chromatic
+                return doesColorMatchIntent(p.h, p.s, p.l, colorIntent);
+            });
+
+            return {
+                img,
+                index,
+                score: intentPixels.length // More intent pixels = higher score
+            };
+        });
+    } else {
+        // No intent: select images that best represent global colors
+        imageScores = imagePixels.map(({ img, index, pixels }) => ({
+            img,
+            index,
+            score: calculateColorRepresentation(pixels, topGlobalHues)
+        }));
+    }
 
     imageScores.sort((a, b) => b.score - a.score);
     const topImages = imageScores.slice(0, 4);
 
-    console.log(`🗺️ PHASE 2: Selected 4 images that best represent global colors:`, topImages.map(s => ({
+    console.log(`🗺️ PHASE 2: Selected 4 images:`, topImages.map(s => ({
         index: s.index,
         score: s.score
     })));
