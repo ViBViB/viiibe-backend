@@ -221,64 +221,7 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
     // Accent = most vibrant chromatic color (different from primary)
     let accentHex, accentPrim;
 
-    // Find all chromatic clusters (excluding primary cluster)
-    const chromaticClusters = clusters.filter(c =>
-        !c.isAchromatic &&
-        c !== primaryCluster && // Exclude primary cluster
-        c.avgS > 40 &&          // Must be vibrant (not washed out)
-        c.avgL > 25 &&          // Not too dark
-        c.avgL < 75             // Not too light
-    );
-
-    // Sort by vibrancy (saturation * pixel count)
-    chromaticClusters.sort((a, b) => {
-        const vibrancyA = a.avgS * a.pixels.length;
-        const vibrancyB = b.avgS * b.pixels.length;
-        return vibrancyB - vibrancyA;
-    });
-
-    console.log('🎨 Chromatic clusters for accent:', chromaticClusters.map(c => ({
-        h: Math.round(c.h),
-        s: Math.round(c.avgS),
-        l: Math.round(c.avgL),
-        pixels: c.pixels.length,
-        vibrancy: Math.round(c.avgS * c.pixels.length)
-    })));
-
-    // Find first cluster that's visually distinct from primary
-    const accentCluster = chromaticClusters.find(c => {
-        const hueDiff = Math.abs(c.h - primaryPixel.h);
-        const normalizedHueDiff = Math.min(hueDiff, 360 - hueDiff); // Handle wrap-around
-        return normalizedHueDiff > 60; // Must be clearly different (60° minimum)
-    });
-
-    if (accentCluster) {
-        // Pick most saturated pixel from accent cluster
-        const accentPixel = accentCluster.pixels.reduce((prev: any, curr: any) =>
-            curr.s > prev.s ? curr : prev
-        );
-        accentHex = hslToHex(accentPixel.h, accentPixel.s, accentPixel.l);
-        accentPrim = `Accent-Context-${Math.round(accentPixel.h)}`;
-        console.log('✅ Found accent:', { h: accentPixel.h, s: accentPixel.s, l: accentPixel.l, hex: accentHex });
-    } else if (chromaticClusters.length > 0) {
-        // Fallback: use most vibrant color even if not 60° different
-        const fallbackCluster = chromaticClusters[0];
-        const accentPixel = fallbackCluster.pixels.reduce((prev: any, curr: any) =>
-            curr.s > prev.s ? curr : prev
-        );
-        accentHex = hslToHex(accentPixel.h, accentPixel.s, accentPixel.l);
-        accentPrim = `Accent-Vibrant-${Math.round(accentPixel.h)}`;
-        console.log('⚠️ Using most vibrant color as accent (not 60° different):', { h: accentPixel.h, s: accentPixel.s, l: accentPixel.l, hex: accentHex });
-    } else {
-        // No vibrant colors found, use neutral gray
-        accentHex = hslToHex(0, 0, 65);
-        accentPrim = 'Neutral-400';
-        console.log('⚠️ No vibrant colors found, using neutral gray');
-    }
-
-    // Secondary = second most dominant chromatic color from images
-    let secondaryHex, secondaryPrim;
-
+    // FIRST: Calculate secondary to know which cluster to exclude
     // Find chromatic clusters excluding primary (less strict than accent)
     const secondaryCandidates = clusters.filter(c =>
         !c.isAchromatic &&
@@ -293,9 +236,54 @@ export async function calculatePaletteFromImages(images: NodeListOf<Element> | H
         return scoreB - scoreA;
     });
 
-    if (secondaryCandidates.length > 0) {
-        // Use most dominant chromatic color (after primary)
-        const secondaryCluster = secondaryCandidates[0];
+    const secondaryCluster = secondaryCandidates.length > 0 ? secondaryCandidates[0] : null;
+
+    // NOW: Find accent excluding both primary AND secondary
+    const accentCandidates = clusters.filter(c =>
+        !c.isAchromatic &&
+        c !== primaryCluster && // Exclude primary
+        c !== secondaryCluster && // Exclude secondary
+        c.avgS > 40 &&          // Must be vibrant (not washed out)
+        c.avgL > 25 &&          // Not too dark
+        c.avgL < 75             // Not too light
+    );
+
+    // Sort by vibrancy (saturation * pixel count)
+    accentCandidates.sort((a, b) => {
+        const vibrancyA = a.avgS * a.pixels.length;
+        const vibrancyB = b.avgS * b.pixels.length;
+        return vibrancyB - vibrancyA;
+    });
+
+    console.log('🎨 Accent candidates (excluding primary & secondary):', accentCandidates.map(c => ({
+        h: Math.round(c.h),
+        s: Math.round(c.avgS),
+        l: Math.round(c.avgL),
+        pixels: c.pixels.length,
+        vibrancy: Math.round(c.avgS * c.pixels.length)
+    })));
+
+    if (accentCandidates.length > 0) {
+        // Use most vibrant color (no hue difference requirement)
+        const accentCluster = accentCandidates[0];
+        const accentPixel = accentCluster.pixels.reduce((prev: any, curr: any) =>
+            curr.s > prev.s ? curr : prev
+        );
+        accentHex = hslToHex(accentPixel.h, accentPixel.s, accentPixel.l);
+        accentPrim = `Accent-Vibrant-${Math.round(accentPixel.h)}`;
+        console.log('✅ Found accent:', { h: accentPixel.h, s: accentPixel.s, l: accentPixel.l, hex: accentHex });
+    } else {
+        // No vibrant colors found, use neutral gray
+        accentHex = hslToHex(0, 0, 65);
+        accentPrim = 'Neutral-400';
+        console.log('⚠️ No vibrant colors found, using neutral gray');
+    }
+
+
+    // Secondary = use the cluster we already calculated above
+    let secondaryHex, secondaryPrim;
+
+    if (secondaryCluster) {
         const secondaryPixel = secondaryCluster.pixels.reduce((prev: any, curr: any) =>
             (curr.s - Math.abs(curr.l - 50) * 0.5) > (prev.s - Math.abs(prev.l - 50) * 0.5) ? curr : prev
         );
