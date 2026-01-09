@@ -139,17 +139,25 @@
                     <div class="fab" id="fabGenerate">
                         Generate style guide
                     </div>
-                    <button class="create-btn" id="createBtn"
-                        style="display: none; width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 1000;">
-                        <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="54" height="54" rx="27" fill="black" />
-                            <rect x="0.5" y="0.5" width="53" height="53" rx="26.5" stroke="black"
-                                stroke-opacity="0.3" />
-                            <path
-                                d="M19.9996 22V26M24.9996 17V21M32.9996 31V35M17.9996 24H21.9996M22.9996 19H26.9996M30.9996 33H34.9996M28.9996 22L31.828 24.8284M34.5162 18.7461L35.0819 19.3118C35.4779 19.7078 35.6759 19.9058 35.7501 20.1342C35.8154 20.335 35.8154 20.5513 35.7501 20.7522C35.6759 20.9805 35.4779 21.1785 35.0819 21.5745L21.5251 35.1314C21.1291 35.5274 20.9311 35.7254 20.7027 35.7996C20.5019 35.8649 20.2855 35.8649 20.0847 35.7996C19.8564 35.7254 19.6584 35.5274 19.2623 35.1314L18.6966 34.5657C18.3006 34.1697 18.1026 33.9717 18.0284 33.7433C17.9632 33.5425 17.9632 33.3262 18.0284 33.1253C18.1026 32.897 18.3006 32.699 18.6966 32.303L32.2535 18.7461C32.6495 18.3501 32.8475 18.1521 33.0758 18.0779C33.2767 18.0126 33.493 18.0126 33.6939 18.0779C33.9222 18.1521 34.1202 18.3501 34.5162 18.7461Z"
-                                stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </button>
+                    <!-- Create button with gradient background and white circular wrapper -->
+                    <div id="createBtnContainer"
+                        style="display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 140px; background: linear-gradient(0deg, #FFF 0%, rgba(255, 255, 255, 0.00) 94.87%); pointer-events: none; z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                        <div style="border-radius: 1000px; background: #FFF; padding: 6px; pointer-events: auto;">
+                            <button class="create-btn" id="createBtn"
+                                style="width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; display: block;">
+                                <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="54" height="54" rx="27" fill="black" />
+                                    <rect x="0.5" y="0.5" width="53" height="53" rx="26.5" stroke="black"
+                                        stroke-opacity="0.3" />
+                                    <path
+                                        d="M19.9996 22V26M24.9996 17V21M32.9996 31V35M17.9996 24H21.9996M22.9996 19H26.9996M30.9996 33H34.9996M28.9996 22L31.828 24.8284M34.5162 18.7461L35.0819 19.3118C35.4779 19.7078 35.6759 19.9058 35.7501 20.1342C35.8154 20.335 35.8154 20.5513 35.7501 20.7522C35.6759 20.9805 35.4779 21.1785 35.0819 21.5745L21.5251 35.1314C21.1291 35.5274 20.9311 35.7254 20.7027 35.7996C20.5019 35.8649 20.2855 35.8649 20.0847 35.7996C19.8564 35.7254 19.6584 35.5274 19.2623 35.1314L18.6966 34.5657C18.3006 34.1697 18.1026 33.9717 18.0284 33.7433C17.9632 33.5425 17.9632 33.3262 18.0284 33.1253C18.1026 32.897 18.3006 32.699 18.6966 32.303L32.2535 18.7461C32.6495 18.3501 32.8475 18.1521 33.0758 18.0779C33.2767 18.0126 33.493 18.0126 33.6939 18.0779C33.9222 18.1521 34.1202 18.3501 34.5162 18.7461Z"
+                                        stroke="white" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
