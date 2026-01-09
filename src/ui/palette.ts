@@ -345,163 +345,53 @@ function calculateColorRepresentation(pixels: any[], targetHues: number[]): numb
     return score;
 }
 
-// New function: Extract color distribution map (top 4 colors with percentages)
+// New simplified extractColorMap function
 async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[], userQuery?: string): Promise<any> {
-    console.log(`🗺️ PHASE 1: Analyzing ALL ${images.length} images for global colors...`);
+    console.log(`🗺️ Analyzing ALL ${images.length} images...`);
 
-    // Detect color intent from user query
+    // STEP 1: Detect color intent
     const colorIntent = detectColorIntent(userQuery || '');
     if (colorIntent) {
-        console.log(`🎯 User is searching for "${colorIntent}" - will prioritize this color`);
+        console.log(`🎯 User searching for "${colorIntent}" - will prioritize`);
     }
 
-    // PHASE 1: Analyze ALL images to find global dominant colors
+    // STEP 2: Gather pixels from ALL images
     const allPixels: any[] = [];
-    const imagePixels: Array<{ img: HTMLImageElement, index: number, pixels: any[] }> = [];
-
     for (let i = 0; i < images.length; i++) {
         const img = images[i] as HTMLImageElement;
         if (img.src) {
             const pixels = await getSamplePixels(img);
             allPixels.push(...pixels);
-            imagePixels.push({ img, index: i, pixels });
         }
     }
 
     if (allPixels.length === 0) return { colorMap: [], neutrals: [], statusColors: [] };
 
-    // Filter backgrounds from global analysis
-    const globalContentPixels = allPixels.filter(p => {
-        const isBackground = p.s < 10 && p.l > 85;
-        return !isBackground;
+    // STEP 3: Filter background pixels
+    const contentPixels = allPixels.filter(p => {
+        return !(p.s < 10 && p.l > 85); // Remove white/gray backgrounds
     });
 
-    // Quick clustering to find global dominant hues
-    const globalClusters: any[] = [];
-    globalContentPixels.forEach(p => {
-        if (p.s > 20) { // Only chromatic
-            let cluster = globalClusters.find(c => Math.abs(c.h - p.h) < 15);
-            if (cluster) {
-                cluster.pixels.push(p);
-            } else {
-                globalClusters.push({ h: p.h, pixels: [p] });
-            }
-        }
-    });
-
-    // Calculate scores with color intent boost
-    globalClusters.forEach(c => {
-        const avgH = c.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / c.pixels.length;
-        const avgS = c.pixels.reduce((sum: number, p: any) => sum + p.s, 0) / c.pixels.length;
-        const avgL = c.pixels.reduce((sum: number, p: any) => sum + p.l, 0) / c.pixels.length;
-
-        // Base score = pixel count * saturation (favor vibrant colors)
-        let score = c.pixels.length * (1 + avgS / 100);
-
-        // MASSIVE BOOST if matches user intent
-        if (colorIntent && doesColorMatchIntent(avgH, avgS, avgL, colorIntent)) {
-            score *= 10000; // Ensure it's in top 4
-            c.matchesIntent = true;
-            console.log(`🎯 Cluster matches "${colorIntent}" intent:`, {
-                h: Math.round(avgH),
-                s: Math.round(avgS),
-                l: Math.round(avgL),
-                boostedScore: Math.round(score)
-            });
-        }
-
-        c.score = score;
-        c.avgH = avgH;
-        c.avgS = avgS;
-        c.avgL = avgL;
-    });
-
-    // Sort by score (includes intent boost)
-    globalClusters.sort((a, b) => b.score - a.score);
-    const topGlobalHues = globalClusters.slice(0, 4).map(c => {
-        const avgH = c.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / c.pixels.length;
-        return avgH;
-    });
-
-    console.log(`🗺️ Global dominant hues:`, topGlobalHues.map(h => Math.round(h)));
-
-    // PHASE 2: Select 4 images
-    let imageScores;
-
-    if (colorIntent) {
-        // When user has color intent, select images with MOST of that color
-        console.log(`🎯 PHASE 2: Selecting images with most "${colorIntent}" color...`);
-
-        imageScores = imagePixels.map(({ img, index, pixels }) => {
-            // Count pixels that match the intent color
-            const intentPixels = pixels.filter(p => {
-                // For achromatic colors (black/white), don't require high saturation
-                if (colorIntent === 'black' || colorIntent === 'white') {
-                    return doesColorMatchIntent(p.h, p.s, p.l, colorIntent);
-                }
-                // For chromatic colors, require saturation
-                if (p.s < 20) return false;
-                return doesColorMatchIntent(p.h, p.s, p.l, colorIntent);
-            });
-
-            return {
-                img,
-                index,
-                score: intentPixels.length // More intent pixels = higher score
-            };
-        });
-    } else {
-        // No intent: select images that best represent global colors
-        imageScores = imagePixels.map(({ img, index, pixels }) => ({
-            img,
-            index,
-            score: calculateColorRepresentation(pixels, topGlobalHues)
-        }));
-    }
-
-    imageScores.sort((a, b) => b.score - a.score);
-    const topImages = imageScores.slice(0, 4);
-
-    console.log(`🗺️ PHASE 2: Selected 4 images:`, topImages.map(s => ({
-        index: s.index,
-        score: s.score
-    })));
-
-    // PHASE 3: Extract final color map from these 4 representative images
-    const candidates: any[] = [];
-
-    for (const { img } of topImages) {
-        const pixels = await getSamplePixels(img);
-        candidates.push(...pixels);
-    }
-
-    if (candidates.length === 0) return { colorMap: [], neutrals: [], statusColors: [] };
-
-    // FILTER OUT BACKGROUNDS FIRST (before clustering)
-    // This ensures percentages reflect actual content colors, not white/gray backgrounds
-    const contentPixels = candidates.filter(p => {
-        const isBackground = p.s < 10 && p.l > 85; // Very light, desaturated = background
-        return !isBackground;
-    });
-
-    console.log(`🗺️ Filtered ${candidates.length - contentPixels.length} background pixels, analyzing ${contentPixels.length} content pixels`);
+    console.log(`🗺️ Filtered ${allPixels.length - contentPixels.length} background pixels, analyzing ${contentPixels.length} content pixels`);
 
     if (contentPixels.length === 0) return { colorMap: [], neutrals: [], statusColors: [] };
 
-    // Cluster pixels by hue (chromatic) or lightness (achromatic)
+    // STEP 4: Cluster colors by hue
     const clusters: any[] = [];
     contentPixels.forEach(p => {
         const isAchromatic = p.s < 15;
 
         if (isAchromatic) {
+            // Cluster by lightness
             let cluster = clusters.find(c => c.isAchromatic && Math.abs(c.avgL - p.l) < 20);
             if (cluster) {
                 cluster.pixels.push(p);
                 cluster.avgL = (cluster.avgL * (cluster.pixels.length - 1) + p.l) / cluster.pixels.length;
             } else {
-                clusters.push({ isAchromatic: true, avgL: p.l, pixels: [p], h: 0, s: p.s });
+                clusters.push({ isAchromatic: true, avgL: p.l, pixels: [p] });
             }
         } else {
+            // Cluster by hue
             let cluster = clusters.find(c => !c.isAchromatic && Math.abs(c.h - p.h) < 15);
             if (cluster) {
                 cluster.pixels.push(p);
@@ -511,105 +401,108 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
         }
     });
 
-    // Calculate stats with color intent boost
+    // STEP 5: Calculate cluster stats
     clusters.forEach(c => {
         const pixelCount = c.pixels.length;
+        const avgH = c.isAchromatic ? 0 : c.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / pixelCount;
         const avgS = c.pixels.reduce((sum: number, p: any) => sum + p.s, 0) / pixelCount;
         const avgL = c.pixels.reduce((sum: number, p: any) => sum + p.l, 0) / pixelCount;
-        const avgH = c.isAchromatic ? 0 : c.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / pixelCount;
 
+        c.avgH = avgH;
         c.avgS = avgS;
         c.avgL = avgL;
-        c.avgH = avgH;
         c.pixelCount = pixelCount;
+        c.percentage = (pixelCount / contentPixels.length) * 100;
+    });
 
-        // APPLY COLOR INTENT BOOST IN FINAL CLUSTERING TOO
-        if (colorIntent && !c.isAchromatic && doesColorMatchIntent(avgH, avgS, avgL, colorIntent)) {
-            c.intentMatch = true;
-            console.log(`🎯 PHASE 3: Final cluster matches "${colorIntent}":`, {
-                h: Math.round(avgH),
-                s: Math.round(avgS),
-                l: Math.round(avgL),
-                pixels: pixelCount
+    // STEP 6: Find priority color
+    let priorityColor: any = null;
+    let usedClusters: any[] = [];
+
+    if (colorIntent) {
+        // SCENARIO 1: User specified color - combine ALL matching clusters
+        const matchingClusters = clusters.filter(c =>
+            doesColorMatchIntent(c.avgH, c.avgS, c.avgL, colorIntent)
+        );
+
+        if (matchingClusters.length > 0) {
+            console.log(`🎯 Found ${matchingClusters.length} clusters matching "${colorIntent}"`);
+
+            // Combine all matching clusters
+            const totalPixels = matchingClusters.reduce((sum, c) => sum + c.pixelCount, 0);
+            const totalPercentage = matchingClusters.reduce((sum, c) => sum + c.percentage, 0);
+
+            // Calculate weighted average HSL
+            let sumH = 0, sumS = 0, sumL = 0;
+            matchingClusters.forEach(c => {
+                const weight = c.pixelCount / totalPixels;
+                sumH += c.avgH * weight;
+                sumS += c.avgS * weight;
+                sumL += c.avgL * weight;
             });
+
+            priorityColor = {
+                hex: hslToHex(sumH, sumS, sumL),
+                percentage: Math.round(totalPercentage),
+                h: Math.round(sumH),
+                s: Math.round(sumS),
+                l: Math.round(sumL),
+                isIntent: true
+            };
+
+            usedClusters = matchingClusters;
+
+            console.log(`🎯 Combined priority color:`, priorityColor);
         }
-    });
-
-    // Get chromatic and achromatic
-    const chromatic = clusters.filter(c => !c.isAchromatic && c.avgS > 20);
-    const achromatic = clusters.filter(c => c.isAchromatic || c.avgS <= 20);
-
-    // Sort chromatic: INTENT MATCHES FIRST, then by dominance
-    chromatic.sort((a, b) => {
-        // Intent matches always come first
-        if (a.intentMatch && !b.intentMatch) return -1;
-        if (!a.intentMatch && b.intentMatch) return 1;
-        // Otherwise sort by pixel count
-        return b.pixelCount - a.pixelCount;
-    });
-
-    // Sort achromatic by dominance
-    achromatic.sort((a, b) => {
-        // Intent matches always come first
-        if (a.intentMatch && !b.intentMatch) return -1;
-        if (!a.intentMatch && b.intentMatch) return 1;
-        // Otherwise sort by pixel count
-        return b.pixelCount - a.pixelCount;
-    });
-
-    // Top 4 colors for map
-    // If user is searching for black/white, include achromatic colors
-    let topColors;
-    if (colorIntent === 'black' || colorIntent === 'white') {
-        // For black/white: Show intent color FIRST + top 3 chromatic accents
-        const intentColors = achromatic.filter(c => c.intentMatch);
-        const accentColors = chromatic; // All chromatic are potential accents
-
-        // Take top 1 intent + top 3 accents
-        topColors = [
-            ...intentColors.slice(0, 1),
-            ...accentColors.slice(0, 3)
-        ];
-    } else {
-        // Normal: only chromatic colors
-        topColors = chromatic.slice(0, 4);
     }
 
-    const totalPixels = contentPixels.length; // Use content pixels for percentage, not all candidates
+    if (!priorityColor) {
+        // SCENARIO 2: No color specified or no matches - use most dominant
+        clusters.sort((a, b) => b.percentage - a.percentage);
+        const topCluster = clusters[0];
 
-    const colorMap = topColors.map((cluster, index) => {
-        // Use AVERAGE HSL of the cluster instead of most saturated pixel
-        // This gives us the actual representative color from the images
-        const avgH = cluster.pixels.reduce((sum: number, p: any) => sum + p.h, 0) / cluster.pixels.length;
-        const avgS = cluster.avgS; // Already calculated
-        const avgL = cluster.avgL; // Already calculated
-
-        const hex = hslToHex(avgH, avgS, avgL);
-        const percentage = Math.round((cluster.pixelCount / totalPixels) * 100);
-
-        return {
-            name: `Color ${index + 1}`,
-            hex: hex,
-            percentage: percentage,
-            h: Math.round(avgH),
-            s: Math.round(avgS),
-            l: Math.round(avgL),
-            intentMatch: cluster.intentMatch || false
+        priorityColor = {
+            hex: hslToHex(topCluster.avgH, topCluster.avgS, topCluster.avgL),
+            percentage: Math.round(topCluster.percentage),
+            h: Math.round(topCluster.avgH),
+            s: Math.round(topCluster.avgS),
+            l: Math.round(topCluster.avgL),
+            isIntent: false
         };
-    });
 
-    // Filter out very low percentages (< 1%), BUT keep intent colors
-    const filteredColorMap = colorMap.filter(c => c.percentage >= 1 || c.intentMatch);
+        usedClusters = [topCluster];
 
-    // SORT: Intent first, then percentage descending
-    filteredColorMap.sort((a, b) => {
-        if (a.intentMatch && !b.intentMatch) return -1;
-        if (!a.intentMatch && b.intentMatch) return 1;
-        return b.percentage - a.percentage;
-    });
+        console.log(`🗺️ Most dominant color:`, priorityColor);
+    }
 
-    // Extract neutrals
+    // STEP 7: Find top 3 accent colors
+    const remainingClusters = clusters.filter(c => !usedClusters.includes(c));
+    remainingClusters.sort((a, b) => b.percentage - a.percentage);
+
+    const accentColors = remainingClusters.slice(0, 3).map(c => ({
+        hex: hslToHex(c.avgH, c.avgS, c.avgL),
+        percentage: Math.round(c.percentage),
+        h: Math.round(c.avgH),
+        s: Math.round(c.avgS),
+        l: Math.round(c.avgL),
+        isIntent: false
+    }));
+
+    // STEP 8: Build final color map
+    const colorMap = [priorityColor, ...accentColors];
+
+    // Filter out colors with very low percentage (< 1%), BUT always keep priority
+    const filteredColorMap = colorMap.filter((c, index) =>
+        index === 0 || c.percentage >= 1
+    );
+
+    console.log('🗺️ Final Color Map:', filteredColorMap);
+
+    // Extract neutrals (keeping existing logic for now)
     const neutrals: any[] = [];
+    const achromatic = clusters.filter(c => c.isAchromatic || c.avgS <= 20);
+    achromatic.sort((a, b) => b.pixelCount - a.pixelCount);
+
     const blackCluster = achromatic.find(c => c.avgL < 25);
     if (blackCluster) neutrals.push({ name: 'Black', hex: '#111111' });
 
@@ -624,8 +517,6 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
         { name: 'Warning', hex: hslToHex(35, 90, 55) },
         { name: 'Error', hex: hslToHex(0, 80, 55) }
     ];
-
-    console.log('🗺️ Color Map:', filteredColorMap);
 
     return { colorMap: filteredColorMap, neutrals, statusColors };
 }
