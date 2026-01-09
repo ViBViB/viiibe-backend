@@ -73,9 +73,16 @@
                                     fill="black" />
                             </svg>
                         </div>
-                        <div class="header-text">
-                            <div class="header-title">Results</div>
-                        </div>
+                        <button id="reloadButton" class="reload-btn" title="Get different results"
+                            style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid #E7E7E7; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="#E7E7E7" />
+                                <path
+                                    d="M22.1851 12.6783C21.0268 10.6787 18.8619 9.33337 16.3823 9.33337C13.5709 9.33337 11.1641 11.0628 10.1703 13.5145M20.1505 13.5145H23.5V10.1696M10.6482 19.3681C11.8065 21.3677 13.9714 22.713 16.451 22.713C19.2624 22.713 21.6693 20.9835 22.6631 18.5319M12.6828 18.5319H9.33333V21.8768"
+                                    stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
                     </div>
                     <div class="tabs">
                         <div id="tab-moodboard" class="tab active">Mood board</div>
@@ -124,25 +131,26 @@
                 <div class="bottom-bar">
                     <!-- Unified toolbar with white gradient - shows different buttons per tab -->
                     <div id="toolbarContainer"
-                        style="position: fixed; bottom: 0; left: 0; right: 0; height: 140px; background: linear-gradient(0deg, #FFF 0%, rgba(255, 255, 255, 0.00) 94.87%); pointer-events: none; z-index: 1000; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                        style="position: fixed; bottom: 0; left: 0; right: 0; height: 140px; background: linear-gradient(0deg, #FFF 0%, rgba(255, 255, 255, 0.00) 94.87%); pointer-events: none; z-index: 1000; display: flex; align-items: center; justify-content: center;">
 
-                        <!-- Curate button (Mood board only) -->
-                        <button id="curateBtn"
-                            style="display: block; width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; pointer-events: auto;">
-                            <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <rect width="54" height="54" rx="27" fill="black" fill-opacity="0.05" />
-                                <path
-                                    d="M29.4004 27.0291C29.4004 28.3189 28.3259 29.3645 27.0004 29.3645C25.6749 29.3645 24.6004 28.3189 24.6004 27.0291C24.6004 25.7393 25.6749 24.6938 27.0004 24.6938C28.3259 24.6938 29.4004 25.7393 29.4004 27.0291Z"
-                                    stroke="black" stroke-width="2" />
-                            </svg>
-                        </button>
+                        <!-- White container for both buttons -->
+                        <div id="buttonsWrapper"
+                            style="display: flex; gap: 0; border-radius: 1000px; background: #FFF; padding: 6px; pointer-events: auto;">
+                            <!-- Curate button (Mood board only) -->
+                            <button id="curateBtn"
+                                style="display: block; width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0;">
+                                <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="54" height="54" rx="27" fill="black" fill-opacity="0.05" />
+                                    <path
+                                        d="M29.4004 27.0291C29.4004 28.3189 28.3259 29.3645 27.0004 29.3645C25.6749 29.3645 24.6004 28.3189 24.6004 27.0291C24.6004 25.7393 25.6749 24.6938 27.0004 24.6938C28.3259 24.6938 29.4004 25.7393 29.4004 27.0291Z"
+                                        stroke="black" stroke-width="2" />
+                                </svg>
+                            </button>
 
-                        <!-- Create button (Mood board & Color palette) -->
-                        <div id="createBtnWrapper"
-                            style="display: block; border-radius: 1000px; background: #FFF; padding: 6px; pointer-events: auto;">
+                            <!-- Create button (Mood board & Color palette & Type scale) -->
                             <button id="createBtn"
-                                style="width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; display: block;">
+                                style="display: block; width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0;">
                                 <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <rect width="54" height="54" rx="27" fill="black" />

@@ -11,37 +11,40 @@ export function switchTab(activeTabId: string) {
 
     // Get toolbar buttons
     const curateBtn = document.getElementById('curateBtn');
-    const createBtnWrapper = document.getElementById('createBtnWrapper');
+    const createBtn = document.getElementById('createBtn');
+    const buttonsWrapper = document.getElementById('buttonsWrapper');
 
     if (activeTabId === 'moodboard') {
         tabs.moodboard?.classList.add('active');
         if (sections.moodboard) sections.moodboard.style.display = 'block';
         // Show both Curate and Create buttons
+        if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'block';
-        if (createBtnWrapper) createBtnWrapper.style.display = 'block';
+        if (createBtn) createBtn.style.display = 'block';
     }
     else if (activeTabId === 'colors') {
         tabs.colors?.classList.add('active');
         if (sections.colors) sections.colors.style.display = 'block';
         // Show only Create button
+        if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'none';
-        if (createBtnWrapper) createBtnWrapper.style.display = 'block';
+        if (createBtn) createBtn.style.display = 'block';
         extractAndGeneratePalette();
     }
     else if (activeTabId === 'typography') {
         tabs.typography?.classList.add('active');
         if (sections.typography) sections.typography.style.display = 'block';
         // Show only Create button
+        if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'none';
-        if (createBtnWrapper) createBtnWrapper.style.display = 'block';
+        if (createBtn) createBtn.style.display = 'block';
         generateTypographySystem();
     }
     else if (activeTabId === 'layout') {
         tabs.layout?.classList.add('active');
         if (sections.layout) sections.layout.style.display = 'block';
         // Hide all buttons
-        if (curateBtn) curateBtn.style.display = 'none';
-        if (createBtnWrapper) createBtnWrapper.style.display = 'none';
+        if (buttonsWrapper) buttonsWrapper.style.display = 'none';
     }
 }
 
