@@ -51,8 +51,8 @@ function detectColorIntent(query: string): string | null {
 // Check if a color cluster matches the user's intent
 function doesColorMatchIntent(h: number, s: number, l: number, intent: string): boolean {
     const COLOR_RANGES: { [key: string]: any } = {
-        'red': { hMin: 345, hMax: 15 },
-        'orange': { hMin: 15, hMax: 40 },
+        'red': { hMin: 345, hMax: 25 },
+        'orange': { hMin: 25, hMax: 45 },
         'yellow': { hMin: 40, hMax: 70 },
         'green': { hMin: 70, hMax: 160 },
         'cyan': { hMin: 160, hMax: 190 },
