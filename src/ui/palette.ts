@@ -800,10 +800,13 @@ function renderColorMapUI(data: any) {
         const info = document.createElement('div');
         info.style.cssText = `
             position: absolute;
-            top: 32px;
+            bottom: 140px;
             left: 32px;
             right: 32px;
             color: ${textColor};
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         `;
 
         // Role label (Primary, Secondary, etc.)
@@ -855,7 +858,13 @@ function renderColorMapUI(data: any) {
         // Click to copy
         bar.onclick = async () => {
             try {
-                await navigator.clipboard.writeText(color.hex);
+                // Use parent.postMessage to copy in Figma plugin context
+                parent.postMessage({
+                    pluginMessage: {
+                        type: 'copy-to-clipboard',
+                        text: color.hex
+                    }
+                }, '*');
                 showToast(`Copied ${color.hex}`);
             } catch (err) {
                 console.error('Failed to copy:', err);
