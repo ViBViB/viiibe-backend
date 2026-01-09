@@ -33,6 +33,135 @@ function hexToRgb(hex: string) {
     return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 0, g: 0, b: 0 };
 }
 
+// Color naming dictionary for descriptive names
+const COLOR_NAMES: { [key: string]: { name: string, hex: string } } = {
+    // Reds
+    'crimson': { name: 'Crimson', hex: '#DC143C' },
+    'flag-red': { name: 'Flag red', hex: '#C72A25' },
+    'cherry': { name: 'Cherry', hex: '#D2042D' },
+    'brick': { name: 'Brick', hex: '#B22222' },
+
+    // Oranges/Browns
+    'sandy-clay': { name: 'Sandy clay', hex: '#E0AD8C' },
+    'terracotta': { name: 'Terracotta', hex: '#E2725B' },
+    'rust': { name: 'Rust', hex: '#B7410E' },
+    'copper': { name: 'Copper', hex: '#B87333' },
+
+    // Grays
+    'silver': { name: 'Silver', hex: '#C0C0C0' },
+    'graphite': { name: 'Graphite', hex: '#383838' },
+    'slate': { name: 'Slate', hex: '#708090' },
+    'charcoal': { name: 'Charcoal', hex: '#36454F' },
+    'ash': { name: 'Ash', hex: '#B2BEB5' },
+
+    // Blues
+    'ocean': { name: 'Ocean', hex: '#006994' },
+    'sky': { name: 'Sky', hex: '#87CEEB' },
+    'navy': { name: 'Navy', hex: '#000080' },
+    'cobalt': { name: 'Cobalt', hex: '#0047AB' },
+    'azure': { name: 'Azure', hex: '#007FFF' },
+
+    // Greens
+    'forest': { name: 'Forest', hex: '#228B22' },
+    'mint': { name: 'Mint', hex: '#98FF98' },
+    'olive': { name: 'Olive', hex: '#808000' },
+    'emerald': { name: 'Emerald', hex: '#50C878' },
+    'sage': { name: 'Sage', hex: '#9DC183' },
+
+    // Yellows
+    'sunshine': { name: 'Sunshine', hex: '#FFD700' },
+    'butter': { name: 'Butter', hex: '#FFFACD' },
+    'mustard': { name: 'Mustard', hex: '#FFDB58' },
+    'gold': { name: 'Gold', hex: '#FFD700' },
+
+    // Purples
+    'lavender': { name: 'Lavender', hex: '#E6E6FA' },
+    'plum': { name: 'Plum', hex: '#8E4585' },
+    'violet': { name: 'Violet', hex: '#8F00FF' },
+    'amethyst': { name: 'Amethyst', hex: '#9966CC' },
+
+    // Pinks
+    'rose': { name: 'Rose', hex: '#FF007F' },
+    'coral': { name: 'Coral', hex: '#FF7F50' },
+    'blush': { name: 'Blush', hex: '#DE5D83' },
+
+    // Blacks/Whites
+    'onyx': { name: 'Onyx', hex: '#0F0F0F' },
+    'ivory': { name: 'Ivory', hex: '#FFFFF0' },
+    'pearl': { name: 'Pearl', hex: '#F0EAD6' }
+};
+
+// Get descriptive color name using nearest-color algorithm
+function getColorName(hex: string): string {
+    const rgb = hexToRgb(hex);
+    let minDistance = Infinity;
+    let closestName = 'Color';
+
+    for (const key in COLOR_NAMES) {
+        const namedRgb = hexToRgb(COLOR_NAMES[key].hex);
+        const distance = Math.sqrt(
+            Math.pow(rgb.r - namedRgb.r, 2) +
+            Math.pow(rgb.g - namedRgb.g, 2) +
+            Math.pow(rgb.b - namedRgb.b, 2)
+        );
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestName = COLOR_NAMES[key].name;
+        }
+    }
+
+    return closestName;
+}
+
+// Lighten a color by a percentage
+function lightenColor(hex: string, percent: number): string {
+    const rgb = hexToRgb(hex);
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    const newL = Math.min(100, hsl[2] + percent);
+    return hslToHex(hsl[0], hsl[1], newL);
+}
+
+// Show toast notification
+function showToast(message: string) {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 10000;
+        animation: fadeInOut 2s;
+        pointer-events: none;
+    `;
+
+    // Add CSS animation if not already added
+    if (!document.getElementById('toast-animation-style')) {
+        const style = document.createElement('style');
+        style.id = 'toast-animation-style';
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+                10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+}
+
+
 // Detect color intent from user query
 function detectColorIntent(query: string): string | null {
     const lowerQuery = query.toLowerCase();
@@ -627,32 +756,39 @@ function renderColorMapUI(data: any) {
 
     container.innerHTML = '';
 
-    // Title
-    const title = document.createElement('h3');
-    title.textContent = 'Color Map';
-    title.style.cssText = 'grid-column: 1/-1; margin: 0 0 8px 0; font-size: 14px; font-weight: 600;';
-    container.appendChild(title);
+    // Filter to show only 4 colors: Primary, Secondary, Tertiary, Accent (no Neutral)
+    const displayColors = data.colorMap
+        .filter((c: any) => c.role && c.role !== 'Neutral')
+        .slice(0, 4);
 
-    const subtitle = document.createElement('p');
-    subtitle.textContent = 'Color distribution from moodboard';
-    subtitle.style.cssText = 'grid-column: 1/-1; margin: 0 0 16px 0; font-size: 12px; color: #999;';
-    container.appendChild(subtitle);
-
-    // Color Map Container (stacked stripes)
+    // Color Map Container (vertical bars)
     const mapContainer = document.createElement('div');
-    mapContainer.style.cssText = 'grid-column: 1/-1; display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; min-height: 300px;';
+    mapContainer.style.cssText = `
+        grid-column: 1/-1;
+        display: flex;
+        flex-direction: row;
+        height: calc(100vh - 180px);
+        min-height: 400px;
+        border-radius: 0;
+        overflow: hidden;
+        gap: 0;
+    `;
 
-    data.colorMap.forEach((color: any) => {
-        const stripe = document.createElement('div');
-        stripe.style.cssText = `
-            background-color: ${color.hex};
-            flex: 0 0 ${color.percentage}%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            min-height: 60px;
+    displayColors.forEach((color: any) => {
+        const bar = document.createElement('div');
+
+        // Create gradient from base color to lighter version
+        const lighterColor = lightenColor(color.hex, 20);
+
+        bar.style.cssText = `
+            flex: 1;
             position: relative;
+            background: linear-gradient(to bottom, ${color.hex} 0%, ${lighterColor} 100%);
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 32px 24px;
         `;
 
         // Determine text color based on background
@@ -660,52 +796,76 @@ function renderColorMapUI(data: any) {
         const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
         const textColor = yiq >= 128 ? '#000' : '#fff';
 
-        stripe.innerHTML = `
-            <div style="text-align: center; color: ${textColor};">
-                <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${color.percentage}%</div>
-                <div style="font-size: 11px; opacity: 0.8;">${color.hex}</div>
-                ${color.role ? `<div style="font-size: 10px; opacity: 0.6; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">${color.role}</div>` : ''}
-            </div>
+        // Create info container
+        const info = document.createElement('div');
+        info.style.cssText = `
+            width: 100%;
+            color: ${textColor};
         `;
 
-        mapContainer.appendChild(stripe);
+        // Role label (Primary, Secondary, etc.)
+        const role = document.createElement('div');
+        role.textContent = color.role;
+        role.style.cssText = `
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        `;
+
+        // Color name (Flag red, Sandy clay, etc.)
+        const name = document.createElement('div');
+        name.textContent = getColorName(color.hex);
+        name.style.cssText = `
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        `;
+
+        // Hex code
+        const hex = document.createElement('div');
+        hex.textContent = color.hex;
+        hex.style.cssText = `
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0.8;
+        `;
+
+        info.appendChild(role);
+        info.appendChild(name);
+        info.appendChild(hex);
+        bar.appendChild(info);
+
+        // Hover effect
+        bar.onmouseenter = () => {
+            bar.style.transform = 'scale(1.02)';
+            bar.style.filter = 'brightness(1.05)';
+        };
+        bar.onmouseleave = () => {
+            bar.style.transform = 'scale(1)';
+            bar.style.filter = 'brightness(1)';
+        };
+
+        // Click to copy
+        bar.onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(color.hex);
+                showToast(`Copied ${color.hex}`);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                showToast('Failed to copy');
+            }
+        };
+
+        mapContainer.appendChild(bar);
     });
 
     container.appendChild(mapContainer);
 
-    // Neutrals section
-    if (data.neutrals.length > 0) {
-        const neutralsTitle = document.createElement('h4');
-        neutralsTitle.textContent = 'Neutrals';
-        neutralsTitle.style.cssText = 'grid-column: 1/-1; margin: 24px 0 8px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666;';
-        container.appendChild(neutralsTitle);
-
-        data.neutrals.forEach((neutral: any) => {
-            const div = document.createElement('div');
-            div.className = 'role-card';
-            const rgb = hexToRgb(neutral.hex);
-            const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
-            const dot = yiq >= 128 ? '#000' : '#fff';
-            div.innerHTML = `<div class="role-preview" style="background-color:${neutral.hex}"><div class="contrast-dot" style="background-color:${dot}"></div></div><div class="role-info"><span class="role-name">${neutral.name}</span><span class="role-hex">${neutral.hex}</span></div>`;
-            container.appendChild(div);
-        });
-    }
-
-    // Status colors section
-    const statusTitle = document.createElement('h4');
-    statusTitle.textContent = 'Status Colors';
-    statusTitle.style.cssText = 'grid-column: 1/-1; margin: 24px 0 8px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666;';
-    container.appendChild(statusTitle);
-
-    data.statusColors.forEach((status: any) => {
-        const div = document.createElement('div');
-        div.className = 'role-card';
-        const rgb = hexToRgb(status.hex);
-        const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
-        const dot = yiq >= 128 ? '#000' : '#fff';
-        div.innerHTML = `<div class="role-preview" style="background-color:${status.hex}"><div class="contrast-dot" style="background-color:${dot}"></div></div><div class="role-info"><span class="role-name">${status.name}</span><span class="role-hex">${status.hex}</span></div>`;
-        container.appendChild(div);
-    });
+    // Remove Neutrals and Status Colors sections (not needed in new design)
 }
 
 const COLOR_RANGES: { [key: string]: any } = {
