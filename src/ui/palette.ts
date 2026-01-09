@@ -807,7 +807,7 @@ function renderColorMapUI(data: any) {
         const role = document.createElement('div');
         role.textContent = color.role;
         role.style.cssText = `
-            font-size: 11px;
+            font-size: 16px;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -819,7 +819,7 @@ function renderColorMapUI(data: any) {
         const name = document.createElement('div');
         name.textContent = getColorName(color.hex);
         name.style.cssText = `
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             line-height: 1.2;
             margin-bottom: 8px;

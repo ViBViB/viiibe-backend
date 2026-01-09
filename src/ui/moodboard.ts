@@ -9,30 +9,40 @@ export function switchTab(activeTabId: string) {
     [tabs.moodboard, tabs.colors, tabs.typography, tabs.layout].forEach(t => t?.classList.remove('active'));
     [sections.moodboard, sections.colors, sections.typography, sections.layout].forEach(s => s && (s.style.display = 'none'));
 
-    // Hide/show searchTermsBar based on active tab
+    // Hide/show searchTermsBar and buttons based on active tab
     const searchTermsBar = document.getElementById('searchTermsBar');
+    const fabGenerate = document.getElementById('fabGenerate');
+    const createBtn = document.getElementById('createBtn');
 
     if (activeTabId === 'moodboard') {
         tabs.moodboard?.classList.add('active');
         if (sections.moodboard) sections.moodboard.style.display = 'block';
         if (searchTermsBar) searchTermsBar.style.display = 'flex';
+        if (fabGenerate) fabGenerate.style.display = 'flex';
+        if (createBtn) createBtn.style.display = 'none';
     }
     else if (activeTabId === 'colors') {
         tabs.colors?.classList.add('active');
         if (sections.colors) sections.colors.style.display = 'block';
         if (searchTermsBar) searchTermsBar.style.display = 'none'; // Hide for clean color palette view
+        if (fabGenerate) fabGenerate.style.display = 'none'; // Hide Generate button
+        if (createBtn) createBtn.style.display = 'block'; // Show Create icon button
         extractAndGeneratePalette();
     }
     else if (activeTabId === 'typography') {
         tabs.typography?.classList.add('active');
         if (sections.typography) sections.typography.style.display = 'block';
         if (searchTermsBar) searchTermsBar.style.display = 'flex';
+        if (fabGenerate) fabGenerate.style.display = 'flex';
+        if (createBtn) createBtn.style.display = 'none';
         generateTypographySystem();
     }
     else if (activeTabId === 'layout') {
         tabs.layout?.classList.add('active');
         if (sections.layout) sections.layout.style.display = 'block';
         if (searchTermsBar) searchTermsBar.style.display = 'flex';
+        if (fabGenerate) fabGenerate.style.display = 'flex';
+        if (createBtn) createBtn.style.display = 'none';
     }
 }
 
