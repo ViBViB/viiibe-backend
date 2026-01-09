@@ -255,6 +255,13 @@ header {
   position: relative;
 }
 
+/* Remove padding when showing color palette for edge-to-edge bars */
+#section-colors {
+  margin: -24px -32px;
+  padding: 0;
+  height: calc(100% + 48px);
+}
+
 #moodboardGrid {
   display: block;
   column-count: 3;

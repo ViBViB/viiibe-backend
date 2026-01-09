@@ -813,7 +813,7 @@ function renderColorMapUI(data: any) {
         role.style.cssText = `
             font-size: 16px;
             font-weight: 500;
-            text-transform: uppercase;
+            text-transform: capitalize;
             letter-spacing: 0.5px;
             opacity: 0.7;
             margin-bottom: 8px;
