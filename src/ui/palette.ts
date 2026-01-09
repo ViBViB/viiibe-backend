@@ -433,18 +433,25 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
             const totalPercentage = matchingClusters.reduce((sum, c) => sum + c.percentage, 0);
 
             // Calculate weighted average HSL
-            let sumH = 0, sumS = 0, sumL = 0;
+            // For hue, use circular mean to handle wrap-around (e.g., 350° + 10° = 0°, not 180°)
+            let sumSinH = 0, sumCosH = 0, sumS = 0, sumL = 0;
             matchingClusters.forEach(c => {
                 const weight = c.pixelCount / totalPixels;
-                sumH += c.avgH * weight;
+                const hRad = (c.avgH * Math.PI) / 180; // Convert to radians
+                sumSinH += Math.sin(hRad) * weight;
+                sumCosH += Math.cos(hRad) * weight;
                 sumS += c.avgS * weight;
                 sumL += c.avgL * weight;
             });
 
+            // Convert back to degrees
+            let avgH = (Math.atan2(sumSinH, sumCosH) * 180) / Math.PI;
+            if (avgH < 0) avgH += 360; // Normalize to 0-360
+
             priorityColor = {
-                hex: hslToHex(sumH, sumS, sumL),
+                hex: hslToHex(avgH, sumS, sumL),
                 percentage: Math.round(totalPercentage),
-                h: Math.round(sumH),
+                h: Math.round(avgH),
                 s: Math.round(sumS),
                 l: Math.round(sumL),
                 isIntent: true
