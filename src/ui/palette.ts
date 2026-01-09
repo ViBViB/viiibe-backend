@@ -788,9 +788,6 @@ function renderColorMapUI(data: any) {
             background: linear-gradient(to bottom, ${color.hex} 0%, ${lighterColor} 100%);
             cursor: pointer;
             transition: transform 0.2s ease, filter 0.2s ease;
-            display: flex;
-            align-items: flex-end;
-            padding: 0;
             margin: 0;
         `;
 
@@ -802,9 +799,11 @@ function renderColorMapUI(data: any) {
         // Create info container
         const info = document.createElement('div');
         info.style.cssText = `
-            width: 100%;
+            position: absolute;
+            top: 32px;
+            left: 32px;
+            right: 32px;
             color: ${textColor};
-            padding: 32px 24px;
         `;
 
         // Role label (Primary, Secondary, etc.)
@@ -824,7 +823,7 @@ function renderColorMapUI(data: any) {
         name.textContent = getColorName(color.hex);
         name.style.cssText = `
             font-size: 24px;
-            font-weight: 700;
+            font-weight: 600;
             line-height: 1.2;
             margin-bottom: 8px;
         `;
