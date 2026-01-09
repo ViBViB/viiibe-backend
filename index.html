@@ -86,20 +86,6 @@
                 </header>
 
                 <div class="grid-scroll">
-                    <div id="searchTermsBar" class="search-terms-bar">
-                        <span class="results-label">Results for:</span>
-                        <span id="searchTermsDisplay" class="search-terms-text"></span>
-                        <button id="reloadButton" class="reload-btn" title="Get different results">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C12.0711 2.5 13.9461 3.35714 15.3033 4.75"
-                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                                <path d="M15 2.5V5H12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg>
-                        </button>
-                    </div>
                     <div id="moodboardGrid"></div>
 
                     <!-- Color Palette -->
@@ -136,14 +122,26 @@
                 </div>
 
                 <div class="bottom-bar">
-                    <div class="fab" id="fabGenerate">
-                        Generate style guide
-                    </div>
-                    <!-- Create button with gradient background and white circular wrapper -->
-                    <div id="createBtnContainer"
-                        style="display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 140px; background: linear-gradient(0deg, #FFF 0%, rgba(255, 255, 255, 0.00) 94.87%); pointer-events: none; z-index: 1000; display: flex; align-items: center; justify-content: center;">
-                        <div style="border-radius: 1000px; background: #FFF; padding: 6px; pointer-events: auto;">
-                            <button class="create-btn" id="createBtn"
+                    <!-- Unified toolbar with white gradient - shows different buttons per tab -->
+                    <div id="toolbarContainer"
+                        style="position: fixed; bottom: 0; left: 0; right: 0; height: 140px; background: linear-gradient(0deg, #FFF 0%, rgba(255, 255, 255, 0.00) 94.87%); pointer-events: none; z-index: 1000; display: flex; align-items: center; justify-content: center; gap: 12px;">
+
+                        <!-- Curate button (Mood board only) -->
+                        <button id="curateBtn"
+                            style="display: none; width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; pointer-events: auto;">
+                            <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="54" height="54" rx="27" fill="black" fill-opacity="0.05" />
+                                <path
+                                    d="M29.4004 27.0291C29.4004 28.3189 28.3259 29.3645 27.0004 29.3645C25.6749 29.3645 24.6004 28.3189 24.6004 27.0291C24.6004 25.7393 25.6749 24.6938 27.0004 24.6938C28.3259 24.6938 29.4004 25.7393 29.4004 27.0291Z"
+                                    stroke="black" stroke-width="2" />
+                            </svg>
+                        </button>
+
+                        <!-- Create button (Mood board & Color palette) -->
+                        <div id="createBtnWrapper"
+                            style="display: none; border-radius: 1000px; background: #FFF; padding: 6px; pointer-events: auto;">
+                            <button id="createBtn"
                                 style="width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; display: block;">
                                 <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
