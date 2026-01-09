@@ -804,6 +804,7 @@ function renderColorMapUI(data: any) {
             left: 32px;
             right: 32px;
             color: ${textColor};
+            opacity: 0.8;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
