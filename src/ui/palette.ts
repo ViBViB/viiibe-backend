@@ -800,7 +800,7 @@ function renderColorMapUI(data: any) {
         const info = document.createElement('div');
         info.style.cssText = `
             position: absolute;
-            top: 32px;
+            top: 500px;
             left: 32px;
             right: 32px;
             color: ${textColor};
