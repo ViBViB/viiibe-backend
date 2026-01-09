@@ -486,16 +486,18 @@ async function extractColorMap(images: NodeListOf<Element> | HTMLImageElement[],
     const remainingClusters = clusters.filter(c => !usedClusters.includes(c));
     remainingClusters.sort((a, b) => b.percentage - a.percentage);
 
-    const accentColors = remainingClusters.slice(0, 3).map(c => ({
+    const accentColors = remainingClusters.slice(0, 3).map((c, index) => ({
         hex: hslToHex(c.avgH, c.avgS, c.avgL),
         percentage: Math.round(c.percentage),
         h: Math.round(c.avgH),
         s: Math.round(c.avgS),
         l: Math.round(c.avgL),
-        isIntent: false
+        isIntent: false,
+        role: index === 0 ? 'Secondary' : index === 1 ? 'Tertiary' : 'Accent'
     }));
 
-    // STEP 8: Build final color map
+    // STEP 8: Build final color map with semantic names
+    priorityColor.role = 'Primary';
     const colorMap = [priorityColor, ...accentColors];
 
     // Filter out colors with very low percentage (< 1%), BUT always keep priority
@@ -662,6 +664,7 @@ function renderColorMapUI(data: any) {
             <div style="text-align: center; color: ${textColor};">
                 <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${color.percentage}%</div>
                 <div style="font-size: 11px; opacity: 0.8;">${color.hex}</div>
+                ${color.role ? `<div style="font-size: 10px; opacity: 0.6; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">${color.role}</div>` : ''}
             </div>
         `;
 
