@@ -761,17 +761,19 @@ function renderColorMapUI(data: any) {
         .filter((c: any) => c.role && c.role !== 'Neutral')
         .slice(0, 4);
 
-    // Color Map Container (vertical bars)
+    // Color Map Container (vertical bars) - Full screen, no padding
     const mapContainer = document.createElement('div');
     mapContainer.style.cssText = `
-        grid-column: 1/-1;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         display: flex;
         flex-direction: row;
-        height: calc(100vh - 180px);
-        min-height: 400px;
-        border-radius: 0;
-        overflow: hidden;
         gap: 0;
+        margin: 0;
+        padding: 0;
     `;
 
     displayColors.forEach((color: any) => {
@@ -788,7 +790,8 @@ function renderColorMapUI(data: any) {
             transition: transform 0.2s ease, filter 0.2s ease;
             display: flex;
             align-items: flex-end;
-            padding: 32px 24px;
+            padding: 0;
+            margin: 0;
         `;
 
         // Determine text color based on background
@@ -801,6 +804,7 @@ function renderColorMapUI(data: any) {
         info.style.cssText = `
             width: 100%;
             color: ${textColor};
+            padding: 32px 24px;
         `;
 
         // Role label (Primary, Secondary, etc.)
