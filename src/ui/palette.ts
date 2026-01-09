@@ -801,7 +801,7 @@ function renderColorMapUI(data: any) {
         info.style.cssText = `
             position: absolute;
             top: 500px;
-            left: 32px;
+            left: 20px;
             right: 32px;
             color: ${textColor};
             opacity: 0.8;
