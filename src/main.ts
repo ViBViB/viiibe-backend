@@ -454,6 +454,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const backButton = document.getElementById('backButton');
     if (backButton) backButton.onclick = () => {
+        // Reset to moodboard tab before going back to search
+        switchTab('moodboard');
         // Clear search input when going back
         if (searchInput) searchInput.value = '';
         showView('search');
