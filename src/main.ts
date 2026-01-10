@@ -483,6 +483,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    // Curate button - opens lightbox with first image
+    const curateBtn = document.getElementById('curateBtn');
+    if (curateBtn) curateBtn.onclick = () => {
+        if (imgUrls.length > 0) {
+            currIdx = 0;
+            showView('details');
+            if (dImg) {
+                dImg.src = ''; // Clear previous
+                // Upgrade to full resolution for lightbox
+                const fullResUrl = imgUrls[0].replace('/736x/', '/originals/');
+                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
+            }
+        }
+    };
+
+    // Create button - opens download drawer
+    const createBtn = document.getElementById('createBtn');
+    if (createBtn) createBtn.onclick = () => {
+        const drawerBackdrop = document.getElementById('drawerBackdrop');
+        const drawer = document.getElementById('drawer');
+        if (drawerBackdrop) drawerBackdrop.classList.add('active');
+        if (drawer) drawer.classList.add('active');
+    };
+
     // DETAILS & LIGHTBOX LOGIC
     let imgUrls: string[] = [];
     let currIdx = -1;
