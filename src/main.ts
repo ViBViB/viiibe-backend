@@ -497,12 +497,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Show lightbox immediately
                 showView('details');
 
-                // Use direct proxy URL assignment instead of postMessage
-                const proxyUrl = getImageProxyUrl(imgUrls[0]);
-                console.log('🖼️ Loading proxy URL:', proxyUrl);
+                // Use direct Pinterest URL (same as grid images)
+                // The imgUrls array contains direct Pinterest URLs that work
+                const imageUrl = imgUrls[0];
+                console.log('🖼️ Loading direct URL:', imageUrl);
+
+                // Set crossOrigin to allow loading from Pinterest
+                dImg.crossOrigin = 'anonymous';
 
                 // Set src to trigger load
-                dImg.src = proxyUrl;
+                dImg.src = imageUrl;
 
                 // Log when image loads
                 dImg.onload = () => {
@@ -510,7 +514,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
 
                 dImg.onerror = () => {
-                    console.error('❌ Image failed to load');
+                    console.error('❌ Image failed to load, trying proxy...');
+                    // Fallback to proxy if direct load fails
+                    const proxyUrl = getImageProxyUrl(imageUrl);
+                    console.log('🔄 Trying proxy URL:', proxyUrl);
+                    dImg.src = proxyUrl;
                 };
             } else {
                 console.error('❌ dImg element not found');
