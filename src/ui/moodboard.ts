@@ -13,6 +13,7 @@ export function switchTab(activeTabId: string) {
     const curateBtn = document.getElementById('curateBtn');
     const createBtn = document.getElementById('createBtn');
     const buttonsWrapper = document.getElementById('buttonsWrapper');
+    const reloadButton = document.getElementById('reloadButton');
 
     if (activeTabId === 'moodboard') {
         tabs.moodboard?.classList.add('active');
@@ -21,6 +22,8 @@ export function switchTab(activeTabId: string) {
         if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'block';
         if (createBtn) createBtn.style.display = 'block';
+        // Show reload button only in moodboard
+        if (reloadButton) reloadButton.style.display = 'flex';
     }
     else if (activeTabId === 'colors') {
         tabs.colors?.classList.add('active');
@@ -29,6 +32,8 @@ export function switchTab(activeTabId: string) {
         if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'none';
         if (createBtn) createBtn.style.display = 'block';
+        // Hide reload button
+        if (reloadButton) reloadButton.style.display = 'none';
         extractAndGeneratePalette();
     }
     else if (activeTabId === 'typography') {
@@ -38,6 +43,8 @@ export function switchTab(activeTabId: string) {
         if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'none';
         if (createBtn) createBtn.style.display = 'block';
+        // Hide reload button
+        if (reloadButton) reloadButton.style.display = 'none';
         generateTypographySystem();
     }
     else if (activeTabId === 'layout') {
@@ -45,6 +52,8 @@ export function switchTab(activeTabId: string) {
         if (sections.layout) sections.layout.style.display = 'block';
         // Hide all buttons
         if (buttonsWrapper) buttonsWrapper.style.display = 'none';
+        // Hide reload button
+        if (reloadButton) reloadButton.style.display = 'none';
     }
 }
 
