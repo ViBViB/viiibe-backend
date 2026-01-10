@@ -667,6 +667,7 @@ header {
   padding: 0;
 }
 
+/* Removed - Done button now in toolbar
 #detailsCloseBtn {
   position: fixed;
   top: 20px;
@@ -682,6 +683,7 @@ header {
   font-size: 12px;
   font-weight: 600;
 }
+*/
 
 .container.details .bottom-bar {
   position: fixed;
