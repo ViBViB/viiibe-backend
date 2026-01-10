@@ -210,7 +210,7 @@ export function showMoodboard(data: any) {
             // Click to open lightbox
             div.onclick = () => {
                 currIdx = index;
-                const dImg = document.getElementById('detailsImg') as HTMLImageElement;
+                const dImg = document.getElementById('detailsImage') as HTMLImageElement;
                 if (dImg) {
                     dImg.src = ''; // Clear previous
                     showView('details');
