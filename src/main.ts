@@ -486,15 +486,24 @@ document.addEventListener('DOMContentLoaded', function () {
     // Curate button - opens lightbox with first image
     const curateBtn = document.getElementById('curateBtn');
     if (curateBtn) curateBtn.onclick = () => {
+        console.log('🎨 Curate button clicked');
+        console.log('📊 imgUrls array:', imgUrls);
+        console.log('📊 imgUrls.length:', imgUrls.length);
         if (imgUrls.length > 0) {
             currIdx = 0;
+            console.log('🖼️ First image URL:', imgUrls[0]);
             showView('details');
             if (dImg) {
                 dImg.src = ''; // Clear previous
                 // Upgrade to full resolution for lightbox
                 const fullResUrl = imgUrls[0].replace('/736x/', '/originals/');
+                console.log('🖼️ Full res URL:', fullResUrl);
                 parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
+            } else {
+                console.error('❌ dImg element not found');
             }
+        } else {
+            console.error('❌ imgUrls array is empty');
         }
     };
 
