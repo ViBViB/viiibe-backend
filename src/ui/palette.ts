@@ -779,13 +779,10 @@ function renderColorMapUI(data: any) {
     displayColors.forEach((color: any) => {
         const bar = document.createElement('div');
 
-        // Create gradient from base color to lighter version
-        const lighterColor = lightenColor(color.hex, 20);
-
         bar.style.cssText = `
             flex: 1;
             position: relative;
-            background: linear-gradient(to bottom, ${color.hex} 0%, ${lighterColor} 100%);
+            background: ${color.hex};
             cursor: pointer;
             transition: transform 0.2s ease, filter 0.2s ease;
             margin: 0;
