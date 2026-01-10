@@ -495,10 +495,10 @@ document.addEventListener('DOMContentLoaded', function () {
             showView('details');
             if (dImg) {
                 dImg.src = ''; // Clear previous
-                // Upgrade to full resolution for lightbox
-                const fullResUrl = imgUrls[0].replace('/736x/', '/originals/');
-                console.log('🖼️ Full res URL:', fullResUrl);
-                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
+                // Use 736x resolution (same as grid) instead of originals to avoid 403
+                const imageUrl = imgUrls[0];
+                console.log('🖼️ Loading image:', imageUrl);
+                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: imageUrl, target: 'lightbox' } }, '*');
             } else {
                 console.error('❌ dImg element not found');
             }
