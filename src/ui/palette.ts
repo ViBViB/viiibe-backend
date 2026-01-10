@@ -784,8 +784,9 @@ function renderColorMapUI(data: any) {
             position: relative;
             background: ${color.hex};
             cursor: pointer;
-            transition: transform 0.2s ease, filter 0.2s ease;
+            transition: transform 0.2s ease;
             margin: 0;
+            filter: brightness(1.05);
         `;
 
         // Determine text color based on background
@@ -843,14 +844,12 @@ function renderColorMapUI(data: any) {
         info.appendChild(hex);
         bar.appendChild(info);
 
-        // Hover effect
+        // Hover effect - only scale, no brightness change
         bar.onmouseenter = () => {
             bar.style.transform = 'scale(1.02)';
-            bar.style.filter = 'brightness(1.05)';
         };
         bar.onmouseleave = () => {
             bar.style.transform = 'scale(1)';
-            bar.style.filter = 'brightness(1)';
         };
 
         // Click to copy
