@@ -492,12 +492,26 @@ document.addEventListener('DOMContentLoaded', function () {
         if (imgUrls.length > 0) {
             currIdx = 0;
             console.log('🖼️ First image URL:', imgUrls[0]);
-            showView('details');
+
             if (dImg) {
+                // Show lightbox immediately
+                showView('details');
+
                 // Use direct proxy URL assignment instead of postMessage
                 const proxyUrl = getImageProxyUrl(imgUrls[0]);
                 console.log('🖼️ Loading proxy URL:', proxyUrl);
+
+                // Set src to trigger load
                 dImg.src = proxyUrl;
+
+                // Log when image loads
+                dImg.onload = () => {
+                    console.log('✅ Image loaded successfully');
+                };
+
+                dImg.onerror = () => {
+                    console.error('❌ Image failed to load');
+                };
             } else {
                 console.error('❌ dImg element not found');
             }
