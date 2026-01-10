@@ -259,14 +259,16 @@ header {
 /* Remove padding when showing color palette for edge-to-edge bars */
 #section-colors {
   position: fixed !important;
-  top: 0 !important;
+  top: 60px !important;
+  /* Leave space for header */
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
   width: 100vw !important;
-  height: 100vh !important;
+  height: calc(100vh - 60px) !important;
+  /* Subtract header height */
   z-index: 10;
 }
 
