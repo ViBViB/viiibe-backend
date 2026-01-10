@@ -167,24 +167,68 @@
 
         <!-- 5. DETAILS -->
         <div id="view-details" class="view">
-            <div class="container details">
+            <div class="container details" style="background: #FFFFFF;">
                 <div class="panel">
-                    <div id="detailsCloseBtn" class="chip-close">Done with curation</div>
                     <img id="detailsImage" class="details-image" alt="Preview" />
-                    <div class="bottom-bar">
-                        <div id="detailsPrevBtn" class="circle-btn"><svg fill="none" viewBox="0 0 24 24">
-                                <path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg></div>
-                        <div id="detailsDeleteBtn" class="circle-btn delete"><svg fill="none" viewBox="0 0 24 24">
-                                <path
-                                    d="M4 7H20M9 3H15M10 11V17M14 11V17M6 7L7 19C7 20.1046 7.89543 21 9 21H15C16.1046 21 17 20.1046 17 19L18 7"
-                                    stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg></div>
-                        <div id="detailsNextBtn" class="circle-btn"><svg fill="none" viewBox="0 0 24 24">
-                                <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg></div>
+                    <div class="bottom-bar"
+                        style="background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);">
+                        <!-- Navigation buttons group (white container) -->
+                        <div
+                            style="display: flex; gap: 10px; border-radius: 1000px; background: #FFF; padding: 6px; pointer-events: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <!-- Previous button -->
+                            <button id="detailsPrevBtn"
+                                style="width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M0 27C0 12.0883 12.0883 0 27 0C41.9117 0 54 12.0883 54 27C54 41.9117 41.9117 54 27 54C12.0883 54 0 41.9117 0 27Z"
+                                        fill="black" fill-opacity="0.05" />
+                                    <path d="M21 27H33M21 27L26 22M21 27L26 32" stroke="black" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+
+                            <!-- Delete button -->
+                            <button id="detailsDeleteBtn"
+                                style="width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M0 27C0 12.0883 12.0883 0 27 0C41.9117 0 54 12.0883 54 27C54 41.9117 41.9117 54 27 54C12.0883 54 0 41.9117 0 27Z"
+                                        fill="black" fill-opacity="0.05" />
+                                    <path
+                                        d="M33 21L32.1991 33.0129C32.129 34.065 32.0939 34.5911 31.8667 34.99C31.6666 35.3412 31.3648 35.6235 31.0011 35.7998C30.588 36 30.0607 36 29.0062 36H24.9938C23.9393 36 23.412 36 22.9989 35.7998C22.6352 35.6235 22.3334 35.3412 22.1333 34.99C21.9061 34.5911 21.871 34.065 21.8009 33.0129L21 21M19 21H35M31 21L30.7294 20.1881C30.4671 19.4013 30.3359 19.0078 30.0927 18.717C29.8779 18.4601 29.6021 18.2613 29.2905 18.1388C28.9376 18 28.523 18 27.6936 18H26.3064C25.477 18 25.0624 18 24.7095 18.1388C24.3979 18.2613 24.1221 18.4601 23.9073 18.717C23.6641 19.0078 23.5329 19.4013 23.2706 20.1881L23 21M29 25V32M25 25V32"
+                                        stroke="black" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </button>
+
+                            <!-- Next button -->
+                            <button id="detailsNextBtn"
+                                style="width: 54px; height: 54px; border-radius: 50%; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M0 27C0 12.0883 12.0883 0 27 0C41.9117 0 54 12.0883 54 27C54 41.9117 41.9117 54 27 54C12.0883 54 0 41.9117 0 27Z"
+                                        fill="black" fill-opacity="0.05" />
+                                    <path d="M21 27H33M33 27L28 22M33 27L28 32" stroke="black" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Done button (separate) -->
+                        <button id="detailsCloseBtn"
+                            style="width: 54px; height: 54px; border-radius: 50%; border: none; background: #000; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; pointer-events: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                            <svg width="54" height="54" viewBox="0 0 54 54" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="54" height="54" rx="27" fill="black" />
+                                <rect x="0.5" y="0.5" width="53" height="53" rx="26.5" stroke="black"
+                                    stroke-opacity="0.3" />
+                                <path d="M19 27.6111L23.9231 32.5L35 21.5" stroke="white" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
