@@ -494,11 +494,10 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('🖼️ First image URL:', imgUrls[0]);
             showView('details');
             if (dImg) {
-                dImg.src = ''; // Clear previous
-                // Use 736x resolution (same as grid) instead of originals to avoid 403
-                const imageUrl = imgUrls[0];
-                console.log('🖼️ Loading image:', imageUrl);
-                parent.postMessage({ pluginMessage: { type: 'fetch-image', url: imageUrl, target: 'lightbox' } }, '*');
+                // Use direct proxy URL assignment instead of postMessage
+                const proxyUrl = getImageProxyUrl(imgUrls[0]);
+                console.log('🖼️ Loading proxy URL:', proxyUrl);
+                dImg.src = proxyUrl;
             } else {
                 console.error('❌ dImg element not found');
             }
