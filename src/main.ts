@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const createBtn = document.getElementById('createBtn');
     if (createBtn) createBtn.onclick = () => {
         const drawerBackdrop = document.getElementById('drawerBackdrop');
-        const drawer = document.getElementById('drawer');
+        const drawer = document.getElementById('styleGuideDrawer');
         if (drawerBackdrop) drawerBackdrop.classList.add('active');
         if (drawer) drawer.classList.add('active');
     };
