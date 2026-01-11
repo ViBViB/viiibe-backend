@@ -476,12 +476,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Reload button - get different results for same search
     const reloadButton = document.getElementById('reloadButton');
     if (reloadButton) reloadButton.onclick = (e) => {
-        e.stopPropagation(); // Prevent searchTermsBar click
-        const searchTermsText = document.getElementById('searchTermsDisplay');
-        const query = searchTermsText?.getAttribute('data-original-query') || '';
+        console.log('🔄 Reload button clicked');
+        e.stopPropagation(); // Prevent any parent click handlers
+
+        // Get query from searchInput's data attribute (set when search is performed)
+        const query = searchInput?.getAttribute('data-last-query') || searchInput?.value || '';
+        console.log('🔍 Query for reload:', query);
+
         if (query) {
             console.log('🔄 Reloading search with different results...');
             startSearch(query, true); // Pass true to indicate reload
+        } else {
+            console.error('❌ No query found for reload');
         }
     };
 

@@ -152,6 +152,12 @@ export function startSearch(query: string, reload: boolean = false) {
     const val = (query || '').trim();
     if (!val) return;
 
+    // Save query for reload button
+    const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+    if (searchInput) {
+        searchInput.setAttribute('data-last-query', val);
+    }
+
     // Reset and show loading view
     resetProgress();
     showView('loading');
