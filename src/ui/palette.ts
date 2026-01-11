@@ -666,8 +666,9 @@ export async function extractAndGeneratePalette() {
     if (!container) return;
 
     // Get user's search query for color intent detection
-    const searchTermsEl = document.getElementById('searchTermsDisplay');
-    const userQuery = searchTermsEl?.getAttribute('data-original-query') || '';
+    const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+    const userQuery = searchInput?.getAttribute('data-last-query') || searchInput?.value || '';
+    console.log('🎨 Palette generation with query:', userQuery);
 
     if (images.length === 0) {
         container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#999;">Add images first.</p>';
