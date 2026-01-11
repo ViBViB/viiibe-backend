@@ -1069,6 +1069,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             // Send to backend with config
+            console.log('📤 Sending to backend:');
+            console.log('  - Images:', data.images.length);
+            console.log('  - Colors:', data.colors);
+            console.log('  - Typography:', data.typography.length);
+            console.log('  - Config:', config);
+
             parent.postMessage({
                 pluginMessage: {
                     type: "generate-full-styleguide",
