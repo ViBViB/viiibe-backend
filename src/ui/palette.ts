@@ -762,6 +762,13 @@ function renderColorMapUI(data: any) {
         .filter((c: any) => c.role && c.role !== 'Neutral')
         .slice(0, 4);
 
+    // Store in window for backend access
+    (window as any).viibeColorMap = displayColors.map((c: any) => ({
+        role: c.role,
+        hex: hslToHex(c.h, c.s, c.l)
+    }));
+    console.log('🎨 Stored colorMap in window:', (window as any).viibeColorMap);
+
     // Color Map Container (vertical bars) - Full screen, no padding
     const mapContainer = document.createElement('div');
     mapContainer.style.cssText = `

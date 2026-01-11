@@ -150,26 +150,15 @@ async function collectAllData(): Promise<{ images: any[], colors: any[], typogra
     const images = allImages.filter(img => img !== null);
     console.log(`🎨 [collectAllData] Collected ${images.length} images (${allImages.length - images.length} failed)`);
 
-    // Collect colors from the UI (already calculated and displayed)
+    // Collect colors from window.viibeColorMap (set by palette UI)
     let colors: any[] = [];
 
-    // Read colors from the color palette UI elements
-    const colorBars = document.querySelectorAll('.color-map-bar');
-    console.log("🎨 [collectAllData] Found color bars:", colorBars.length);
-
-    colorBars.forEach((bar: any, index: number) => {
-        const roleEl = bar.querySelector('[style*="font-size: 12px"]');
-        const hexEl = bar.querySelector('[style*="font-size: 14px"]');
-
-        if (roleEl && hexEl) {
-            const role = roleEl.textContent.trim();
-            const hex = hexEl.textContent.trim();
-            colors.push({ role, hex });
-            console.log(`🎨 [collectAllData] Color ${index}: ${role} = ${hex}`);
-        }
-    });
-
-    console.log("🎨 [collectAllData] Collected colors from UI:", colors.length);
+    if ((window as any).viibeColorMap && (window as any).viibeColorMap.length > 0) {
+        colors = (window as any).viibeColorMap;
+        console.log("🎨 [collectAllData] Loaded colors from window.viibeColorMap:", colors);
+    } else {
+        console.warn("🎨 [collectAllData] No colors in window.viibeColorMap, palette may not be rendered yet");
+    }
 
     // Collect typography
     const typography: any[] = [];
