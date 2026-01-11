@@ -1450,10 +1450,24 @@ async function generatePalette(colors, config = {}) {
       ];
     }
 
-    // USE EXACT COLORS FROM FRONTEND - NO REMAPPING
-    // The frontend already calculated the correct palette with roles
-    console.log("Using colors from frontend (no remapping):", colors);
-    const baseColors = colors;
+    // Filter to only roles that support Tailwind scales
+    // But KEEP the exact hex values from frontend
+    const supportedRoles = ["Primary", "Secondary", "Tertiary", "Accent", "Neutral"];
+    console.log("Filtering to supported roles:", supportedRoles);
+
+    // Map Accent role to Tertiary if needed (frontend uses "Accent" for 3rd color)
+    const baseColors = colors
+      .filter(c => supportedRoles.includes(c.role) || c.role === "Accent")
+      .map(c => {
+        // If we don't have a Tertiary but have an Accent, use Accent as Tertiary
+        if (c.role === "Accent" && !colors.find(col => col.role === "Tertiary")) {
+          console.log(`Mapping Accent (${c.hex}) to Tertiary`);
+          return { ...c, role: "Tertiary" };
+        }
+        return c;
+      });
+
+    console.log("Final colors for Tailwind scales:", baseColors);
 
     // Generar escalas Tailwind para cada color
     console.log("Generating Tailwind scales...");
