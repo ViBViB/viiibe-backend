@@ -1450,24 +1450,25 @@ async function generatePalette(colors, config = {}) {
       ];
     }
 
-    // Filter to only roles that support Tailwind scales
-    // But KEEP the exact hex values from frontend
-    const supportedRoles = ["Primary", "Secondary", "Tertiary", "Accent", "Neutral"];
-    console.log("Filtering to supported roles:", supportedRoles);
+    console.log("📥 Received colors from frontend:", colors);
+    
+    // SIMPLE: Use first 4 colors from frontend in exact order
+    const roleMapping = ["Primary", "Secondary", "Tertiary", "Accent"];
+    const baseColors = [];
+    
+    for (let i = 0; i < Math.min(4, colors.length); i++) {
+      if (colors[i] && colors[i].hex) {
+        baseColors.push({ role: roleMapping[i], hex: colors[i].hex });
+        console.log("✅ Color " + i + ": " + colors[i].hex + " → " + roleMapping[i]);
+      }
+    }
+    
+    // Add Neutral
+    if (baseColors.length > 0) {
+      baseColors.push({ role: "Neutral", hex: baseColors[0].hex });
+    }
 
-    // Map Accent role to Tertiary if needed (frontend uses "Accent" for 3rd color)
-    const baseColors = colors
-      .filter(c => supportedRoles.includes(c.role) || c.role === "Accent")
-      .map(c => {
-        // If we don't have a Tertiary but have an Accent, use Accent as Tertiary
-        if (c.role === "Accent" && !colors.find(col => col.role === "Tertiary")) {
-          console.log(`Mapping Accent (${c.hex}) to Tertiary`);
-          return { role: "Tertiary", hex: c.hex, primitive: c.primitive };
-        }
-        return c;
-      });
-
-    console.log("Final colors for Tailwind scales:", baseColors);
+    console.log("🎨 Final colors:", baseColors);
 
     // Generar escalas Tailwind para cada color
     console.log("Generating Tailwind scales...");
