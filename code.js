@@ -1435,6 +1435,7 @@ async function generateMoodboard(images) {
 async function generatePalette(colors, config = {}) {
   console.log("Generating palette page with Tailwind scales...");
   console.log("Config:", config);
+  console.log("Received colors from frontend:", colors);
 
   try {
     // Si no hay colores, usar paleta predeterminada
@@ -1449,25 +1450,17 @@ async function generatePalette(colors, config = {}) {
       ];
     }
 
-    // Filtrar los colores base necesarios
-    const baseRoles = ["Primary", "Secondary", "Tertiary", "Accent", "Neutral"];
-    let baseColors = colors.filter(c => baseRoles.includes(c.role));
-
-    // Si faltan colores (ej. si viene de default), rellenar o usar lo que hay
-    if (baseColors.length < baseRoles.length) {
-      // Fallback simple: mapear los primeros 4 si no coinciden los roles
-      const names = ["Primary", "Secondary", "Tertiary", "Accent", "Neutral"];
-      baseColors = colors.slice(0, 5).map((c, i) => ({
-        role: names[i],
-        hex: c.hex
-      }));
-    }
+    // USE EXACT COLORS FROM FRONTEND - NO REMAPPING
+    // The frontend already calculated the correct palette with roles
+    console.log("Using colors from frontend (no remapping):", colors);
+    const baseColors = colors;
 
     // Generar escalas Tailwind para cada color
     console.log("Generating Tailwind scales...");
     const colorScales = {};
     baseColors.forEach(c => {
       if (c.role && c.hex) {
+        console.log(`Creating scale for ${c.role}: ${c.hex}`);
         colorScales[c.role] = generateColorScale(c.hex);
       }
     });
