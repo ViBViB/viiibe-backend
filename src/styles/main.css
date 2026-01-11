@@ -875,13 +875,11 @@ header {
   border-top: 1px solid #E5E7EB;
 }
 
-
 .drawer-option {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #f5f5f5;
 }
 
 .drawer-option:first-child {
@@ -890,7 +888,6 @@ header {
 
 .drawer-option:last-child {
   padding-bottom: 0;
-  border-bottom: none;
 }
 
 .drawer-option-label {
