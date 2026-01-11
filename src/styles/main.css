@@ -841,6 +841,51 @@ header {
   margin-bottom: 16px;
 }
 
+/* Section header with badge */
+.drawer-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Badges */
+.badge-free {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #10B981;
+  background: #D1FAE5;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.badge-pro {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8B5CF6;
+  background: #EDE9FE;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.badge-pro.upgrade-required {
+  color: #DC2626;
+  background: #FEE2E2;
+  cursor: pointer;
+}
+
+/* Section spacing */
+.drawer-section+.drawer-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #E5E7EB;
+}
+
+
 .drawer-option {
   display: flex;
   justify-content: space-between;

@@ -26,6 +26,9 @@ let currentPage = 0;
 const PINS_PER_PAGE = 20;
 let currentQuery = '';
 
+// Fundamentals download tracking
+let fundamentalsDownloadsUsed = 0;
+const FUNDAMENTALS_FREE_LIMIT = 3;
 
 interface StyleGuideConfig {
     downloadMoodboard: boolean;
@@ -51,6 +54,48 @@ function closeDrawer() {
     if (drawer && backdrop) {
         backdrop.classList.remove('active');
         drawer.classList.remove('active');
+    }
+}
+
+// Fundamentals tracking functions
+function checkFundamentalsLimit(): boolean {
+    // Get from localStorage
+    fundamentalsDownloadsUsed = parseInt(localStorage.getItem('fundamentalsDownloads') || '0');
+    return fundamentalsDownloadsUsed < FUNDAMENTALS_FREE_LIMIT;
+}
+
+function incrementFundamentalsDownload() {
+    fundamentalsDownloadsUsed++;
+    localStorage.setItem('fundamentalsDownloads', fundamentalsDownloadsUsed.toString());
+    updateFundamentalsBadge();
+    console.log(`📊 Fundamentals downloads used: ${fundamentalsDownloadsUsed}/${FUNDAMENTALS_FREE_LIMIT}`);
+}
+
+function updateFundamentalsBadge() {
+    const badge = document.getElementById('fundamentals-badge');
+    if (!badge) return;
+
+    const remaining = FUNDAMENTALS_FREE_LIMIT - fundamentalsDownloadsUsed;
+    if (remaining > 0) {
+        badge.textContent = `${remaining} Free Download${remaining === 1 ? '' : 's'}`;
+        badge.className = 'badge-pro';
+    } else {
+        badge.textContent = 'Upgrade to Pro';
+        badge.className = 'badge-pro upgrade-required';
+    }
+}
+
+function showUpgradeModal() {
+    const modal = document.getElementById('upgradeModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function closeUpgradeModal() {
+    const modal = document.getElementById('upgradeModal');
+    if (modal) {
+        modal.style.display = 'none';
     }
 }
 
@@ -968,10 +1013,44 @@ document.addEventListener('DOMContentLoaded', function () {
     if (drawerCloseBtn) drawerCloseBtn.onclick = () => closeDrawer();
     if (drawerBackdrop) drawerBackdrop.onclick = () => closeDrawer();
 
+    // Upgrade modal event listeners
+    const upgradeBtn = document.getElementById('upgradeBtn');
+    const cancelUpgradeBtn = document.getElementById('cancelUpgradeBtn');
+
+    if (upgradeBtn) {
+        upgradeBtn.onclick = () => {
+            // TODO: Redirect to payment page or open Stripe checkout
+            console.log('🚀 Upgrade to Pro clicked');
+            alert('Payment integration coming soon! For now, this is just a demo.');
+            closeUpgradeModal();
+        };
+    }
+
+    if (cancelUpgradeBtn) {
+        cancelUpgradeBtn.onclick = () => {
+            closeUpgradeModal();
+        };
+    }
+
+    // Initialize badge on page load
+    updateFundamentalsBadge();
+
     if (generateStyleGuideBtn) {
         generateStyleGuideBtn.onclick = async () => {
             const config = getStyleGuideConfig();
             console.log('🎨 Style guide configuration:', config);
+
+            // Check if any Fundamentals are selected
+            const hasFundamentals = config.createFigmaStyles || config.createFigmaVariables;
+
+            if (hasFundamentals) {
+                if (!checkFundamentalsLimit()) {
+                    // Show upgrade modal
+                    console.log('❌ Fundamentals limit reached');
+                    showUpgradeModal();
+                    return;
+                }
+            }
 
             // Close drawer
             closeDrawer();
@@ -998,6 +1077,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     config: config
                 }
             }, "*");
+
+            // Increment Fundamentals counter if applicable
+            if (hasFundamentals) {
+                incrementFundamentalsDownload();
+            }
         };
     }
 });

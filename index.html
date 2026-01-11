@@ -305,6 +305,26 @@
         </div>
         <div id="toast" class="toast"></div>
 
+        <!-- UPGRADE MODAL -->
+        <div id="upgradeModal" class="modal">
+            <div class="modal-content" style="max-width: 400px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 18px;">🎉 You've used your 3 free Fundamental downloads!</h3>
+                <p style="margin: 0 0 16px 0; color: #666; line-height: 1.5;">
+                    Upgrade to <strong>Viiibe Pro</strong> for unlimited access to:
+                </p>
+                <ul style="margin: 0 0 20px 0; padding-left: 20px; color: #666; line-height: 1.8;">
+                    <li>✓ Unlimited Figma styles & variables</li>
+                    <li>✓ Component libraries (coming soon)</li>
+                    <li>✓ Priority support</li>
+                    <li>✓ Early access to new features</li>
+                </ul>
+                <div class="modal-buttons">
+                    <button id="upgradeBtn" class="btn-primary" style="flex: 1;">Upgrade to Pro - $9/month</button>
+                    <button id="cancelUpgradeBtn" class="secondary">Maybe later</button>
+                </div>
+            </div>
+        </div>
+
         <!-- DRAWER -->
         <div id="drawerBackdrop" class="drawer-backdrop"></div>
         <div id="styleGuideDrawer" class="drawer">
@@ -317,15 +337,26 @@
                 </div>
             </div>
             <div class="drawer-content">
-                <!-- Basic Download Section -->
+                <!-- SECTION 1: Inspiration (Always Free) -->
                 <div class="drawer-section">
-                    <div class="drawer-section-title">Style guide</div>
+                    <div class="drawer-section-header">
+                        <div class="drawer-section-title">📥 Inspiration</div>
+                        <span class="badge-free">Always Free</span>
+                    </div>
                     <div class="drawer-option">
                         <div class="drawer-option-label">Download mood board</div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggle-moodboard" checked>
                             <span class="toggle-slider"></span>
                         </label>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Style Guide (Always Free) -->
+                <div class="drawer-section">
+                    <div class="drawer-section-header">
+                        <div class="drawer-section-title">🎨 Style Guide</div>
+                        <span class="badge-free">Always Free</span>
                     </div>
                     <div class="drawer-option">
                         <div class="drawer-option-label">Download color palette</div>
@@ -343,9 +374,12 @@
                     </div>
                 </div>
 
-                <!-- Advanced Download Section -->
+                <!-- SECTION 3: Fundamentals (3 Free → Pro) -->
                 <div class="drawer-section">
-                    <div class="drawer-section-title">Design fundamentals</div>
+                    <div class="drawer-section-header">
+                        <div class="drawer-section-title">⚡ Fundamentals</div>
+                        <span class="badge-pro" id="fundamentals-badge">3 Free Downloads</span>
+                    </div>
                     <div class="drawer-option">
                         <div class="drawer-option-label">Download Figma styles</div>
                         <label class="toggle-switch">
