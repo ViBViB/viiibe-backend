@@ -512,32 +512,40 @@ document.addEventListener('DOMContentLoaded', function () {
             if (grid) {
                 grid.innerHTML = '';
                 pinsToShow.forEach((pin: any, index: number) => {
-                    imgUrls.push(pin.image);
+                    const srcUrl = pin.imageUrl || pin.image;
+                    if (!srcUrl) return;
+
+                    const proxyUrl = getImageProxyUrl(srcUrl);
+                    const urlIndex = imgUrls.length;
+                    imgUrls.push(proxyUrl);
+
+                    // Use same structure as normal rendering
                     const div = document.createElement('div');
-                    div.className = 'grid-item';
+                    div.className = 'pin-container';
+
                     const img = document.createElement('img');
-                    img.src = getImageProxyUrl(pin.image);
+                    img.className = 'pin-image';
+                    img.setAttribute('data-url', srcUrl);
+                    img.crossOrigin = 'Anonymous';
+                    img.src = proxyUrl;
                     img.alt = pin.title || 'Pin';
                     img.loading = 'lazy';
 
-                    // Click to open lightbox
-                    div.onclick = () => {
-                        currIdx = start + index;
+                    // Create overlay with eye icon
+                    const overlay = document.createElement('div');
+                    overlay.className = 'pin-overlay';
+                    overlay.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`;
+                    overlay.onclick = () => {
+                        currIdx = urlIndex;
                         const dImg = document.getElementById('detailsImage') as HTMLImageElement;
                         if (dImg) {
-                            dImg.src = '';
                             showView('details');
-                            dImg.crossOrigin = 'anonymous';
-                            dImg.src = pin.image;
-                            dImg.onload = () => console.log('✅ Image loaded');
-                            dImg.onerror = () => {
-                                console.error('❌ Image failed, trying proxy...');
-                                dImg.src = getImageProxyUrl(pin.image);
-                            };
+                            dImg.src = imgUrls[urlIndex];
                         }
                     };
 
                     div.appendChild(img);
+                    div.appendChild(overlay);
                     grid.appendChild(div);
                 });
             }
