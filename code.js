@@ -625,8 +625,8 @@ async function searchSavedPins(query, intent, randomize = false) {
       }
     }
 
-    // Limit to 20 pins maximum (same as Chrome extension)
-    const limitedPins = scoredPins.slice(0, 20);
+    // Limit to 60 pins maximum (for pre-fetch optimization - frontend shows 20 at a time)
+    const limitedPins = scoredPins.slice(0, 60);
 
     // Pre-validate and fix URLs to ensure 100% load success
     // Convert /originals/ to /736x/ since many /originals/ URLs return 403
