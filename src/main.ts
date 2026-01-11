@@ -77,11 +77,12 @@ function updateFundamentalsBadge() {
 
     const remaining = FUNDAMENTALS_FREE_LIMIT - fundamentalsDownloadsUsed;
     if (remaining > 0) {
-        badge.textContent = `${remaining} Free Download${remaining === 1 ? '' : 's'}`;
-        badge.className = 'badge-pro';
+        badge.textContent = `${remaining} FREE DOWNLOAD${remaining === 1 ? '' : 'S'}`;
+        badge.className = 'drawer-section-badge badge-fundamentals';
     } else {
-        badge.textContent = 'Upgrade to Pro';
-        badge.className = 'badge-pro upgrade-required';
+        badge.textContent = 'UPGRADE TO PRO';
+        badge.className = 'drawer-section-badge badge-fundamentals';
+        badge.style.color = '#DC2626'; // Red color for upgrade
     }
 }
 

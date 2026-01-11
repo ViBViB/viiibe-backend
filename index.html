@@ -337,14 +337,16 @@
                 </div>
             </div>
             <div class="drawer-content">
-                <!-- SECTION 1: Inspiration (Always Free) -->
+                <!-- SECTION 1: Inspiration -->
                 <div class="drawer-section">
                     <div class="drawer-section-header">
-                        <div class="drawer-section-title">📥 Inspiration</div>
-                        <span class="badge-free">Always Free</span>
+                        <div>
+                            <div class="drawer-section-title">Download Inspiration</div>
+                            <div class="drawer-section-badge">FREE FOREVER</div>
+                        </div>
                     </div>
                     <div class="drawer-option">
-                        <div class="drawer-option-label">Download mood board</div>
+                        <div class="drawer-option-label">Mood board</div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggle-moodboard" checked>
                             <span class="toggle-slider"></span>
@@ -352,21 +354,23 @@
                     </div>
                 </div>
 
-                <!-- SECTION 2: Style Guide (Always Free) -->
+                <!-- SECTION 2: Style Guide -->
                 <div class="drawer-section">
                     <div class="drawer-section-header">
-                        <div class="drawer-section-title">🎨 Style Guide</div>
-                        <span class="badge-free">Always Free</span>
+                        <div>
+                            <div class="drawer-section-title">Download Style Guide</div>
+                            <div class="drawer-section-badge">FREE FOREVER</div>
+                        </div>
                     </div>
                     <div class="drawer-option">
-                        <div class="drawer-option-label">Download color palette</div>
+                        <div class="drawer-option-label">Color palette</div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggle-palette" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                     <div class="drawer-option">
-                        <div class="drawer-option-label">Download type scale</div>
+                        <div class="drawer-option-label">Type scale</div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggle-typography" checked>
                             <span class="toggle-slider"></span>
@@ -374,40 +378,40 @@
                     </div>
                 </div>
 
-                <!-- SECTION 3: Fundamentals (3 Free → Pro) -->
+                <!-- SECTION 3: Fundamentals -->
                 <div class="drawer-section">
                     <div class="drawer-section-header">
-                        <div class="drawer-section-title">⚡ Fundamentals</div>
-                        <span class="badge-pro" id="fundamentals-badge">3 Free Downloads</span>
+                        <div>
+                            <div class="drawer-section-title">Download Fundamentals</div>
+                            <div class="drawer-section-badge badge-fundamentals" id="fundamentals-badge">3 FREE
+                                DOWNLOADS</div>
+                        </div>
                     </div>
                     <div class="drawer-option">
-                        <div class="drawer-option-label">Download Figma styles</div>
+                        <div class="drawer-option-label">Figma styles</div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggle-styles">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                     <div class="drawer-option">
-                        <div class="drawer-option-label">Download Figma variables</div>
+                        <div class="drawer-option-label">Figma variables</div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggle-variables">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="drawer-option">
-                        <div class="drawer-option-label disabled">
-                            Download components
-                            <span class="chip-soon">Soon</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggle-components" disabled>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                 </div>
             </div>
             <div class="drawer-footer">
-                <button id="generateStyleGuideBtn">Get style guide</button>
+                <button id="generateStyleGuideBtn" class="btn-download-circle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 15L12 3M12 15L8 11M12 15L16 11" stroke="white" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M3 17V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V17" stroke="white"
+                            stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
             </div>
         </div>
     </div>

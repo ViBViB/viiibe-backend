@@ -835,10 +835,23 @@ header {
 }
 
 .drawer-section-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 16px;
+  margin-bottom: 4px;
+}
+
+/* Section badge (FREE FOREVER / 3 FREE DOWNLOADS) */
+.drawer-section-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #10B981;
+  text-transform: uppercase;
+}
+
+.drawer-section-badge.badge-fundamentals {
+  color: #8B5CF6;
 }
 
 /* Section header with badge */
@@ -846,42 +859,19 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-/* Badges */
-.badge-free {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #10B981;
-  background: #D1FAE5;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
+/* Remove old badge styles */
+.badge-free,
 .badge-pro {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #8B5CF6;
-  background: #EDE9FE;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.badge-pro.upgrade-required {
-  color: #DC2626;
-  background: #FEE2E2;
-  cursor: pointer;
+  display: none;
 }
 
 /* Section spacing */
 .drawer-section+.drawer-section {
-  margin-top: 24px;
-  padding-top: 24px;
+  margin-top: 32px;
+  padding-top: 32px;
   border-top: 1px solid #E5E7EB;
 }
 
@@ -890,11 +880,16 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 16px 0;
   border-bottom: 1px solid #f5f5f5;
 }
 
+.drawer-option:first-child {
+  padding-top: 0;
+}
+
 .drawer-option:last-child {
+  padding-bottom: 0;
   border-bottom: none;
 }
 
@@ -923,11 +918,12 @@ header {
   letter-spacing: 0.5px;
 }
 
-/* Toggle Switch */
+/* Larger iOS-style Toggle Switch */
 .toggle-switch {
   position: relative;
-  width: 44px;
-  height: 24px;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
   flex-shrink: 0;
 }
 
@@ -940,22 +936,26 @@ header {
 .toggle-slider {
   position: absolute;
   cursor: pointer;
-  inset: 0;
-  background-color: #ccc;
-  border-radius: 24px;
-  transition: background-color 0.2s;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #E5E7EB;
+  transition: 0.3s;
+  border-radius: 28px;
 }
 
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
+  height: 24px;
+  width: 24px;
+  left: 2px;
+  bottom: 2px;
   background-color: white;
+  transition: 0.3s;
   border-radius: 50%;
-  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .toggle-switch input:checked+.toggle-slider {
@@ -967,9 +967,8 @@ header {
 }
 
 .toggle-switch input:disabled+.toggle-slider {
-  background-color: #e0e0e0;
-  cursor: not-allowed;
   opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .drawer-footer {
@@ -982,10 +981,34 @@ header {
   justify-content: flex-end;
 }
 
-.drawer-footer button {
-  width: auto;
+/* Circular download button */
+.btn-download-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #000;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+.btn-download-circle:hover {
+  background: #333;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-download-circle:active {
+  transform: scale(0.95);
+}
+
+.btn-download-circle svg {
+  flex-shrink: 0;
+}
 
 /* ============================
    LOADING (Simple)
