@@ -1462,7 +1462,7 @@ async function generatePalette(colors, config = {}) {
         // If we don't have a Tertiary but have an Accent, use Accent as Tertiary
         if (c.role === "Accent" && !colors.find(col => col.role === "Tertiary")) {
           console.log(`Mapping Accent (${c.hex}) to Tertiary`);
-          return { ...c, role: "Tertiary" };
+          return { role: "Tertiary", hex: c.hex, primitive: c.primitive };
         }
         return c;
       });
