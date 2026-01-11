@@ -549,7 +549,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     grid.appendChild(div);
                 });
             }
-            showToast(`Showing results ${start + 1}-${Math.min(end, cachedPins.length)}`);
         } else {
             // Cache exhausted - fetch new pins from backend
             console.log('🔄 Cache exhausted, fetching new pins from backend...');
