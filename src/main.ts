@@ -20,6 +20,11 @@ import { MiniPRDController, MiniPRD } from './ui/mini-prd-gpt';
 // Lottie animation instance
 let logoAnimation: AnimationItem | null = null;
 
+// Pin cache for instant reloads
+let cachedPins: any[] = [];
+let currentPage = 0;
+const PINS_PER_PAGE = 20;
+let currentQuery = '';
 
 
 interface StyleGuideConfig {
@@ -483,11 +488,66 @@ document.addEventListener('DOMContentLoaded', function () {
         const query = searchInput?.getAttribute('data-last-query') || searchInput?.value || '';
         console.log('🔍 Query for reload:', query);
 
-        if (query) {
-            console.log('🔄 Reloading search with different results...');
-            startSearch(query, true); // Pass true to indicate reload
-        } else {
+        if (!query) {
             console.error('❌ No query found for reload');
+            return;
+        }
+
+        // Check if we have cached pins to show
+        currentPage++;
+        const start = currentPage * PINS_PER_PAGE;
+        const end = start + PINS_PER_PAGE;
+
+        console.log(`📄 Page ${currentPage + 1}, showing pins ${start + 1}-${end}`);
+        console.log(`💾 Cache has ${cachedPins.length} pins`);
+
+        if (start < cachedPins.length) {
+            // We have cached pins - show them instantly!
+            console.log('⚡ Using cached pins - instant reload!');
+            const pinsToShow = cachedPins.slice(start, end);
+
+            // Render pins directly without loading screen
+            imgUrls = [];
+            const grid = document.getElementById('moodboardGrid');
+            if (grid) {
+                grid.innerHTML = '';
+                pinsToShow.forEach((pin: any, index: number) => {
+                    imgUrls.push(pin.image);
+                    const div = document.createElement('div');
+                    div.className = 'grid-item';
+                    const img = document.createElement('img');
+                    img.src = getImageProxyUrl(pin.image);
+                    img.alt = pin.title || 'Pin';
+                    img.loading = 'lazy';
+
+                    // Click to open lightbox
+                    div.onclick = () => {
+                        currIdx = start + index;
+                        const dImg = document.getElementById('detailsImage') as HTMLImageElement;
+                        if (dImg) {
+                            dImg.src = '';
+                            showView('details');
+                            dImg.crossOrigin = 'anonymous';
+                            dImg.src = pin.image;
+                            dImg.onload = () => console.log('✅ Image loaded');
+                            dImg.onerror = () => {
+                                console.error('❌ Image failed, trying proxy...');
+                                dImg.src = getImageProxyUrl(pin.image);
+                            };
+                        }
+                    };
+
+                    div.appendChild(img);
+                    grid.appendChild(div);
+                });
+            }
+            showToast(`Showing results ${start + 1}-${Math.min(end, cachedPins.length)}`);
+        } else {
+            // Cache exhausted - fetch new pins from backend
+            console.log('🔄 Cache exhausted, fetching new pins from backend...');
+            currentPage = 0;
+            cachedPins = [];
+            startSearch(query, true); // Pass true to indicate reload
         }
     };
 
@@ -627,10 +687,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (grid) {
                     grid.innerHTML = '';
                     if (msg.data.pins && msg.data.pins.length > 0) {
-                        let loadedCount = 0;
-                        const totalImages = msg.data.pins.length;
+                        // Cache ALL pins for instant reloads
+                        cachedPins = msg.data.pins;
+                        currentPage = 0;
+                        console.log(`💾 Cached ${cachedPins.length} pins for instant reloads`);
 
-                        msg.data.pins.forEach((pin: any, index: number) => {
+                        // Show only first PINS_PER_PAGE (20) pins
+                        const pinsToShow = cachedPins.slice(0, PINS_PER_PAGE);
+                        console.log(`📄 Showing first ${pinsToShow.length} pins (page 1)`);
+
+                        let loadedCount = 0;
+                        const totalImages = pinsToShow.length;
+
+                        pinsToShow.forEach((pin: any, index: number) => {
                             const srcUrl = pin.imageUrl || pin.image;
                             if (!srcUrl) return;
 
