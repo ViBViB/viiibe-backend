@@ -1452,22 +1452,37 @@ async function generatePalette(colors, config = {}) {
 
     console.log("📥 Received colors from frontend:", colors);
     
-    // SIMPLE: Use first 4 colors from frontend in exact order
-    const roleMapping = ["Primary", "Secondary", "Tertiary", "Accent"];
+    // Use only the first 3 EXTRACTED colors (Primary, Secondary, Accent)
+    // Skip calculated colors like Background, Foreground, etc.
+    const extractedColors = colors.filter(c => 
+      c.role === 'Primary' || c.role === 'Secondary' || c.role === 'Accent'
+    );
+    
+    console.log("🎨 Extracted colors:", extractedColors);
+    
     const baseColors = [];
     
-    for (let i = 0; i < Math.min(4, colors.length); i++) {
-      if (colors[i] && colors[i].hex) {
-        baseColors.push({ role: roleMapping[i], hex: colors[i].hex });
-        console.log("✅ Color " + i + ": " + colors[i].hex + " → " + roleMapping[i]);
-      }
+    // Map to Tailwind roles
+    if (extractedColors[0]) {
+      baseColors.push({ role: "Primary", hex: extractedColors[0].hex });
+      console.log("✅ Primary: " + extractedColors[0].hex);
+    }
+    if (extractedColors[1]) {
+      baseColors.push({ role: "Secondary", hex: extractedColors[1].hex });
+      console.log("✅ Secondary: " + extractedColors[1].hex);
+    }
+    if (extractedColors[2]) {
+      baseColors.push({ role: "Tertiary", hex: extractedColors[2].hex });
+      console.log("✅ Tertiary (from Accent): " + extractedColors[2].hex);
     }
     
-    // Add Neutral
+    // Add Neutral as a desaturated version of Primary
     if (baseColors.length > 0) {
       baseColors.push({ role: "Neutral", hex: baseColors[0].hex });
+      console.log("✅ Neutral (from Primary): " + baseColors[0].hex);
     }
 
+    console.log("🎨 Final colors for Tailwind scales:", baseColors);
     console.log("🎨 Final colors:", baseColors);
 
     // Generar escalas Tailwind para cada color
