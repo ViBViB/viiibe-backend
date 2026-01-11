@@ -150,21 +150,26 @@ async function collectAllData(): Promise<{ images: any[], colors: any[], typogra
     const images = allImages.filter(img => img !== null);
     console.log(`🎨 [collectAllData] Collected ${images.length} images (${allImages.length - images.length} failed)`);
 
-    // Collect colors
+    // Collect colors from the UI (already calculated and displayed)
     let colors: any[] = [];
 
-    // Calculate palette directly from images
-    if (imageElements.length > 0) {
-        try {
-            console.log("🎨 [collectAllData] Calculating palette...");
-            colors = await calculatePaletteFromImages(imageElements);
-            console.log("🎨 [collectAllData] Calculated colors:", colors.length);
-        } catch (e) {
-            console.error("🎨 [collectAllData] Error calculating palette:", e);
+    // Read colors from the color palette UI elements
+    const colorBars = document.querySelectorAll('.color-map-bar');
+    console.log("🎨 [collectAllData] Found color bars:", colorBars.length);
+
+    colorBars.forEach((bar: any, index: number) => {
+        const roleEl = bar.querySelector('[style*="font-size: 12px"]');
+        const hexEl = bar.querySelector('[style*="font-size: 14px"]');
+
+        if (roleEl && hexEl) {
+            const role = roleEl.textContent.trim();
+            const hex = hexEl.textContent.trim();
+            colors.push({ role, hex });
+            console.log(`🎨 [collectAllData] Color ${index}: ${role} = ${hex}`);
         }
-    } else {
-        console.log("🎨 [collectAllData] No images found for palette extraction");
-    }
+    });
+
+    console.log("🎨 [collectAllData] Collected colors from UI:", colors.length);
 
     // Collect typography
     const typography: any[] = [];
