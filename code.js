@@ -1452,35 +1452,25 @@ async function generatePalette(colors, config = {}) {
 
     console.log("📥 Received colors from frontend:", colors);
     
-    // Use only the first 3 EXTRACTED colors (Primary, Secondary, Accent)
-    // Skip calculated colors like Background, Foreground, etc.
-    const extractedColors = colors.filter(c => 
-      c.role === 'Primary' || c.role === 'Secondary' || c.role === 'Accent'
-    );
-    
-    console.log("🎨 Extracted colors:", extractedColors);
-    
+    // Use the 4 colors from the UI: Primary, Secondary, Tertiary (shown as Tertiary in UI), Accent
     const baseColors = [];
     
-    // Map to Tailwind roles
-    if (extractedColors[0]) {
-      baseColors.push({ role: "Primary", hex: extractedColors[0].hex });
-      console.log("✅ Primary: " + extractedColors[0].hex);
-    }
-    if (extractedColors[1]) {
-      baseColors.push({ role: "Secondary", hex: extractedColors[1].hex });
-      console.log("✅ Secondary: " + extractedColors[1].hex);
-    }
-    if (extractedColors[2]) {
-      baseColors.push({ role: "Tertiary", hex: extractedColors[2].hex });
-      console.log("✅ Tertiary (from Accent): " + extractedColors[2].hex);
-    }
-    
-    // Add Neutral as a desaturated version of Primary
-    if (baseColors.length > 0) {
-      baseColors.push({ role: "Neutral", hex: baseColors[0].hex });
-      console.log("✅ Neutral (from Primary): " + baseColors[0].hex);
-    }
+    // Map colors by role
+    colors.forEach(c => {
+      if (c.role === 'Primary') {
+        baseColors.push({ role: "Primary", hex: c.hex });
+        console.log("✅ Primary: " + c.hex);
+      } else if (c.role === 'Secondary') {
+        baseColors.push({ role: "Secondary", hex: c.hex });
+        console.log("✅ Secondary: " + c.hex);
+      } else if (c.role === 'Tertiary') {
+        baseColors.push({ role: "Tertiary", hex: c.hex });
+        console.log("✅ Tertiary: " + c.hex);
+      } else if (c.role === 'Accent') {
+        baseColors.push({ role: "Accent", hex: c.hex });
+        console.log("✅ Accent: " + c.hex);
+      }
+    });
 
     console.log("🎨 Final colors for Tailwind scales:", baseColors);
     console.log("🎨 Final colors:", baseColors);
