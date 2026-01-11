@@ -823,11 +823,11 @@ header {
 }
 
 .drawer-content {
-  padding: 24px;
+  padding: 20px 24px;
 }
 
 .drawer-section {
-  margin-bottom: 32px;
+  margin-bottom: 0;
 }
 
 .drawer-section:last-child {
@@ -838,7 +838,7 @@ header {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 /* Section badge (FREE FOREVER / 3 FREE DOWNLOADS) */
@@ -859,7 +859,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 /* Remove old badge styles */
@@ -868,10 +868,10 @@ header {
   display: none;
 }
 
-/* Section spacing */
+/* Section spacing - more compact */
 .drawer-section+.drawer-section {
-  margin-top: 32px;
-  padding-top: 32px;
+  margin-top: 20px;
+  padding-top: 20px;
   border-top: 1px solid #E5E7EB;
 }
 
@@ -880,7 +880,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
+  padding: 10px 0;
   border-bottom: 1px solid #f5f5f5;
 }
 
@@ -972,7 +972,7 @@ header {
 }
 
 .drawer-footer {
-  padding: 16px 24px;
+  padding: 12px 20px;
   border-top: 1px solid var(--border);
   background: #fff;
   position: sticky;
