@@ -794,7 +794,6 @@ function renderColorMapUI(data: any) {
             cursor: pointer;
             transition: transform 0.2s ease;
             margin: 0;
-            filter: brightness(1.05);
         `;
 
         // Determine text color based on background
