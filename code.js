@@ -1638,7 +1638,7 @@ async function generatePalette(colors, config = {}) {
     // Helper function to create a color swatch
     function createColorSwatch(colorData, width, height) {
       const { role, hex, name } = colorData;
-      console.log(`Creating ${width}x${height} swatch for ${role}: ${hex} (${name})`);
+      console.log(`Creating ${width}x${height} swatch for ${role}: ${hex} (name: ${name || 'undefined'})`);
 
       const swatchContainer = figma.createFrame();
       swatchContainer.name = role;
