@@ -1634,10 +1634,12 @@ async function generatePalette(colors, config = {}) {
     // Create large swatches for each color
     const colorNames = Object.keys(colorScales);
     const swatchWidth = 1200 / colorNames.length;
+    console.log(`Creating ${colorNames.length} large swatches, each ${swatchWidth}px wide`);
 
     for (const colorName of colorNames) {
       const scale = colorScales[colorName];
       const baseHex = scale['500'];
+      console.log(`Creating swatch for ${colorName}: ${baseHex}`);
 
       // Swatch container
       const swatchContainer = figma.createFrame();
@@ -1682,7 +1684,10 @@ async function generatePalette(colors, config = {}) {
       swatchContainer.appendChild(hexLabel);
 
       largeSwatchesFrame.appendChild(swatchContainer);
+      console.log(`✅ Added ${colorName} swatch to frame`);
     }
+
+    console.log(`✅ Completed large swatches section with ${colorNames.length} colors`);
 
     // ========================================
     // SECTION 2: COLOR SCALES
