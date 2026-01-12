@@ -765,7 +765,7 @@ function renderColorMapUI(data: any) {
     // Store in window for backend access
     (window as any).viibeColorMap = displayColors.map((c: any) => ({
         role: c.role,
-        hex: hslToHex(c.h, c.s, c.l)
+        hex: c.hex // Use pre-calculated hex instead of recalculating
     }));
     console.log('🎨 Stored colorMap in window:', (window as any).viibeColorMap);
 
