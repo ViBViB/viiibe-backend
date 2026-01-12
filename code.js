@@ -1649,36 +1649,38 @@ async function generatePalette(colors, config = {}) {
       swatchContainer.counterAxisSizingMode = "FIXED";
       swatchContainer.primaryAxisAlignItems = "MAX";
       swatchContainer.counterAxisAlignItems = "MIN";
-      swatchContainer.paddingLeft = 40;
-      swatchContainer.paddingBottom = 40;
+      swatchContainer.paddingLeft = 30;
+      swatchContainer.paddingRight = 30;
+      swatchContainer.paddingTop = 30;
+      swatchContainer.paddingBottom = 30;
 
       // Determine text color based on background
       const rgb = hexToFigmaRgb(hex);
       const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
       const textColor = yiq >= 0.5 ? { r: 0, g: 0, b: 0 } : { r: 1, g: 1, b: 1 };
 
-      // Role label
+      // Role label (14px, Semi Bold)
       const roleLabel = figma.createText();
-      roleLabel.fontName = { family: "Inter", style: "Medium" };
+      roleLabel.fontName = { family: "Inter", style: "Semi Bold" };
       roleLabel.characters = role;
-      roleLabel.fontSize = 16;
+      roleLabel.fontSize = 14;
       roleLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
       swatchContainer.appendChild(roleLabel);
 
-      // Color name (from plugin)
+      // Color name (20px, Semi Bold)
       const colorNameLabel = figma.createText();
-      colorNameLabel.fontName = { family: "Inter", style: "Bold" };
-      colorNameLabel.characters = name || getColorNameFromHex(hex); // Use name from frontend or fallback
-      colorNameLabel.fontSize = 32;
+      colorNameLabel.fontName = { family: "Inter", style: "Semi Bold" };
+      colorNameLabel.characters = name || getColorNameFromHex(hex);
+      colorNameLabel.fontSize = 20;
       colorNameLabel.fills = [{ type: "SOLID", color: textColor }];
       swatchContainer.appendChild(colorNameLabel);
 
-      // Hex label
+      // Hex label (14px, Semi Bold)
       const hexLabel = figma.createText();
-      hexLabel.fontName = { family: "Inter", style: "Regular" };
+      hexLabel.fontName = { family: "Inter", style: "Semi Bold" };
       hexLabel.characters = hex.toUpperCase();
-      hexLabel.fontSize = 16;
-      hexLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.8 }];
+      hexLabel.fontSize = 14;
+      hexLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
       swatchContainer.appendChild(hexLabel);
 
       return swatchContainer;
