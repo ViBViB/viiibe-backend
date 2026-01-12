@@ -1618,34 +1618,32 @@ async function generatePalette(colors, config = {}) {
     container.appendChild(mainTitle);
 
     // ========================================
-    // SECTION 1: LARGE COLOR SWATCHES
+    // SECTION 1: LARGE COLOR SWATCHES (MOCKUP LAYOUT)
     // ========================================
+    // Layout: Primary (500x500) | Secondary (250x500) | [Tertiary (250x250) / Accent (250x250)]
 
     const largeSwatchesFrame = figma.createFrame();
     largeSwatchesFrame.name = "Large Swatches";
     largeSwatchesFrame.layoutMode = "HORIZONTAL";
-    largeSwatchesFrame.primaryAxisSizingMode = "FIXED";
+    largeSwatchesFrame.primaryAxisSizingMode = "AUTO";
     largeSwatchesFrame.counterAxisSizingMode = "AUTO";
-    largeSwatchesFrame.resize(1200, 400);
     largeSwatchesFrame.itemSpacing = 0;
     largeSwatchesFrame.fills = [];
     container.appendChild(largeSwatchesFrame);
 
-    // Create large swatches for each color
-    const colorNames = Object.keys(colorScales);
-    const swatchWidth = 1200 / colorNames.length;
-    console.log(`Creating ${colorNames.length} large swatches, each ${swatchWidth}px wide`);
+    // Get colors array (should have role, hex, and name from frontend)
+    const colorsArray = baseColors; // baseColors comes from the filtered colors sent by frontend
+    console.log(`Creating mockup layout with ${colorsArray.length} colors`);
 
-    for (const colorName of colorNames) {
-      const scale = colorScales[colorName];
-      const baseHex = scale['500'];
-      console.log(`Creating swatch for ${colorName}: ${baseHex}`);
+    // Helper function to create a color swatch
+    function createColorSwatch(colorData, width, height) {
+      const { role, hex, name } = colorData;
+      console.log(`Creating ${width}x${height} swatch for ${role}: ${hex} (${name})`);
 
-      // Swatch container
       const swatchContainer = figma.createFrame();
-      swatchContainer.name = colorName;
-      swatchContainer.resize(swatchWidth, 400);
-      swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(baseHex) }];
+      swatchContainer.name = role;
+      swatchContainer.resize(width, height);
+      swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(hex) }];
       swatchContainer.layoutMode = "VERTICAL";
       swatchContainer.primaryAxisSizingMode = "FIXED";
       swatchContainer.counterAxisSizingMode = "FIXED";
@@ -1655,22 +1653,22 @@ async function generatePalette(colors, config = {}) {
       swatchContainer.paddingBottom = 40;
 
       // Determine text color based on background
-      const rgb = hexToFigmaRgb(baseHex);
+      const rgb = hexToFigmaRgb(hex);
       const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
       const textColor = yiq >= 0.5 ? { r: 0, g: 0, b: 0 } : { r: 1, g: 1, b: 1 };
 
       // Role label
       const roleLabel = figma.createText();
       roleLabel.fontName = { family: "Inter", style: "Medium" };
-      roleLabel.characters = colorName;
+      roleLabel.characters = role;
       roleLabel.fontSize = 16;
       roleLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
       swatchContainer.appendChild(roleLabel);
 
-      // Color name (get from plugin's color naming)
+      // Color name (from plugin)
       const colorNameLabel = figma.createText();
       colorNameLabel.fontName = { family: "Inter", style: "Bold" };
-      colorNameLabel.characters = getColorNameFromHex(baseHex);
+      colorNameLabel.characters = name || getColorNameFromHex(hex); // Use name from frontend or fallback
       colorNameLabel.fontSize = 32;
       colorNameLabel.fills = [{ type: "SOLID", color: textColor }];
       swatchContainer.appendChild(colorNameLabel);
@@ -1678,16 +1676,50 @@ async function generatePalette(colors, config = {}) {
       // Hex label
       const hexLabel = figma.createText();
       hexLabel.fontName = { family: "Inter", style: "Regular" };
-      hexLabel.characters = baseHex.toUpperCase();
+      hexLabel.characters = hex.toUpperCase();
       hexLabel.fontSize = 16;
       hexLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.8 }];
       swatchContainer.appendChild(hexLabel);
 
-      largeSwatchesFrame.appendChild(swatchContainer);
-      console.log(`✅ Added ${colorName} swatch to frame`);
+      return swatchContainer;
     }
 
-    console.log(`✅ Completed large swatches section with ${colorNames.length} colors`);
+    // Primary: 500x500
+    if (colorsArray[0]) {
+      const primarySwatch = createColorSwatch(colorsArray[0], 500, 500);
+      largeSwatchesFrame.appendChild(primarySwatch);
+    }
+
+    // Secondary: 250x500
+    if (colorsArray[1]) {
+      const secondarySwatch = createColorSwatch(colorsArray[1], 250, 500);
+      largeSwatchesFrame.appendChild(secondarySwatch);
+    }
+
+    // Tertiary & Accent: 250x250 stacked vertically
+    if (colorsArray[2] || colorsArray[3]) {
+      const rightColumn = figma.createFrame();
+      rightColumn.name = "Right Column";
+      rightColumn.layoutMode = "VERTICAL";
+      rightColumn.primaryAxisSizingMode = "AUTO";
+      rightColumn.counterAxisSizingMode = "AUTO";
+      rightColumn.itemSpacing = 0;
+      rightColumn.fills = [];
+
+      if (colorsArray[2]) {
+        const tertiarySwatch = createColorSwatch(colorsArray[2], 250, 250);
+        rightColumn.appendChild(tertiarySwatch);
+      }
+
+      if (colorsArray[3]) {
+        const accentSwatch = createColorSwatch(colorsArray[3], 250, 250);
+        rightColumn.appendChild(accentSwatch);
+      }
+
+      largeSwatchesFrame.appendChild(rightColumn);
+    }
+
+    console.log(`✅ Completed mockup layout`);
 
     // ========================================
     // SECTION 2: COLOR SCALES

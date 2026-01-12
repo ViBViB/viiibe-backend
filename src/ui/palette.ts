@@ -765,7 +765,8 @@ function renderColorMapUI(data: any) {
     // Store in window for backend access
     (window as any).viibeColorMap = displayColors.map((c: any) => ({
         role: c.role,
-        hex: c.hex // Use pre-calculated hex instead of recalculating
+        hex: c.hex, // Use pre-calculated hex instead of recalculating
+        name: getColorName(c.hex) // Add color name for Figma display
     }));
     console.log('🎨 Stored colorMap in window:', (window as any).viibeColorMap);
 
