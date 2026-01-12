@@ -1515,17 +1515,17 @@ async function generatePalette(colors, config = {}) {
     // Map colors by role
     colors.forEach(c => {
       if (c.role === 'Primary') {
-        baseColors.push({ role: "Primary", hex: c.hex });
-        console.log("✅ Primary: " + c.hex);
+        baseColors.push({ role: "Primary", hex: c.hex, name: c.name });
+        console.log(`✅ Primary: ${c.hex} (${c.name})`);
       } else if (c.role === 'Secondary') {
-        baseColors.push({ role: "Secondary", hex: c.hex });
-        console.log("✅ Secondary: " + c.hex);
+        baseColors.push({ role: "Secondary", hex: c.hex, name: c.name });
+        console.log(`✅ Secondary: ${c.hex} (${c.name})`);
       } else if (c.role === 'Tertiary') {
-        baseColors.push({ role: "Tertiary", hex: c.hex });
-        console.log("✅ Tertiary: " + c.hex);
+        baseColors.push({ role: "Tertiary", hex: c.hex, name: c.name });
+        console.log(`✅ Tertiary: ${c.hex} (${c.name})`);
       } else if (c.role === 'Accent') {
-        baseColors.push({ role: "Accent", hex: c.hex });
-        console.log("✅ Accent: " + c.hex);
+        baseColors.push({ role: "Accent", hex: c.hex, name: c.name });
+        console.log(`✅ Accent: ${c.hex} (${c.name})`);
       }
     });
 
