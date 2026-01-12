@@ -1451,10 +1451,10 @@ async function generatePalette(colors, config = {}) {
     }
 
     console.log("📥 Received colors from frontend:", colors);
-    
+
     // Use the 4 colors from the UI: Primary, Secondary, Tertiary (shown as Tertiary in UI), Accent
     const baseColors = [];
-    
+
     // Map colors by role
     colors.forEach(c => {
       if (c.role === 'Primary') {
@@ -1559,8 +1559,8 @@ async function generatePalette(colors, config = {}) {
     title.fontSize = 64;
     container.appendChild(title);
 
-    // 6. Crear cada escala de color
-    const shades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+    // 6. Show only the base color (500) for each role to verify accuracy
+    const shades = ['500']; // Only show base color for now
 
     for (const colorName in colorScales) {
       const scale = colorScales[colorName];
