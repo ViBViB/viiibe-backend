@@ -1727,12 +1727,6 @@ async function generatePalette(colors, config = {}) {
     // SECTION 2: COLOR SCALES
     // ========================================
 
-    // Spacer
-    const spacer = figma.createFrame();
-    spacer.resize(1200, 60);
-    spacer.fills = [];
-    container.appendChild(spacer);
-
     // Scales title
     const scalesTitle = figma.createText();
     scalesTitle.fontName = { family: "Inter", style: "Bold" };
