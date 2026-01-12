@@ -1645,13 +1645,12 @@ async function generatePalette(colors, config = {}) {
       swatchContainer.resize(swatchWidth, 400);
       swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(baseHex) }];
       swatchContainer.layoutMode = "VERTICAL";
-      swatchContainer.primaryAxisAlignItems = "MIN";
-      swatchContainer.counterAxisAlignItems = "MIN";
-      swatchContainer.paddingLeft = 40;
-      swatchContainer.paddingBottom = 40;
       swatchContainer.primaryAxisSizingMode = "FIXED";
       swatchContainer.counterAxisSizingMode = "FIXED";
       swatchContainer.primaryAxisAlignItems = "MAX";
+      swatchContainer.counterAxisAlignItems = "MIN";
+      swatchContainer.paddingLeft = 40;
+      swatchContainer.paddingBottom = 40;
 
       // Determine text color based on background
       const rgb = hexToFigmaRgb(baseHex);
