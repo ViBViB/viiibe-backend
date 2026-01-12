@@ -1663,7 +1663,7 @@ async function generatePalette(colors, config = {}) {
       roleLabel.fontName = { family: "Inter", style: "Medium" };
       roleLabel.characters = colorName;
       roleLabel.fontSize = 16;
-      roleLabel.fills = [{ type: "SOLID", color: { ...textColor, a: 0.7 } }];
+      roleLabel.fills = [{ type: "SOLID", color: { r: textColor.r, g: textColor.g, b: textColor.b, a: 0.7 } }];
       swatchContainer.appendChild(roleLabel);
 
       // Color name (get from plugin's color naming)
@@ -1679,7 +1679,7 @@ async function generatePalette(colors, config = {}) {
       hexLabel.fontName = { family: "Inter", style: "Regular" };
       hexLabel.characters = baseHex.toUpperCase();
       hexLabel.fontSize = 16;
-      hexLabel.fills = [{ type: "SOLID", color: { ...textColor, a: 0.8 } }];
+      hexLabel.fills = [{ type: "SOLID", color: { r: textColor.r, g: textColor.g, b: textColor.b, a: 0.8 } }];
       swatchContainer.appendChild(hexLabel);
 
       largeSwatchesFrame.appendChild(swatchContainer);
