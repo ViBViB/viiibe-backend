@@ -1742,12 +1742,13 @@ async function generatePalette(colors, config = {}) {
     // All shades for Tailwind scales
     const allShades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
 
-    for (const colorName of colorNames) {
-      const scale = colorScales[colorName];
+    for (const colorData of colorsArray) {
+      const { role } = colorData;
+      const scale = colorScales[role];
 
       // Row container for this color's scale
       const scaleRow = figma.createFrame();
-      scaleRow.name = `${colorName} Scale`;
+      scaleRow.name = `${role} Scale`;
       scaleRow.layoutMode = "HORIZONTAL";
       scaleRow.primaryAxisSizingMode = "AUTO";
       scaleRow.counterAxisSizingMode = "AUTO";
