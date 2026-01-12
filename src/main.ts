@@ -9,7 +9,7 @@ import viiibeLogo from './assets/viiibe-logo.json';
 // STYLE GUIDE DATA COLLECTION
 // ==============================================================
 
-import { calculatePaletteFromImages } from './ui/palette';
+import { calculatePaletteFromImages, extractAndGeneratePalette } from './ui/palette';
 
 // ==============================================================
 // MINI-PRD CONTROLLER
@@ -153,11 +153,17 @@ async function collectAllData(): Promise<{ images: any[], colors: any[], typogra
     // Collect colors from window.viibeColorMap (set by palette UI)
     let colors: any[] = [];
 
+    // CRITICAL: Always calculate colors before collecting, even if palette tab wasn't clicked
+    if (!(window as any).viibeColorMap || (window as any).viibeColorMap.length === 0) {
+        console.log("🎨 [collectAllData] viibeColorMap not found, calculating colors now...");
+        await extractAndGeneratePalette();
+    }
+
     if ((window as any).viibeColorMap && (window as any).viibeColorMap.length > 0) {
         colors = (window as any).viibeColorMap;
         console.log("🎨 [collectAllData] Loaded colors from window.viibeColorMap:", colors);
     } else {
-        console.warn("🎨 [collectAllData] No colors in window.viibeColorMap, palette may not be rendered yet");
+        console.warn("🎨 [collectAllData] No colors available even after calculation");
     }
 
     // Collect typography
