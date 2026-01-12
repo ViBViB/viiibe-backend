@@ -1853,7 +1853,6 @@ async function generateTypography(items, config = {}) {
     console.log("Loading fonts for typography...");
     await figma.loadFontAsync({ family: "Inter", style: "Regular" });
     await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-    await figma.loadFontAsync({ family: "Inter", style: "SemiBold" });
     await figma.loadFontAsync({ family: "Inter", style: "Bold" });
     console.log("Fonts loaded for typography!");
 
