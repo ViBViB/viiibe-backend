@@ -1607,6 +1607,7 @@ async function generatePalette(colors, config = {}) {
     await figma.loadFontAsync({ family: "Inter", style: "Regular" });
     await figma.loadFontAsync({ family: "Inter", style: "Bold" });
     await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+    await figma.loadFontAsync({ family: "Inter", style: "SemiBold" });
     console.log("Fonts loaded for palette!");
 
     // 5. Crear título principal
@@ -1661,7 +1662,7 @@ async function generatePalette(colors, config = {}) {
 
       // Role label (14px, Semi Bold)
       const roleLabel = figma.createText();
-      roleLabel.fontName = { family: "Inter", style: "Semi Bold" };
+      roleLabel.fontName = { family: "Inter", style: "SemiBold" };
       roleLabel.characters = role;
       roleLabel.fontSize = 14;
       roleLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
@@ -1669,7 +1670,7 @@ async function generatePalette(colors, config = {}) {
 
       // Color name (20px, Semi Bold)
       const colorNameLabel = figma.createText();
-      colorNameLabel.fontName = { family: "Inter", style: "Semi Bold" };
+      colorNameLabel.fontName = { family: "Inter", style: "SemiBold" };
       colorNameLabel.characters = name || getColorNameFromHex(hex);
       colorNameLabel.fontSize = 20;
       colorNameLabel.fills = [{ type: "SOLID", color: textColor }];
@@ -1677,7 +1678,7 @@ async function generatePalette(colors, config = {}) {
 
       // Hex label (14px, Semi Bold)
       const hexLabel = figma.createText();
-      hexLabel.fontName = { family: "Inter", style: "Semi Bold" };
+      hexLabel.fontName = { family: "Inter", style: "SemiBold" };
       hexLabel.characters = hex.toUpperCase();
       hexLabel.fontSize = 14;
       hexLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
@@ -1859,7 +1860,7 @@ async function generateTypography(items, config = {}) {
     console.log("Loading fonts for typography...");
     await figma.loadFontAsync({ family: "Inter", style: "Regular" });
     await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-    await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+    await figma.loadFontAsync({ family: "Inter", style: "SemiBold" });
     await figma.loadFontAsync({ family: "Inter", style: "Bold" });
     console.log("Fonts loaded for typography!");
 
