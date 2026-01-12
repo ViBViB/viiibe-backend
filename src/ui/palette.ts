@@ -769,6 +769,7 @@ function renderColorMapUI(data: any) {
         name: getColorName(c.hex) // Add color name for Figma display
     }));
     console.log('🎨 Stored colorMap in window:', (window as any).viibeColorMap);
+    console.log('🎨 Color names generated:', (window as any).viibeColorMap.map((c: any) => `${c.role}: ${c.name} (${c.hex})`));
 
     // Color Map Container (vertical bars) - Full screen, no padding
     const mapContainer = document.createElement('div');
