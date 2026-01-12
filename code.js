@@ -862,6 +862,63 @@ function hexToFigmaRgb(hex) {
   };
 }
 
+// Get descriptive color name from hex
+function getColorNameFromHex(hex) {
+  const rgb = hexToFigmaRgb(hex);
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+  // Determine base color from hue
+  const h = hsl.h;
+  const s = hsl.s;
+  const l = hsl.l;
+
+  // Achromatic colors
+  if (s < 10) {
+    if (l < 20) return "Black";
+    if (l > 90) return "White";
+    if (l < 40) return "Charcoal";
+    if (l > 70) return "Silver";
+    return "Gray";
+  }
+
+  // Chromatic colors
+  if (h < 15 || h >= 345) return "Red";
+  if (h < 45) return "Orange";
+  if (h < 70) return "Yellow";
+  if (h < 150) return "Green";
+  if (h < 200) return "Cyan";
+  if (h < 260) return "Blue";
+  if (h < 290) return "Purple";
+  if (h < 345) return "Pink";
+
+  return "Color";
+}
+
+function rgbToHsl(r, g, b) {
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+
+  return {
+    h: h * 360,
+    s: s * 100,
+    l: l * 100
+  };
+}
+
 // --------------------------------------------------------------
 // COLOR SCALE GENERATOR (Tailwind-style 50-950)
 // --------------------------------------------------------------
@@ -1552,98 +1609,156 @@ async function generatePalette(colors, config = {}) {
     await figma.loadFontAsync({ family: "Inter", style: "Medium" });
     console.log("Fonts loaded for palette!");
 
-    // 5. Crear título
-    const title = figma.createText();
-    title.fontName = { family: "Inter", style: "Bold" };
-    title.characters = "Viiibe Color Palette";
-    title.fontSize = 64;
-    container.appendChild(title);
+    // 5. Crear título principal
+    const mainTitle = figma.createText();
+    mainTitle.fontName = { family: "Inter", style: "Bold" };
+    mainTitle.characters = "Color palette";
+    mainTitle.fontSize = 32;
+    mainTitle.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
+    container.appendChild(mainTitle);
 
-    // 6. Show only the base color (500) for each role to verify accuracy
-    const shades = ['500']; // Only show base color for now
+    // ========================================
+    // SECTION 1: LARGE COLOR SWATCHES
+    // ========================================
 
-    for (const colorName in colorScales) {
+    const largeSwatchesFrame = figma.createFrame();
+    largeSwatchesFrame.name = "Large Swatches";
+    largeSwatchesFrame.layoutMode = "HORIZONTAL";
+    largeSwatchesFrame.primaryAxisSizingMode = "FIXED";
+    largeSwatchesFrame.counterAxisSizingMode = "AUTO";
+    largeSwatchesFrame.resize(1200, 400);
+    largeSwatchesFrame.itemSpacing = 0;
+    largeSwatchesFrame.fills = [];
+    container.appendChild(largeSwatchesFrame);
+
+    // Create large swatches for each color
+    const colorNames = Object.keys(colorScales);
+    const swatchWidth = 1200 / colorNames.length;
+
+    for (const colorName of colorNames) {
+      const scale = colorScales[colorName];
+      const baseHex = scale['500'];
+
+      // Swatch container
+      const swatchContainer = figma.createFrame();
+      swatchContainer.name = colorName;
+      swatchContainer.resize(swatchWidth, 400);
+      swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(baseHex) }];
+      swatchContainer.layoutMode = "VERTICAL";
+      swatchContainer.primaryAxisAlignItems = "MIN";
+      swatchContainer.counterAxisAlignItems = "MIN";
+      swatchContainer.paddingLeft = 40;
+      swatchContainer.paddingBottom = 40;
+      swatchContainer.primaryAxisSizingMode = "FIXED";
+      swatchContainer.counterAxisSizingMode = "FIXED";
+      swatchContainer.primaryAxisAlignItems = "MAX";
+
+      // Determine text color based on background
+      const rgb = hexToFigmaRgb(baseHex);
+      const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
+      const textColor = yiq >= 0.5 ? { r: 0, g: 0, b: 0 } : { r: 1, g: 1, b: 1 };
+
+      // Role label
+      const roleLabel = figma.createText();
+      roleLabel.fontName = { family: "Inter", style: "Medium" };
+      roleLabel.characters = colorName;
+      roleLabel.fontSize = 16;
+      roleLabel.fills = [{ type: "SOLID", color: { ...textColor, a: 0.7 } }];
+      swatchContainer.appendChild(roleLabel);
+
+      // Color name (get from plugin's color naming)
+      const colorNameLabel = figma.createText();
+      colorNameLabel.fontName = { family: "Inter", style: "Bold" };
+      colorNameLabel.characters = getColorNameFromHex(baseHex);
+      colorNameLabel.fontSize = 32;
+      colorNameLabel.fills = [{ type: "SOLID", color: textColor }];
+      swatchContainer.appendChild(colorNameLabel);
+
+      // Hex label
+      const hexLabel = figma.createText();
+      hexLabel.fontName = { family: "Inter", style: "Regular" };
+      hexLabel.characters = baseHex.toUpperCase();
+      hexLabel.fontSize = 16;
+      hexLabel.fills = [{ type: "SOLID", color: { ...textColor, a: 0.8 } }];
+      swatchContainer.appendChild(hexLabel);
+
+      largeSwatchesFrame.appendChild(swatchContainer);
+    }
+
+    // ========================================
+    // SECTION 2: COLOR SCALES
+    // ========================================
+
+    // Spacer
+    const spacer = figma.createFrame();
+    spacer.resize(1200, 60);
+    spacer.fills = [];
+    container.appendChild(spacer);
+
+    // Scales title
+    const scalesTitle = figma.createText();
+    scalesTitle.fontName = { family: "Inter", style: "Bold" };
+    scalesTitle.characters = "Color scales";
+    scalesTitle.fontSize = 32;
+    scalesTitle.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
+    container.appendChild(scalesTitle);
+
+    // All shades for Tailwind scales
+    const allShades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+
+    for (const colorName of colorNames) {
       const scale = colorScales[colorName];
 
-      // Frame para esta escala
-      const scaleFrame = figma.createFrame();
-      scaleFrame.name = `${colorName} Scale`;
-      scaleFrame.layoutMode = "VERTICAL";
-      scaleFrame.primaryAxisSizingMode = "AUTO";
-      scaleFrame.counterAxisSizingMode = "AUTO";
-      scaleFrame.itemSpacing = 20;
-      scaleFrame.fills = [];
+      // Row container for this color's scale
+      const scaleRow = figma.createFrame();
+      scaleRow.name = `${colorName} Scale`;
+      scaleRow.layoutMode = "HORIZONTAL";
+      scaleRow.primaryAxisSizingMode = "AUTO";
+      scaleRow.counterAxisSizingMode = "AUTO";
+      scaleRow.itemSpacing = 8;
+      scaleRow.fills = [];
 
-      // Título de la escala
-      const scaleTitle = figma.createText();
-      scaleTitle.fontName = { family: "Inter", style: "Bold" };
-      scaleTitle.characters = colorName;
-      scaleTitle.fontSize = 32;
-      scaleFrame.appendChild(scaleTitle);
-
-      // Frame horizontal para los swatches
-      const swatchesFrame = figma.createFrame();
-      swatchesFrame.name = "Swatches";
-      swatchesFrame.layoutMode = "HORIZONTAL";
-      swatchesFrame.primaryAxisSizingMode = "AUTO";
-      swatchesFrame.counterAxisSizingMode = "AUTO";
-      swatchesFrame.itemSpacing = 8;
-      swatchesFrame.fills = [];
-
-      // Crear cada swatch
-      shades.forEach(shade => {
+      // Create swatches for each shade
+      allShades.forEach(shade => {
         const swatchGroup = figma.createFrame();
         swatchGroup.name = shade;
         swatchGroup.layoutMode = "VERTICAL";
         swatchGroup.primaryAxisSizingMode = "AUTO";
         swatchGroup.counterAxisSizingMode = "AUTO";
-        swatchGroup.itemSpacing = 8;
+        swatchGroup.itemSpacing = 4;
         swatchGroup.fills = [];
 
-        // Rectángulo de color - vinculado a variable
+        // Color rectangle
         const rect = figma.createRectangle();
         rect.resize(80, 80);
         rect.cornerRadius = 8;
-
-        // Create SolidPaint and try to bind to variable
-        const colorVar = colorPrimitives && colorPrimitives[colorName] && colorPrimitives[colorName][shade];
-        const basePaint = { type: "SOLID", color: hexToFigmaRgb(scale[shade]) };
-
-        if (colorVar) {
-          try {
-            rect.fills = [figma.variables.setBoundVariableForPaint(basePaint, 'color', colorVar)];
-          } catch (e) {
-            rect.fills = [basePaint];
-          }
-        } else {
-          rect.fills = [basePaint];
-        }
+        rect.fills = [{ type: "SOLID", color: hexToFigmaRgb(scale[shade]) }];
         swatchGroup.appendChild(rect);
 
-        // Label con el número del shade
+        // Shade number label
         const shadeLabel = figma.createText();
         shadeLabel.fontName = { family: "Inter", style: "Medium" };
         shadeLabel.characters = shade;
-        shadeLabel.fontSize = 14;
+        shadeLabel.fontSize = 12;
         shadeLabel.resize(80, shadeLabel.height);
         shadeLabel.textAlignHorizontal = "CENTER";
+        shadeLabel.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
         swatchGroup.appendChild(shadeLabel);
 
-        // Label con el hex
+        // Hex label
         const hexLabel = figma.createText();
         hexLabel.fontName = { family: "Inter", style: "Regular" };
         hexLabel.characters = scale[shade].toUpperCase();
-        hexLabel.fontSize = 11;
+        hexLabel.fontSize = 10;
         hexLabel.resize(80, hexLabel.height);
         hexLabel.textAlignHorizontal = "CENTER";
         hexLabel.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
         swatchGroup.appendChild(hexLabel);
 
-        swatchesFrame.appendChild(swatchGroup);
+        scaleRow.appendChild(swatchGroup);
       });
 
-      scaleFrame.appendChild(swatchesFrame);
-      container.appendChild(scaleFrame);
+      container.appendChild(scaleRow);
     }
 
     const message = config.createFigmaVariables
