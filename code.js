@@ -1317,11 +1317,11 @@ async function createTypographyStyles() {
       "Display xs": { size: "2xl", weight: "Bold", lineHeight: 1.1, spacing: -2 }
     },
     "Heading": {
-      "H1": { size: "xl", weight: "Semi Bold", lineHeight: 1.2, spacing: -1 },
-      "H2": { size: "lg", weight: "Semi Bold", lineHeight: 1.2, spacing: -1 },
-      "H3": { size: "base", weight: "Semi Bold", lineHeight: 1.2, spacing: -1 },
-      "H4": { size: "sm", weight: "Semi Bold", lineHeight: 1.2, spacing: -1 },
-      "H5": { size: "xs", weight: "Semi Bold", lineHeight: 1.2, spacing: -1 }
+      "H1": { size: "xl", weight: "Medium", lineHeight: 1.2, spacing: -1 },
+      "H2": { size: "lg", weight: "Medium", lineHeight: 1.2, spacing: -1 },
+      "H3": { size: "base", weight: "Medium", lineHeight: 1.2, spacing: -1 },
+      "H4": { size: "sm", weight: "Medium", lineHeight: 1.2, spacing: -1 },
+      "H5": { size: "xs", weight: "Medium", lineHeight: 1.2, spacing: -1 }
     },
     "Body": {
       "Body xl": { size: "xl", weight: "Regular", lineHeight: 1.5, spacing: 0 },
@@ -1903,11 +1903,11 @@ async function generateTypography(items, config = {}) {
         { name: "Display xs", size: 24, weight: "Bold", lineHeight: 1.1 }
       ],
       "Heading": [
-        { name: "H1", size: 20, weight: "Semi Bold", lineHeight: 1.2 },
-        { name: "H2", size: 18, weight: "Semi Bold", lineHeight: 1.2 },
-        { name: "H3", size: 16, weight: "Semi Bold", lineHeight: 1.2 },
-        { name: "H4", size: 14, weight: "Semi Bold", lineHeight: 1.2 },
-        { name: "H5", size: 12, weight: "Semi Bold", lineHeight: 1.2 }
+        { name: "H1", size: 20, weight: "Medium", lineHeight: 1.2 },
+        { name: "H2", size: 18, weight: "Medium", lineHeight: 1.2 },
+        { name: "H3", size: 16, weight: "Medium", lineHeight: 1.2 },
+        { name: "H4", size: 14, weight: "Medium", lineHeight: 1.2 },
+        { name: "H5", size: 12, weight: "Medium", lineHeight: 1.2 }
       ],
       "Body": [
         { name: "Body xl", size: 20, weight: "Regular", lineHeight: 1.5 },
@@ -1972,7 +1972,7 @@ async function generateTypography(items, config = {}) {
           infoCol.primaryAxisSizingMode = "AUTO";
 
           const styleName = figma.createText();
-          styleName.fontName = { family: "Inter", style: "Semi Bold" };
+          styleName.fontName = { family: "Inter", style: "Medium" };
           styleName.characters = style.name.split("/").pop();
           styleName.fontSize = 14;
           infoCol.appendChild(styleName);
@@ -2043,7 +2043,7 @@ async function generateTypography(items, config = {}) {
           infoCol.primaryAxisSizingMode = "AUTO";
 
           const styleName = figma.createText();
-          styleName.fontName = { family: "Inter", style: "Semi Bold" };
+          styleName.fontName = { family: "Inter", style: "Medium" };
           styleName.characters = def.name;
           styleName.fontSize = 14;
           infoCol.appendChild(styleName);
