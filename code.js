@@ -1862,9 +1862,12 @@ async function generateTypography(items, config = {}) {
     const headerFrame = figma.createFrame();
     headerFrame.name = "Header";
     headerFrame.layoutMode = "HORIZONTAL";
-    headerFrame.primaryAxisSizingMode = "FIXED";
+    headerFrame.primaryAxisSizingMode = "FILL"; // Fill full width
     headerFrame.counterAxisSizingMode = "AUTO";
-    headerFrame.resize(1200, headerFrame.height);
+    headerFrame.paddingLeft = 80;
+    headerFrame.paddingRight = 80;
+    headerFrame.paddingTop = 0;
+    headerFrame.paddingBottom = 0;
     headerFrame.primaryAxisAlignItems = "MIN"; // Align items to start
     headerFrame.counterAxisAlignItems = "MIN"; // Align items to top
     headerFrame.fills = [];
@@ -1895,9 +1898,9 @@ async function generateTypography(items, config = {}) {
 
     container.appendChild(headerFrame);
 
-    // Divider line
+    // Divider line (full width)
     const divider = figma.createLine();
-    divider.resize(1200, 0);
+    divider.resize(container.width, 0); // Match container width
     divider.strokes = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
     divider.strokeWeight = 1;
     container.appendChild(divider);
