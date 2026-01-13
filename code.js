@@ -1835,14 +1835,14 @@ async function generateTypography(items, config = {}) {
     const children = Array.from(page.children);
     children.forEach(child => child.remove());
 
-    // 3. Crear frame contenedor con autolayout (sin padding para permitir full-width header)
+    // 3. Crear frame contenedor con autolayout
     const container = figma.createFrame();
     container.name = "Viiibe Type Scale";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
-    container.paddingLeft = 0;
-    container.paddingRight = 0;
+    container.paddingLeft = 80;
+    container.paddingRight = 80;
     container.paddingTop = 80;
     container.paddingBottom = 80;
     container.itemSpacing = 80;
@@ -1965,8 +1965,6 @@ async function generateTypography(items, config = {}) {
         categoryFrame.layoutMode = "VERTICAL";
         categoryFrame.primaryAxisSizingMode = "AUTO";
         categoryFrame.counterAxisSizingMode = "AUTO";
-        categoryFrame.paddingLeft = 80;
-        categoryFrame.paddingRight = 80;
         categoryFrame.itemSpacing = 24;
         categoryFrame.fills = [];
 
