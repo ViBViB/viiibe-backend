@@ -1875,10 +1875,10 @@ async function generateTypography(items, config = {}) {
     mainTitle.resize(300, mainTitle.height);
     headerFrame.appendChild(mainTitle);
 
-    // Descripción
+    // Descripción / Disclaimer
     const description = figma.createText();
     description.fontName = { family: "Inter", style: "Regular" };
-    description.characters = "A well-defined type scale creates visual hierarchy and improves readability across your design system. It establishes consistent sizing, weights, and spacing that guide users through content naturally. Our type scale uses the Inter font family for its versatility and excellent legibility at all sizes.";
+    description.characters = "Viiibe cannot determine with precision the typography used in the moodboard images. This type scale is a contextual suggestion based on your search query, designed to complement the visual direction of your moodboard. The suggested font pairing is commonly used in similar projects and can serve as a starting point for your design system.";
     description.fontSize = 14;
     description.lineHeight = { value: 24, unit: "PIXELS" };
     description.resize(500, description.height);

@@ -86,9 +86,23 @@ export function generateTypographySystem() {
     ];
 
     let listHtml = '';
+
+    // Add disclaimer banner at the top
+    const disclaimer = `
+        <div style="background: #f5f5f5; border-left: 3px solid #666; padding: 16px 20px; margin-bottom: 24px; border-radius: 4px;">
+            <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #666; margin-bottom: 8px; letter-spacing: 0.5px;">Typography Suggestion</div>
+            <div style="font-size: 13px; line-height: 1.6; color: #333;">
+                Viiibe cannot determine with precision the typography used in the moodboard images. 
+                This type scale is a <strong>contextual suggestion</strong> based on your search query "<strong>${term}</strong>", 
+                using the <strong>${pair.name}</strong> pairing. This style is commonly used in similar projects and 
+                complements the visual direction of your moodboard.
+            </div>
+        </div>
+    `;
+
     tokens.forEach(t => {
         if (t.isDivider) listHtml += `<h4 style="font-size:10px; font-weight:600; text-transform:uppercase; color:#bbb; margin:32px 0 8px 0; letter-spacing:1px;">${t.label}</h4>`;
         else listHtml += `<div class="scale-item"><div class="scale-meta"><span class="scale-role">${t.role}</span><span class="scale-specs">${t.size} / ${t.lh}</span></div><div class="scale-preview" style="font-family:'${t.font.family}'; font-weight:${t.weight}; font-size:${t.size}; line-height:${t.lh}; letter-spacing:${t.ls};">${t.text}</div></div>`;
     });
-    container.innerHTML = `<div class="scale-list">${listHtml}</div>`;
+    container.innerHTML = `${disclaimer}<div class="scale-list">${listHtml}</div>`;
 }
