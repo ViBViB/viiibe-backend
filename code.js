@@ -1835,14 +1835,14 @@ async function generateTypography(items, config = {}) {
     const children = Array.from(page.children);
     children.forEach(child => child.remove());
 
-    // 3. Crear frame contenedor con autolayout
+    // 3. Crear frame contenedor con autolayout (no left/right padding for full-width header)
     const container = figma.createFrame();
     container.name = "Viiibe Type Scale";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
-    container.paddingLeft = 80;
-    container.paddingRight = 80;
+    container.paddingLeft = 0;
+    container.paddingRight = 0;
     container.paddingTop = 80;
     container.paddingBottom = 80;
     container.itemSpacing = 80;
@@ -1857,23 +1857,17 @@ async function generateTypography(items, config = {}) {
     console.log("Fonts loaded for typography!");
 
     // ============================================================
-    // BLOQUE 1: HEADER (Título + Descripción)
+    // BLOQUE 1: HEADER (Título + Descripción) - FULL WIDTH
     // ============================================================
-    // Header needs to extend beyond container padding (80px on each side)
-    // So we make it wider and position content with internal padding
     const headerFrame = figma.createFrame();
     headerFrame.name = "Header";
     headerFrame.layoutMode = "HORIZONTAL";
-    headerFrame.primaryAxisSizingMode = "FIXED";
+    headerFrame.primaryAxisSizingMode = "AUTO";
     headerFrame.counterAxisSizingMode = "AUTO";
-    headerFrame.resize(1360, 100); // 1200 content + 160 padding
     headerFrame.paddingLeft = 80;
     headerFrame.paddingRight = 80;
     headerFrame.paddingTop = 0;
     headerFrame.paddingBottom = 0;
-    headerFrame.layoutPositioning = "ABSOLUTE"; // Position absolutely to ignore container padding
-    headerFrame.x = -80; // Move left by container padding amount
-    headerFrame.y = 0;
     headerFrame.primaryAxisAlignItems = "MIN";
     headerFrame.counterAxisAlignItems = "MIN";
     headerFrame.fills = [];
@@ -1904,13 +1898,10 @@ async function generateTypography(items, config = {}) {
 
     container.appendChild(headerFrame);
 
-    // Divider line (full width - extends beyond container padding)
+    // Divider line (full width)
     const divider = figma.createRectangle();
     divider.name = "Divider";
-    divider.resize(1360, 1); // Full width including padding
-    divider.layoutPositioning = "ABSOLUTE";
-    divider.x = -80; // Move left by container padding amount
-    divider.y = headerFrame.height;
+    divider.resize(1200, 1);
     divider.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
     container.appendChild(divider);
 
@@ -1974,6 +1965,8 @@ async function generateTypography(items, config = {}) {
         categoryFrame.layoutMode = "VERTICAL";
         categoryFrame.primaryAxisSizingMode = "AUTO";
         categoryFrame.counterAxisSizingMode = "AUTO";
+        categoryFrame.paddingLeft = 80;
+        categoryFrame.paddingRight = 80;
         categoryFrame.itemSpacing = 24;
         categoryFrame.fills = [];
 
