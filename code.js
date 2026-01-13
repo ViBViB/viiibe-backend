@@ -1835,14 +1835,14 @@ async function generateTypography(items, config = {}) {
     const children = Array.from(page.children);
     children.forEach(child => child.remove());
 
-    // 3. Crear frame contenedor con autolayout
+    // 3. Crear frame contenedor con autolayout (sin padding para permitir full-width header)
     const container = figma.createFrame();
     container.name = "Viiibe Type Scale";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
-    container.paddingLeft = 80;
-    container.paddingRight = 80;
+    container.paddingLeft = 0;
+    container.paddingRight = 0;
     container.paddingTop = 80;
     container.paddingBottom = 80;
     container.itemSpacing = 80;
@@ -1859,15 +1859,11 @@ async function generateTypography(items, config = {}) {
     // ============================================================
     // BLOQUE 1: HEADER (Título + Descripción)
     // ============================================================
-    // Calculate full width (container width without padding)
-    const fullWidth = 1200 + 160; // Content width + total padding (80*2)
-
     const headerFrame = figma.createFrame();
     headerFrame.name = "Header";
     headerFrame.layoutMode = "HORIZONTAL";
-    headerFrame.primaryAxisSizingMode = "FIXED";
+    headerFrame.primaryAxisSizingMode = "AUTO";
     headerFrame.counterAxisSizingMode = "AUTO";
-    headerFrame.resize(fullWidth, 100); // Set to full width
     headerFrame.paddingLeft = 80;
     headerFrame.paddingRight = 80;
     headerFrame.paddingTop = 0;
@@ -1902,11 +1898,11 @@ async function generateTypography(items, config = {}) {
 
     container.appendChild(headerFrame);
 
-    // Divider line (full width)
-    const divider = figma.createLine();
-    divider.resize(fullWidth, 0);
-    divider.strokes = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
-    divider.strokeWeight = 1;
+    // Divider line (full width - will auto-expand)
+    const divider = figma.createRectangle();
+    divider.name = "Divider";
+    divider.resize(1200, 1);
+    divider.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
     container.appendChild(divider);
 
     // ============================================================
