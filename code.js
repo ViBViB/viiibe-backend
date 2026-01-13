@@ -1840,7 +1840,8 @@ async function generateTypography(items, config = {}) {
     container.name = "Viiibe Type Scale";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
-    container.counterAxisSizingMode = "AUTO";
+    container.counterAxisSizingMode = "FIXED";
+    container.resize(1440, 100); // Set fixed width for full page
     container.paddingLeft = 0;
     container.paddingRight = 0;
     container.paddingTop = 80;
