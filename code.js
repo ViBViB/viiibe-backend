@@ -1871,17 +1871,17 @@ async function generateTypography(items, config = {}) {
     const mainTitle = figma.createText();
     mainTitle.fontName = { family: "Inter", style: "Bold" };
     mainTitle.characters = "Viiibe Type Scale";
-    mainTitle.fontSize = 48;
-    mainTitle.resize(300, mainTitle.height);
+    mainTitle.fontSize = 32;
+    mainTitle.resize(250, mainTitle.height);
     headerFrame.appendChild(mainTitle);
 
     // Descripción / Disclaimer
     const description = figma.createText();
     description.fontName = { family: "Inter", style: "Regular" };
     description.characters = "Viiibe cannot determine with precision the typography used in the moodboard images. This type scale is a contextual suggestion based on your search query, designed to complement the visual direction of your moodboard. The suggested font pairing is commonly used in similar projects and can serve as a starting point for your design system.";
-    description.fontSize = 14;
-    description.lineHeight = { value: 24, unit: "PIXELS" };
-    description.resize(500, description.height);
+    description.fontSize = 12;
+    description.lineHeight = { value: 20, unit: "PIXELS" };
+    description.resize(600, description.height);
     headerFrame.appendChild(description);
 
     container.appendChild(headerFrame);
@@ -1996,11 +1996,7 @@ async function generateTypography(items, config = {}) {
 
         container.appendChild(categoryFrame);
 
-        // Add spacer
-        const spacer = figma.createRectangle();
-        spacer.resize(100, 40);
-        spacer.opacity = 0;
-        container.appendChild(spacer);
+
       }
     } else {
       // Use direct values (no styles)
@@ -2069,11 +2065,7 @@ async function generateTypography(items, config = {}) {
 
         container.appendChild(categoryFrame);
 
-        // Add spacer
-        const spacer = figma.createRectangle();
-        spacer.resize(100, 40);
-        spacer.opacity = 0;
-        container.appendChild(spacer);
+
       }
     }
 
