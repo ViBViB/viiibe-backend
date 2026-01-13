@@ -1835,18 +1835,17 @@ async function generateTypography(items, config = {}) {
     const children = Array.from(page.children);
     children.forEach(child => child.remove());
 
-    // 3. Crear frame contenedor con autolayout (no left/right padding for full-width header)
+    // 3. Crear frame contenedor con autolayout - matches .viiibe-type-scale with padding: 80px
     const container = figma.createFrame();
     container.name = "Viiibe Type Scale";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
-    container.counterAxisSizingMode = "FIXED";
-    container.resize(1440, 100); // Set fixed width for full page
-    container.paddingLeft = 0;
-    container.paddingRight = 0;
+    container.counterAxisSizingMode = "AUTO";
+    container.paddingLeft = 80;
+    container.paddingRight = 80;
     container.paddingTop = 80;
     container.paddingBottom = 80;
-    container.itemSpacing = 80;
+    container.itemSpacing = 60; // gap: 60px from CSS
     container.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
     page.appendChild(container);
 
@@ -1858,37 +1857,36 @@ async function generateTypography(items, config = {}) {
     console.log("Fonts loaded for typography!");
 
     // ============================================================
-    // BLOQUE 1: HEADER (Título + Descripción) - FULL WIDTH
+    // BLOQUE 1: HEADER - matches .header with align-self: stretch
     // ============================================================
     const headerFrame = figma.createFrame();
     headerFrame.name = "Header";
     headerFrame.layoutMode = "HORIZONTAL";
-    headerFrame.primaryAxisSizingMode = "AUTO";
+    headerFrame.primaryAxisSizingMode = "FILL"; // This makes it stretch to container width
     headerFrame.counterAxisSizingMode = "AUTO";
-    headerFrame.paddingLeft = 80;
-    headerFrame.paddingRight = 80;
-    headerFrame.paddingTop = 0;
-    headerFrame.paddingBottom = 0;
+    headerFrame.itemSpacing = 0;
     headerFrame.primaryAxisAlignItems = "MIN";
     headerFrame.counterAxisAlignItems = "MIN";
     headerFrame.fills = [];
 
-    // Título "Viiibe Type Scale" (izquierda)
+    // Título "Viiibe Type Scale" - matches .text-wrapper with flex: 1
     const mainTitle = figma.createText();
     mainTitle.fontName = { family: "Inter", style: "Bold" };
     mainTitle.characters = "Viiibe Type Scale";
-    mainTitle.fontSize = 32;
+    mainTitle.fontSize = 64; // font-size: 64px from CSS
+    mainTitle.layoutGrow = 1; // flex: 1
     headerFrame.appendChild(mainTitle);
 
-    // Spacer flexible para empujar el disclaimer a la derecha
+    // Spacer - matches .spacer with flex-grow: 1
     const spacer = figma.createFrame();
     spacer.name = "Spacer";
     spacer.layoutMode = "HORIZONTAL";
-    spacer.layoutGrow = 1; // Grow to fill space
+    spacer.layoutGrow = 1;
+    spacer.resize(100, 100); // height: 100px from CSS
     spacer.fills = [];
     headerFrame.appendChild(spacer);
 
-    // Descripción / Disclaimer (derecha)
+    // Descripción / Disclaimer - matches .div with width: 400px
     const description = figma.createText();
     description.fontName = { family: "Inter", style: "Regular" };
     description.characters = "Viiibe cannot determine with precision the typography used in the moodboard images. This type scale is a contextual suggestion based on your search query, designed to complement the visual direction of your moodboard. The suggested font pairing is commonly used in similar projects and can serve as a starting point for your design system.";
@@ -1899,10 +1897,11 @@ async function generateTypography(items, config = {}) {
 
     container.appendChild(headerFrame);
 
-    // Divider line (full width)
+    // Divider - matches .divider with align-self: stretch, width: 100%, height: 1px
     const divider = figma.createRectangle();
     divider.name = "Divider";
-    divider.resize(1200, 1);
+    divider.resize(100, 1); // Width will be overridden by layoutSizing
+    divider.layoutSizingHorizontal = "FILL"; // Stretch to container width
     divider.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
     container.appendChild(divider);
 
@@ -1966,8 +1965,6 @@ async function generateTypography(items, config = {}) {
         categoryFrame.layoutMode = "VERTICAL";
         categoryFrame.primaryAxisSizingMode = "AUTO";
         categoryFrame.counterAxisSizingMode = "AUTO";
-        categoryFrame.paddingLeft = 80;
-        categoryFrame.paddingRight = 80;
         categoryFrame.itemSpacing = 24;
         categoryFrame.fills = [];
 
@@ -2039,8 +2036,6 @@ async function generateTypography(items, config = {}) {
         categoryFrame.layoutMode = "VERTICAL";
         categoryFrame.primaryAxisSizingMode = "AUTO";
         categoryFrame.counterAxisSizingMode = "AUTO";
-        categoryFrame.paddingLeft = 80;
-        categoryFrame.paddingRight = 80;
         categoryFrame.itemSpacing = 24;
         categoryFrame.fills = [];
 
