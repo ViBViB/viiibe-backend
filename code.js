@@ -1859,17 +1859,23 @@ async function generateTypography(items, config = {}) {
     // ============================================================
     // BLOQUE 1: HEADER (Título + Descripción)
     // ============================================================
+    // Header needs to extend beyond container padding (80px on each side)
+    // So we make it wider and position content with internal padding
     const headerFrame = figma.createFrame();
     headerFrame.name = "Header";
     headerFrame.layoutMode = "HORIZONTAL";
-    headerFrame.primaryAxisSizingMode = "AUTO";
+    headerFrame.primaryAxisSizingMode = "FIXED";
     headerFrame.counterAxisSizingMode = "AUTO";
+    headerFrame.resize(1360, 100); // 1200 content + 160 padding
     headerFrame.paddingLeft = 80;
     headerFrame.paddingRight = 80;
     headerFrame.paddingTop = 0;
     headerFrame.paddingBottom = 0;
-    headerFrame.primaryAxisAlignItems = "MIN"; // Align items to start
-    headerFrame.counterAxisAlignItems = "MIN"; // Align items to top
+    headerFrame.layoutPositioning = "ABSOLUTE"; // Position absolutely to ignore container padding
+    headerFrame.x = -80; // Move left by container padding amount
+    headerFrame.y = 0;
+    headerFrame.primaryAxisAlignItems = "MIN";
+    headerFrame.counterAxisAlignItems = "MIN";
     headerFrame.fills = [];
 
     // Título "Viiibe Type Scale" (izquierda)
@@ -1898,10 +1904,13 @@ async function generateTypography(items, config = {}) {
 
     container.appendChild(headerFrame);
 
-    // Divider line (full width - will auto-expand)
+    // Divider line (full width - extends beyond container padding)
     const divider = figma.createRectangle();
     divider.name = "Divider";
-    divider.resize(1200, 1);
+    divider.resize(1360, 1); // Full width including padding
+    divider.layoutPositioning = "ABSOLUTE";
+    divider.x = -80; // Move left by container padding amount
+    divider.y = headerFrame.height;
     divider.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
     container.appendChild(divider);
 
