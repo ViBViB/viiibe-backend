@@ -1862,29 +1862,45 @@ async function generateTypography(items, config = {}) {
     const headerFrame = figma.createFrame();
     headerFrame.name = "Header";
     headerFrame.layoutMode = "HORIZONTAL";
-    headerFrame.primaryAxisSizingMode = "AUTO";
+    headerFrame.primaryAxisSizingMode = "FIXED";
     headerFrame.counterAxisSizingMode = "AUTO";
-    headerFrame.itemSpacing = 120;
+    headerFrame.resize(1200, headerFrame.height);
+    headerFrame.primaryAxisAlignItems = "MIN"; // Align items to start
+    headerFrame.counterAxisAlignItems = "MIN"; // Align items to top
     headerFrame.fills = [];
 
-    // Título "Viiibe Type Scale"
+    // Título "Viiibe Type Scale" (izquierda)
     const mainTitle = figma.createText();
     mainTitle.fontName = { family: "Inter", style: "Bold" };
     mainTitle.characters = "Viiibe Type Scale";
     mainTitle.fontSize = 32;
-    mainTitle.resize(250, mainTitle.height);
     headerFrame.appendChild(mainTitle);
 
-    // Descripción / Disclaimer
+    // Spacer flexible para empujar el disclaimer a la derecha
+    const spacer = figma.createFrame();
+    spacer.name = "Spacer";
+    spacer.layoutMode = "HORIZONTAL";
+    spacer.layoutGrow = 1; // Grow to fill space
+    spacer.fills = [];
+    headerFrame.appendChild(spacer);
+
+    // Descripción / Disclaimer (derecha)
     const description = figma.createText();
     description.fontName = { family: "Inter", style: "Regular" };
     description.characters = "Viiibe cannot determine with precision the typography used in the moodboard images. This type scale is a contextual suggestion based on your search query, designed to complement the visual direction of your moodboard. The suggested font pairing is commonly used in similar projects and can serve as a starting point for your design system.";
     description.fontSize = 12;
     description.lineHeight = { value: 20, unit: "PIXELS" };
-    description.resize(600, description.height);
+    description.resize(400, description.height);
     headerFrame.appendChild(description);
 
     container.appendChild(headerFrame);
+
+    // Divider line
+    const divider = figma.createLine();
+    divider.resize(1200, 0);
+    divider.strokes = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
+    divider.strokeWeight = 1;
+    container.appendChild(divider);
 
     // ============================================================
     // BLOQUE 2: TYPE SCALE VISUALIZATION
