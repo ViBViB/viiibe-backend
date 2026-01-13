@@ -1859,11 +1859,15 @@ async function generateTypography(items, config = {}) {
     // ============================================================
     // BLOQUE 1: HEADER (Título + Descripción)
     // ============================================================
+    // Calculate full width (container width without padding)
+    const fullWidth = 1200 + 160; // Content width + total padding (80*2)
+
     const headerFrame = figma.createFrame();
     headerFrame.name = "Header";
     headerFrame.layoutMode = "HORIZONTAL";
-    headerFrame.primaryAxisSizingMode = "FILL"; // Fill full width
+    headerFrame.primaryAxisSizingMode = "FIXED";
     headerFrame.counterAxisSizingMode = "AUTO";
+    headerFrame.resize(fullWidth, 100); // Set to full width
     headerFrame.paddingLeft = 80;
     headerFrame.paddingRight = 80;
     headerFrame.paddingTop = 0;
@@ -1900,7 +1904,7 @@ async function generateTypography(items, config = {}) {
 
     // Divider line (full width)
     const divider = figma.createLine();
-    divider.resize(container.width, 0); // Match container width
+    divider.resize(fullWidth, 0);
     divider.strokes = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
     divider.strokeWeight = 1;
     container.appendChild(divider);
