@@ -1965,6 +1965,8 @@ async function generateTypography(items, config = {}) {
         categoryFrame.layoutMode = "VERTICAL";
         categoryFrame.primaryAxisSizingMode = "AUTO";
         categoryFrame.counterAxisSizingMode = "AUTO";
+        categoryFrame.paddingLeft = 80;
+        categoryFrame.paddingRight = 80;
         categoryFrame.itemSpacing = 24;
         categoryFrame.fills = [];
 
@@ -2036,6 +2038,8 @@ async function generateTypography(items, config = {}) {
         categoryFrame.layoutMode = "VERTICAL";
         categoryFrame.primaryAxisSizingMode = "AUTO";
         categoryFrame.counterAxisSizingMode = "AUTO";
+        categoryFrame.paddingLeft = 80;
+        categoryFrame.paddingRight = 80;
         categoryFrame.itemSpacing = 24;
         categoryFrame.fills = [];
 
