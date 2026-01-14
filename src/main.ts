@@ -1044,6 +1044,53 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+    // Terms of Use modal event listeners
+    const termsModal = document.getElementById('termsModal');
+    const termsLinkSearch = document.getElementById('termsLinkSearch');
+    const termsLinkDrawer = document.getElementById('termsLinkDrawer');
+    const closeTermsBtn = document.getElementById('closeTermsBtn');
+
+    function openTermsModal() {
+        if (termsModal) {
+            termsModal.style.display = 'flex';
+        }
+    }
+
+    function closeTermsModal() {
+        if (termsModal) {
+            termsModal.style.display = 'none';
+        }
+    }
+
+    if (termsLinkSearch) {
+        termsLinkSearch.onclick = (e) => {
+            e.preventDefault();
+            openTermsModal();
+        };
+    }
+
+    if (termsLinkDrawer) {
+        termsLinkDrawer.onclick = (e) => {
+            e.preventDefault();
+            openTermsModal();
+        };
+    }
+
+    if (closeTermsBtn) {
+        closeTermsBtn.onclick = () => {
+            closeTermsModal();
+        };
+    }
+
+    // Close terms modal when clicking outside
+    if (termsModal) {
+        termsModal.onclick = (e) => {
+            if (e.target === termsModal) {
+                closeTermsModal();
+            }
+        };
+    }
+
     // Initialize badge on page load
     updateFundamentalsBadge();
 

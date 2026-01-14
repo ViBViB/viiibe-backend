@@ -30,6 +30,17 @@
                         </svg>
                     </button>
                 </div>
+                <!-- Terms of Use Link -->
+                <div style="position: absolute; bottom: 16px; left: 16px;">
+                    <a id="termsLinkSearch" href="#"
+                        style="font-size: 12px; color: #666; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="7" cy="7" r="6" stroke="#666" stroke-width="1.2" />
+                            <path d="M7 3.5V7.5M7 10V10.5" stroke="#666" stroke-width="1.2" stroke-linecap="round" />
+                        </svg>
+                        Image Attribution & Terms
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -305,6 +316,47 @@
         </div>
         <div id="toast" class="toast"></div>
 
+        <!-- TERMS OF USE MODAL -->
+        <div id="termsModal" class="modal">
+            <div class="modal-content" style="max-width: 520px; max-height: 80vh; overflow-y: auto;">
+                <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">Image Attribution & Terms of Use</h3>
+
+                <p style="margin: 0 0 16px 0; color: #333; line-height: 1.6; font-size: 14px;">
+                    Viiibe! is a design inspiration and workflow tool that helps designers discover and organize visual
+                    references.
+                </p>
+
+                <h4 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #333;">Image Sources</h4>
+                <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #666; line-height: 1.6; font-size: 13px;">
+                    <li>All images displayed in Viiibe! are sourced from publicly available Pinterest boards</li>
+                    <li>Images remain the property of their respective creators and copyright holders</li>
+                    <li>Viiibe! does not claim ownership of any displayed content</li>
+                </ul>
+
+                <h4 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #333;">What We Don't Do</h4>
+                <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #666; line-height: 1.6; font-size: 13px;">
+                    <li>We do not store images on our servers</li>
+                    <li>We do not perform web scraping or automated content collection</li>
+                    <li>We do not modify or redistribute original content</li>
+                </ul>
+
+                <h4 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #333;">Your Responsibility</h4>
+                <ul style="margin: 0 0 20px 0; padding-left: 20px; color: #666; line-height: 1.6; font-size: 13px;">
+                    <li>Respect copyright and intellectual property rights</li>
+                    <li>Use images for inspiration and reference purposes</li>
+                    <li>Obtain proper licenses for commercial use from original creators</li>
+                </ul>
+
+                <p style="margin: 0 0 20px 0; color: #999; font-size: 12px; font-style: italic;">
+                    By using Viiibe!, you acknowledge and agree to these terms.
+                </p>
+
+                <div class="modal-buttons">
+                    <button id="closeTermsBtn" class="btn-primary" style="flex: 1;">I Understand</button>
+                </div>
+            </div>
+        </div>
+
         <!-- UPGRADE MODAL -->
         <div id="upgradeModal" class="modal">
             <div class="modal-content" style="max-width: 400px;">
@@ -403,7 +455,18 @@
                     </div>
                 </div>
             </div>
-            <div class="drawer-footer">
+            <div class="drawer-footer"
+                style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px;">
+                <!-- Terms Link (Left) -->
+                <a id="termsLinkDrawer" href="#"
+                    style="font-size: 11px; color: #666; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="7" cy="7" r="6" stroke="#666" stroke-width="1.2" />
+                        <path d="M7 3.5V7.5M7 10V10.5" stroke="#666" stroke-width="1.2" stroke-linecap="round" />
+                    </svg>
+                    Terms
+                </a>
+                <!-- Download Button (Right) -->
                 <button id="generateStyleGuideBtn" class="btn-download-circle">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 15L12 3M12 15L8 11M12 15L16 11" stroke="white" stroke-width="2"
