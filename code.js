@@ -1922,11 +1922,12 @@ async function generateTypography(items, config = {}) {
         { name: "Display xs", size: 24, weight: "Bold", lineHeight: 1.1 }
       ],
       "Heading": [
-        { name: "H1", size: 20, weight: "Medium", lineHeight: 1.2 },
-        { name: "H2", size: 18, weight: "Medium", lineHeight: 1.2 },
-        { name: "H3", size: 16, weight: "Medium", lineHeight: 1.2 },
-        { name: "H4", size: 14, weight: "Medium", lineHeight: 1.2 },
-        { name: "H5", size: 12, weight: "Medium", lineHeight: 1.2 }
+        { name: "H1", size: 48, weight: "Bold", lineHeight: 1.2 },
+        { name: "H2", size: 36, weight: "Bold", lineHeight: 1.2 },
+        { name: "H3", size: 30, weight: "Bold", lineHeight: 1.2 },
+        { name: "H4", size: 24, weight: "Medium", lineHeight: 1.2 },
+        { name: "H5", size: 20, weight: "Medium", lineHeight: 1.2 },
+        { name: "H6", size: 18, weight: "Medium", lineHeight: 1.2 }
       ],
       "Body": [
         { name: "Body xl", size: 20, weight: "Regular", lineHeight: 1.5 },
