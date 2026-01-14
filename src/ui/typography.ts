@@ -92,7 +92,7 @@ export function generateTypographySystem() {
         <div style="background: #f5f5f5; border-left: 3px solid #666; padding: 16px 20px; margin-bottom: 24px; border-radius: 4px;">
             <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #666; margin-bottom: 8px; letter-spacing: 0.5px;">Typography Suggestion</div>
             <div style="font-size: 13px; line-height: 1.6; color: #333;">
-                Viiibe cannot determine with precision the typography used in the moodboard images. 
+                Viiibe! cannot determine with precision the typography used in the moodboard images. 
                 This type scale is a <strong>contextual suggestion</strong> based on your search query "<strong>${term}</strong>", 
                 using the <strong>${pair.name}</strong> pairing. This style is commonly used in similar projects and 
                 complements the visual direction of your moodboard.

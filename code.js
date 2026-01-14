@@ -1397,7 +1397,7 @@ async function generateMoodboard(images) {
 
     // 3. Crear frame contenedor con autolayout
     const container = figma.createFrame();
-    container.name = "Viiibe board";
+    container.name = "Viiibe! board";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
@@ -1418,7 +1418,7 @@ async function generateMoodboard(images) {
     console.log("Creating moodboard title...");
     const title = figma.createText();
     title.fontName = { family: "Inter", style: "Bold" };
-    title.characters = "Viiibe Board";
+    title.characters = "Viiibe! Board";
     title.fontSize = 80;
     container.appendChild(title);
     console.log("Moodboard title created!");
@@ -1590,7 +1590,7 @@ async function generatePalette(colors, config = {}) {
 
     // 3. Crear frame contenedor con autolayout
     const container = figma.createFrame();
-    container.name = "Viiibe Color Palette";
+    container.name = "Viiibe! Color Palette";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
@@ -1837,7 +1837,7 @@ async function generateTypography(items, config = {}) {
 
     // 3. Crear frame contenedor con autolayout - matches .viiibe-type-scale with padding: 80px
     const container = figma.createFrame();
-    container.name = "Viiibe Type Scale";
+    container.name = "Viiibe! Type Scale";
     container.layoutMode = "VERTICAL";
     container.primaryAxisSizingMode = "AUTO";
     container.counterAxisSizingMode = "AUTO";
@@ -1869,10 +1869,10 @@ async function generateTypography(items, config = {}) {
     headerFrame.counterAxisAlignItems = "MIN";
     headerFrame.fills = [];
 
-    // Título "Viiibe Type Scale" - matches .text-wrapper with flex: 1
+    // Título "Viiibe! Type Scale" - matches .text-wrapper with flex: 1
     const mainTitle = figma.createText();
     mainTitle.fontName = { family: "Inter", style: "Bold" };
-    mainTitle.characters = "Viiibe Type Scale";
+    mainTitle.characters = "Viiibe! Type Scale";
     mainTitle.fontSize = 64; // font-size: 64px from CSS
     mainTitle.layoutGrow = 1; // flex: 1
     headerFrame.appendChild(mainTitle);
@@ -1889,7 +1889,7 @@ async function generateTypography(items, config = {}) {
     // Descripción / Disclaimer - matches .div with width: 400px
     const description = figma.createText();
     description.fontName = { family: "Inter", style: "Regular" };
-    description.characters = "Viiibe cannot determine with precision the typography used in the moodboard images. This type scale is a contextual suggestion based on your search query, designed to complement the visual direction of your moodboard. The suggested font pairing is commonly used in similar projects and can serve as a starting point for your design system.";
+    description.characters = "Viiibe! cannot determine with precision the typography used in the moodboard images. This type scale is a contextual suggestion based on your search query, designed to complement the visual direction of your moodboard. The suggested font pairing is commonly used in similar projects and can serve as a starting point for your design system.";
     description.fontSize = 12;
     description.lineHeight = { value: 20, unit: "PIXELS" };
     description.resize(400, description.height);
