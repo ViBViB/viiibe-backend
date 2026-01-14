@@ -1054,7 +1054,7 @@ async function createColorVariable(name, color, collectionId) {
 }
 
 async function createPrimitivesCollection(colorScales) {
-  const collection = await getOrCreateCollection("Viiibe Primitives");
+  const collection = await getOrCreateCollection("Viiibe! Primitives");
   const primitives = {};
   const modeId = collection.modes[0].modeId;
 
@@ -1089,23 +1089,77 @@ async function createPrimitivesCollection(colorScales) {
 
   console.log("✅ Color primitives created");
 
-  // Return structure with only color variables (typography disabled)
+  // 2. SPACING/SIZE
+  await createSizeVariables(collection.id);
+
+  // 3. BORDER RADIUS
+  await createBorderRadiusVariables(collection.id);
+
+  // 4. TYPE SIZES
+  const typeSizes = await createTypeSizeVariables(collection.id);
+
+  // 5. LINE HEIGHT
+  await createLineHeightVariables(collection.id);
+
+  // 6. LETTER SPACING
+  await createLetterSpacingVariables(collection.id);
+
+  // 7. FONT WEIGHT
+  await createFontWeightVariables(collection.id);
+
+  // 8. TYPOGRAPHY (Font Family)
+  const typography = await createTypographyVariables(collection.id);
+
+  // Return complete structure
   return {
     colorPrimitives: primitives,
-    typeSizes: {},
-    typography: { families: {}, weights: {}, styles: {} }
+    typeSizes: typeSizes,
+    typography: typography
   };
 }
 
 async function createSizeVariables(collectionId) {
-  // Reduced Tailwind Spacing Scale - only essential sizes
+  // Complete Tailwind Spacing Scale - industry standard
   const spacingScale = {
-    "0": 0, "1": 4, "2": 8, "3": 12, "4": 16,
-    "6": 24, "8": 32, "12": 48, "16": 64, "24": 96
+    "0": 0,
+    "px": 1,
+    "0.5": 2,
+    "1": 4,
+    "1.5": 6,
+    "2": 8,
+    "2.5": 10,
+    "3": 12,
+    "3.5": 14,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "7": 28,
+    "8": 32,
+    "9": 36,
+    "10": 40,
+    "11": 44,
+    "12": 48,
+    "14": 56,
+    "16": 64,
+    "20": 80,
+    "24": 96,
+    "28": 112,
+    "32": 128,
+    "36": 144,
+    "40": 160,
+    "44": 176,
+    "48": 192,
+    "52": 208,
+    "56": 224,
+    "60": 240,
+    "64": 256,
+    "72": 288,
+    "80": 320,
+    "96": 384
   };
 
   for (const key in spacingScale) {
-    const name = `Sizes/${key}`;
+    const name = `Spacing/${key}`;
     const value = spacingScale[key];
     await createFloatVariable(name, value, collectionId);
   }
@@ -1198,7 +1252,7 @@ async function createTypographyVariables(collectionId) {
     variables.families[key] = variable;
   }
 
-  // Create Font Weight variables (NUMBER)
+  // Create Font Weight variables (NUMBER) - expanded to full scale
   for (const key in fontWeights) {
     const name = `Typography/Font Weight/${key}`;
     const value = fontWeights[key];
@@ -1209,6 +1263,101 @@ async function createTypographyVariables(collectionId) {
   console.log("✅ Typography variables created");
   return variables;
 }
+
+async function createBorderRadiusVariables(collectionId) {
+  console.log("Creating Border Radius variables...");
+
+  // Tailwind Border Radius Scale - industry standard
+  const radiusScale = {
+    "none": 0,
+    "sm": 2,
+    "base": 4,
+    "md": 6,
+    "lg": 8,
+    "xl": 12,
+    "2xl": 16,
+    "3xl": 24,
+    "full": 9999
+  };
+
+  for (const key in radiusScale) {
+    const name = `Radius/${key}`;
+    const value = radiusScale[key];
+    await createFloatVariable(name, value, collectionId);
+  }
+
+  console.log("✅ Border Radius variables created");
+}
+
+async function createLineHeightVariables(collectionId) {
+  console.log("Creating Line Height variables...");
+
+  // Tailwind Line Height Scale
+  const lineHeightScale = {
+    "none": 1,
+    "tight": 1.25,
+    "snug": 1.375,
+    "normal": 1.5,
+    "relaxed": 1.625,
+    "loose": 2
+  };
+
+  for (const key in lineHeightScale) {
+    const name = `Typography/Line Height/${key}`;
+    const value = lineHeightScale[key];
+    await createFloatVariable(name, value, collectionId);
+  }
+
+  console.log("✅ Line Height variables created");
+}
+
+async function createLetterSpacingVariables(collectionId) {
+  console.log("Creating Letter Spacing variables...");
+
+  // Tailwind Letter Spacing Scale (in pixels, will need to be converted to em in usage)
+  const letterSpacingScale = {
+    "tighter": -0.8,  // -0.05em equivalent
+    "tight": -0.4,    // -0.025em equivalent
+    "normal": 0,
+    "wide": 0.4,      // 0.025em equivalent
+    "wider": 0.8,     // 0.05em equivalent
+    "widest": 1.6     // 0.1em equivalent
+  };
+
+  for (const key in letterSpacingScale) {
+    const name = `Typography/Letter Spacing/${key}`;
+    const value = letterSpacingScale[key];
+    await createFloatVariable(name, value, collectionId);
+  }
+
+  console.log("✅ Letter Spacing variables created");
+}
+
+async function createFontWeightVariables(collectionId) {
+  console.log("Creating Font Weight variables...");
+
+  // Complete Font Weight Scale
+  const fontWeightScale = {
+    "thin": 100,
+    "extralight": 200,
+    "light": 300,
+    "normal": 400,
+    "medium": 500,
+    "semibold": 600,
+    "bold": 700,
+    "extrabold": 800,
+    "black": 900
+  };
+
+  for (const key in fontWeightScale) {
+    const name = `Typography/Weight/${key}`;
+    const value = fontWeightScale[key];
+    await createFloatVariable(name, value, collectionId);
+  }
+
+  console.log("✅ Font Weight variables created");
+}
+
 
 // ==============================================================
 // CLEANUP: Remove previous style guide artifacts
@@ -2239,7 +2388,7 @@ figma.ui.onmessage = async (msg) => {
       downloadColorPalette: true,
       downloadTypeScale: true,
       createFigmaStyles: true,  // Enable Text Styles creation
-      createFigmaVariables: false,  // Disabled to avoid memory errors
+      createFigmaVariables: true,  // Enable complete variable system (Spacing, Radius, Typography)
       createBasicComponents: false
     };
 

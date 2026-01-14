@@ -59,14 +59,25 @@ function closeDrawer() {
 
 // Fundamentals tracking functions
 function checkFundamentalsLimit(): boolean {
-    // Get from localStorage
-    fundamentalsDownloadsUsed = parseInt(localStorage.getItem('fundamentalsDownloads') || '0');
+    try {
+        // Get from localStorage (may fail in Figma plugin environment)
+        fundamentalsDownloadsUsed = parseInt(localStorage.getItem('fundamentalsDownloads') || '0');
+    } catch (e) {
+        // localStorage not available in Figma plugins, default to 0
+        console.warn('localStorage not available, using default value');
+        fundamentalsDownloadsUsed = 0;
+    }
     return fundamentalsDownloadsUsed < FUNDAMENTALS_FREE_LIMIT;
 }
 
 function incrementFundamentalsDownload() {
     fundamentalsDownloadsUsed++;
-    localStorage.setItem('fundamentalsDownloads', fundamentalsDownloadsUsed.toString());
+    try {
+        localStorage.setItem('fundamentalsDownloads', fundamentalsDownloadsUsed.toString());
+    } catch (e) {
+        // localStorage not available in Figma plugins, skip saving
+        console.warn('localStorage not available, cannot persist download count');
+    }
     updateFundamentalsBadge();
     console.log(`📊 Fundamentals downloads used: ${fundamentalsDownloadsUsed}/${FUNDAMENTALS_FREE_LIMIT}`);
 }
