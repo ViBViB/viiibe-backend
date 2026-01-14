@@ -1317,11 +1317,12 @@ async function createTypographyStyles() {
       "Display xs": { size: "2xl", weight: "Bold", lineHeight: 1.1, spacing: -2 }
     },
     "Heading": {
-      "H1": { size: "xl", weight: "Medium", lineHeight: 1.2, spacing: -1 },
-      "H2": { size: "lg", weight: "Medium", lineHeight: 1.2, spacing: -1 },
-      "H3": { size: "base", weight: "Medium", lineHeight: 1.2, spacing: -1 },
-      "H4": { size: "sm", weight: "Medium", lineHeight: 1.2, spacing: -1 },
-      "H5": { size: "xs", weight: "Medium", lineHeight: 1.2, spacing: -1 }
+      "H1": { size: "5xl", weight: "Bold", lineHeight: 1.2, spacing: -1 },
+      "H2": { size: "4xl", weight: "Bold", lineHeight: 1.2, spacing: -1 },
+      "H3": { size: "3xl", weight: "Bold", lineHeight: 1.2, spacing: -1 },
+      "H4": { size: "2xl", weight: "Medium", lineHeight: 1.2, spacing: -1 },
+      "H5": { size: "xl", weight: "Medium", lineHeight: 1.2, spacing: -1 },
+      "H6": { size: "lg", weight: "Medium", lineHeight: 1.2, spacing: -1 }
     },
     "Body": {
       "Body xl": { size: "xl", weight: "Regular", lineHeight: 1.5, spacing: 0 },
@@ -1348,7 +1349,7 @@ async function createTypographyStyles() {
     console.log(`[createTypographyStyles] Processing category: ${category}`);
     for (const styleName in styles[category]) {
       const config = styles[category][styleName];
-      const fullName = `Viiibe/${category}/${styleName}`;
+      const fullName = `Viiibe!/${category}/${styleName}`;
 
       let style = existingStyles.find(s => s.name === fullName);
       if (!style) {
@@ -1971,7 +1972,7 @@ async function generateTypography(items, config = {}) {
         categoryFrame.fills = [];
 
         // Find styles for this category
-        const categoryStyles = localStyles.filter(s => s.name.startsWith(`Viiibe/${category}/`));
+        const categoryStyles = localStyles.filter(s => s.name.startsWith(`Viiibe!/${category}/`));
 
         // Sort styles by font size descending
         categoryStyles.sort((a, b) => b.fontSize - a.fontSize);
@@ -2237,7 +2238,7 @@ figma.ui.onmessage = async (msg) => {
       downloadMoodboard: true,
       downloadColorPalette: true,
       downloadTypeScale: true,
-      createFigmaStyles: false,  // Disabled to avoid memory errors
+      createFigmaStyles: true,  // Enable Text Styles creation
       createFigmaVariables: false,  // Disabled to avoid memory errors
       createBasicComponents: false
     };
