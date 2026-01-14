@@ -1024,12 +1024,31 @@ function generateColorScale(baseHex) {
 // FIGMA VARIABLES MANAGER
 // --------------------------------------------------------------
 
+async function deleteOldVariableCollections() {
+  console.log("🧹 Cleaning up old variable collections...");
+  const collections = await figma.variables.getLocalVariableCollectionsAsync();
+
+  // Delete old collections with previous naming
+  const oldCollectionNames = ["Viiibe Primitives", "Viiibe Semantic"];
+
+  for (const collection of collections) {
+    if (oldCollectionNames.includes(collection.name)) {
+      console.log(`Deleting old collection: ${collection.name}`);
+      collection.remove();
+    }
+  }
+
+  console.log("✅ Old collections cleaned up");
+}
+
 async function getOrCreateCollection(name) {
   const collections = await figma.variables.getLocalVariableCollectionsAsync();
   let collection = collections.find(c => c.name === name);
   if (!collection) {
     collection = figma.variables.createVariableCollection(name);
     console.log(`✨ Created collection: ${name}`);
+  } else {
+    console.log(`♻️ Reusing existing collection: ${name}`);
   }
   return collection;
 }
@@ -1120,16 +1139,17 @@ async function createPrimitivesCollection(colorScales) {
 
 async function createSizeVariables(collectionId) {
   // Complete Tailwind Spacing Scale - industry standard
+  // Note: Figma doesn't allow dots in variable names, using underscores instead
   const spacingScale = {
     "0": 0,
     "px": 1,
-    "0.5": 2,
+    "0_5": 2,    // 0.5
     "1": 4,
-    "1.5": 6,
+    "1_5": 6,    // 1.5
     "2": 8,
-    "2.5": 10,
+    "2_5": 10,   // 2.5
     "3": 12,
-    "3.5": 14,
+    "3_5": 14,   // 3.5
     "4": 16,
     "5": 20,
     "6": 24,
@@ -1700,6 +1720,10 @@ async function generatePalette(colors, config = {}) {
     // Crear Figma Variables SOLO si está habilitado
     if (config.createFigmaVariables) {
       console.log("Creating Figma Variables...");
+
+      // Clean up old collections first to prevent duplicates
+      await deleteOldVariableCollections();
+
       const result = await createPrimitivesCollection(colorScales);
       colorPrimitives = result.colorPrimitives;
       typeSizes = result.typeSizes;
