@@ -1821,11 +1821,13 @@ async function generatePalette(colors, config = {}, colorPrimitives = null) {
       // Use variable reference if available, otherwise use hardcoded color
       if (colorPrimitives && colorPrimitives[role] && colorPrimitives[role]["500"]) {
         const variable = colorPrimitives[role]["500"];
+        // First set the fill with the actual color value
         swatchContainer.fills = [{
           type: "SOLID",
-          color: { r: 0, g: 0, b: 0 }, // Fallback color
-          boundVariables: { color: { type: "VARIABLE_ALIAS", id: variable.id } }
+          color: hexToFigmaRgb(hex)
         }];
+        // Then bind it to the variable
+        swatchContainer.setBoundVariable("fills", variable);
         console.log(`✅ Linked ${role} swatch to variable: ${variable.name}`);
       } else {
         swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(hex) }];
