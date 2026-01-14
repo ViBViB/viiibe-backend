@@ -1947,11 +1947,11 @@ async function generatePalette(colors, config = {}) {
       scaleRow.counterAxisSizingMode = "AUTO";
       scaleRow.itemSpacing = 0; // No spacing between swatches
       scaleRow.fills = [];
-      scaleRow.resize(1280, 100); // Full width, fixed height
+      scaleRow.resize(1000, 100); // 1000px width, fixed height
       scaleRow.cornerRadius = 0; // No rounded corners
 
       // Create swatches for each shade
-      const swatchWidth = 1280 / allShades.length; // Equal width for each swatch
+      const swatchWidth = 1000 / allShades.length; // Equal width for each swatch
 
       allShades.forEach(shade => {
         const swatchGroup = figma.createFrame();
