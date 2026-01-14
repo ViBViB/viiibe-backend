@@ -1659,11 +1659,10 @@ async function generateMoodboard(images) {
 // ============================================================
 // GENERATOR: PALETTE
 // ============================================================
-async function generatePalette(colors, config = {}, colorPrimitives = null) {
+async function generatePalette(colors, config = {}) {
   console.log("Generating palette page with Tailwind scales...");
   console.log("Config:", config);
   console.log("Received colors from frontend:", colors);
-  console.log("Color primitives variables:", colorPrimitives ? Object.keys(colorPrimitives) : "none");
 
   try {
     // Si no hay colores, usar paleta predeterminada
@@ -1714,6 +1713,7 @@ async function generatePalette(colors, config = {}, colorPrimitives = null) {
     });
 
     // Variables para almacenar referencias (si se crean)
+    let colorPrimitives = null;
     let typeSizes = null;
     let typography = null;
 
@@ -2464,7 +2464,7 @@ figma.ui.onmessage = async (msg) => {
     if (config.downloadColorPalette) {
       try {
         console.log("Generating palette...");
-        await generatePalette(colors, config, colorPrimitives);
+        await generatePalette(colors, config);
       } catch (error) {
         console.error("Error generating palette:", error);
         figma.notify("Error generating palette");
