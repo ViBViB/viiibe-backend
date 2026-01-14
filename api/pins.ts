@@ -219,9 +219,23 @@ async function handleGetSavedPins(req: VercelRequest, res: VercelResponse) {
     const limitParam = req.query.limit;
     const limit = limitParam ? Math.min(parseInt(limitParam as string, 10), 2000) : 2000;
 
+    // Shuffle keys to randomize results (Fisher-Yates algorithm)
+    // This ensures different results on each search while maintaining performance
+    function shuffleArray<T>(array: T[]): T[] {
+        const shuffled = [...array]; // Create a copy to avoid mutating original
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    // Randomize the order of pins
+    const shuffledKeys = shuffleArray(allKeys);
+
     // IMPORTANT: If color filter is active, we need to load ALL pins to filter correctly
     // Otherwise we might miss pins with that color if they're beyond the first 2000
-    const keysToFetch = (color && typeof color === 'string') ? allKeys : allKeys.slice(0, limit);
+    const keysToFetch = (color && typeof color === 'string') ? shuffledKeys : shuffledKeys.slice(0, limit);
     let pins = [];
 
     for (const key of keysToFetch) {
