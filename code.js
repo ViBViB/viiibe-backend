@@ -1864,7 +1864,6 @@ async function generateTypography(items, config = {}) {
     headerFrame.layoutMode = "HORIZONTAL";
     headerFrame.primaryAxisSizingMode = "AUTO";
     headerFrame.counterAxisSizingMode = "AUTO";
-    headerFrame.layoutSizingHorizontal = "FILL"; // Stretch to container width
     headerFrame.itemSpacing = 0;
     headerFrame.primaryAxisAlignItems = "MIN";
     headerFrame.counterAxisAlignItems = "MIN";
@@ -1897,14 +1896,15 @@ async function generateTypography(items, config = {}) {
     headerFrame.appendChild(description);
 
     container.appendChild(headerFrame);
+    headerFrame.layoutSizingHorizontal = "FILL"; // Set AFTER appending to parent
 
     // Divider - matches .divider with align-self: stretch, width: 100%, height: 1px
     const divider = figma.createRectangle();
     divider.name = "Divider";
     divider.resize(100, 1); // Width will be overridden by layoutSizing
-    divider.layoutSizingHorizontal = "FILL"; // Stretch to container width
     divider.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
     container.appendChild(divider);
+    divider.layoutSizingHorizontal = "FILL"; // Set AFTER appending to parent
 
     // ============================================================
     // BLOQUE 2: TYPE SCALE VISUALIZATION
