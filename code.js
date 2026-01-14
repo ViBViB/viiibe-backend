@@ -1823,23 +1823,20 @@ async function generatePalette(colors, config = {}) {
         const variable = colorPrimitives[role]["500"];
         console.log(`🔗 Attempting to link ${role} to variable:`, variable.name, variable.id);
 
-        // First set the fill with the actual color value
-        swatchContainer.fills = [{
+        // Create fill with variable binding directly in the paint object
+        const fillWithVariable = {
           type: "SOLID",
-          color: hexToFigmaRgb(hex)
-        }];
+          color: hexToFigmaRgb(hex),
+          boundVariables: {
+            color: {
+              type: "VARIABLE_ALIAS",
+              id: variable.id
+            }
+          }
+        };
 
-        // Then bind the first fill (index 0) to the variable
-        try {
-          swatchContainer.setBoundVariable("fills", {
-            type: "VARIABLE_ALIAS",
-            id: variable.id
-          });
-          console.log(`✅ Successfully linked ${role} swatch to variable: ${variable.name}`);
-        } catch (error) {
-          console.error(`❌ Error linking ${role} to variable:`, error);
-          // Keep the hardcoded color if binding fails
-        }
+        swatchContainer.fills = [fillWithVariable];
+        console.log(`✅ Successfully linked ${role} swatch to variable: ${variable.name}`);
       } else {
         swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(hex) }];
         console.log(`⚠️ Using hardcoded color for ${role} (variable not available)`);
