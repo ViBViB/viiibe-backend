@@ -1792,29 +1792,22 @@ async function generatePalette(colors, config = {}) {
     container.appendChild(mainTitle);
 
     // ========================================
-    // SECTION 1: COLOR SWATCHES (FULL WIDTH BARS)
+    // SECTION 1: LARGE COLOR SWATCHES (MOCKUP LAYOUT)
     // ========================================
-    // Layout: Horizontal bars spanning full width, no spacing, no rounded corners
+    // Layout: Primary (500x500) | Secondary (250x500) | [Tertiary (250x250) / Accent (250x250)]
 
     const largeSwatchesFrame = figma.createFrame();
-    largeSwatchesFrame.name = "Color Swatches";
+    largeSwatchesFrame.name = "Large Swatches";
     largeSwatchesFrame.layoutMode = "HORIZONTAL";
-    largeSwatchesFrame.primaryAxisSizingMode = "FIXED";
-    largeSwatchesFrame.counterAxisSizingMode = "FIXED";
-    largeSwatchesFrame.itemSpacing = 0; // No spacing between swatches
+    largeSwatchesFrame.primaryAxisSizingMode = "AUTO";
+    largeSwatchesFrame.counterAxisSizingMode = "AUTO";
+    largeSwatchesFrame.itemSpacing = 0;
     largeSwatchesFrame.fills = [];
-    largeSwatchesFrame.cornerRadius = 0; // No rounded corners
-
-    // Calculate width: container width minus padding (80px left + 80px right = 160px)
-    // Assuming standard Figma canvas width or using a fixed width
-    const totalWidth = 1280; // Full width for swatches
-    largeSwatchesFrame.resize(totalWidth, 80); // 80px height for each swatch
-
     container.appendChild(largeSwatchesFrame);
 
     // Get colors array (should have role, hex, and name from frontend)
     const colorsArray = baseColors; // baseColors comes from the filtered colors sent by frontend
-    console.log(`Creating full-width layout with ${colorsArray.length} colors`);
+    console.log(`Creating mockup layout with ${colorsArray.length} colors`);
 
     // Helper function to create a color swatch
     function createColorSwatch(colorData, width, height, colorPrimitives) {
@@ -1824,7 +1817,6 @@ async function generatePalette(colors, config = {}) {
       const swatchContainer = figma.createFrame();
       swatchContainer.name = role;
       swatchContainer.resize(width, height);
-      swatchContainer.cornerRadius = 0; // No rounded corners
 
       // Use variable reference if available, otherwise use hardcoded color
       if (colorPrimitives && colorPrimitives[role] && colorPrimitives[role]["500"]) {
@@ -1891,16 +1883,42 @@ async function generatePalette(colors, config = {}) {
       return swatchContainer;
     }
 
-    // Create equal-width swatches for all colors
-    const swatchWidth = totalWidth / colorsArray.length; // Divide width equally
-    const swatchHeight = 80;
+    // Primary: 500x500
+    if (colorsArray[0]) {
+      const primarySwatch = createColorSwatch(colorsArray[0], 500, 500, colorPrimitives);
+      largeSwatchesFrame.appendChild(primarySwatch);
+    }
 
-    colorsArray.forEach((colorData, index) => {
-      const swatch = createColorSwatch(colorData, swatchWidth, swatchHeight, colorPrimitives);
-      largeSwatchesFrame.appendChild(swatch);
-    });
+    // Secondary: 250x500
+    if (colorsArray[1]) {
+      const secondarySwatch = createColorSwatch(colorsArray[1], 250, 500, colorPrimitives);
+      largeSwatchesFrame.appendChild(secondarySwatch);
+    }
 
-    console.log(`✅ Completed full-width color swatches layout`);
+    // Tertiary & Accent: 250x250 stacked vertically
+    if (colorsArray[2] || colorsArray[3]) {
+      const rightColumn = figma.createFrame();
+      rightColumn.name = "Right Column";
+      rightColumn.layoutMode = "VERTICAL";
+      rightColumn.primaryAxisSizingMode = "AUTO";
+      rightColumn.counterAxisSizingMode = "AUTO";
+      rightColumn.itemSpacing = 0;
+      rightColumn.fills = [];
+
+      if (colorsArray[2]) {
+        const tertiarySwatch = createColorSwatch(colorsArray[2], 250, 250, colorPrimitives);
+        rightColumn.appendChild(tertiarySwatch);
+      }
+
+      if (colorsArray[3]) {
+        const accentSwatch = createColorSwatch(colorsArray[3], 250, 250, colorPrimitives);
+        rightColumn.appendChild(accentSwatch);
+      }
+
+      largeSwatchesFrame.appendChild(rightColumn);
+    }
+
+    console.log(`✅ Completed mockup layout`);
 
     // ========================================
     // SECTION 2: COLOR SCALES
