@@ -1943,25 +1943,31 @@ async function generatePalette(colors, config = {}) {
       const scaleRow = figma.createFrame();
       scaleRow.name = `${role} Scale`;
       scaleRow.layoutMode = "HORIZONTAL";
-      scaleRow.primaryAxisSizingMode = "AUTO";
+      scaleRow.primaryAxisSizingMode = "FIXED";
       scaleRow.counterAxisSizingMode = "AUTO";
-      scaleRow.itemSpacing = 8;
+      scaleRow.itemSpacing = 0; // No spacing between swatches
       scaleRow.fills = [];
+      scaleRow.resize(1280, 100); // Full width, fixed height
+      scaleRow.cornerRadius = 0; // No rounded corners
 
       // Create swatches for each shade
+      const swatchWidth = 1280 / allShades.length; // Equal width for each swatch
+
       allShades.forEach(shade => {
         const swatchGroup = figma.createFrame();
         swatchGroup.name = shade;
         swatchGroup.layoutMode = "VERTICAL";
-        swatchGroup.primaryAxisSizingMode = "AUTO";
+        swatchGroup.primaryAxisSizingMode = "FIXED";
         swatchGroup.counterAxisSizingMode = "AUTO";
         swatchGroup.itemSpacing = 4;
         swatchGroup.fills = [];
+        swatchGroup.resize(swatchWidth, 100);
+        swatchGroup.cornerRadius = 0; // No rounded corners
 
         // Color rectangle
         const rect = figma.createRectangle();
-        rect.resize(80, 80);
-        rect.cornerRadius = 8;
+        rect.resize(swatchWidth, 60); // Fill width of swatch
+        rect.cornerRadius = 0; // No rounded corners
         rect.fills = [{ type: "SOLID", color: hexToFigmaRgb(scale[shade]) }];
         swatchGroup.appendChild(rect);
 
@@ -1970,7 +1976,7 @@ async function generatePalette(colors, config = {}) {
         shadeLabel.fontName = { family: "Inter", style: "Medium" };
         shadeLabel.characters = shade;
         shadeLabel.fontSize = 12;
-        shadeLabel.resize(80, shadeLabel.height);
+        shadeLabel.resize(swatchWidth, shadeLabel.height);
         shadeLabel.textAlignHorizontal = "CENTER";
         shadeLabel.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
         swatchGroup.appendChild(shadeLabel);
@@ -1980,7 +1986,7 @@ async function generatePalette(colors, config = {}) {
         hexLabel.fontName = { family: "Inter", style: "Regular" };
         hexLabel.characters = scale[shade].toUpperCase();
         hexLabel.fontSize = 10;
-        hexLabel.resize(80, hexLabel.height);
+        hexLabel.resize(swatchWidth, hexLabel.height);
         hexLabel.textAlignHorizontal = "CENTER";
         hexLabel.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
         swatchGroup.appendChild(hexLabel);
