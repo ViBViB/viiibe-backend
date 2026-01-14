@@ -1659,10 +1659,11 @@ async function generateMoodboard(images) {
 // ============================================================
 // GENERATOR: PALETTE
 // ============================================================
-async function generatePalette(colors, config = {}) {
+async function generatePalette(colors, config = {}, colorPrimitives = null) {
   console.log("Generating palette page with Tailwind scales...");
   console.log("Config:", config);
   console.log("Received colors from frontend:", colors);
+  console.log("Color primitives variables:", colorPrimitives ? Object.keys(colorPrimitives) : "none");
 
   try {
     // Si no hay colores, usar paleta predeterminada
@@ -1713,7 +1714,6 @@ async function generatePalette(colors, config = {}) {
     });
 
     // Variables para almacenar referencias (si se crean)
-    let colorPrimitives = null;
     let typeSizes = null;
     let typography = null;
 
@@ -1810,14 +1810,27 @@ async function generatePalette(colors, config = {}) {
     console.log(`Creating mockup layout with ${colorsArray.length} colors`);
 
     // Helper function to create a color swatch
-    function createColorSwatch(colorData, width, height) {
+    function createColorSwatch(colorData, width, height, colorPrimitives) {
       const { role, hex, name } = colorData;
       console.log(`Creating ${width}x${height} swatch for ${role}: ${hex} (name: ${name || 'undefined'})`);
 
       const swatchContainer = figma.createFrame();
       swatchContainer.name = role;
       swatchContainer.resize(width, height);
-      swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(hex) }];
+
+      // Use variable reference if available, otherwise use hardcoded color
+      if (colorPrimitives && colorPrimitives[role] && colorPrimitives[role]["500"]) {
+        const variable = colorPrimitives[role]["500"];
+        swatchContainer.fills = [{
+          type: "SOLID",
+          color: { r: 0, g: 0, b: 0 }, // Fallback color
+          boundVariables: { color: { type: "VARIABLE_ALIAS", id: variable.id } }
+        }];
+        console.log(`✅ Linked ${role} swatch to variable: ${variable.name}`);
+      } else {
+        swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(hex) }];
+        console.log(`⚠️ Using hardcoded color for ${role} (variable not available)`);
+      }
       swatchContainer.layoutMode = "VERTICAL";
       swatchContainer.primaryAxisSizingMode = "FIXED";
       swatchContainer.counterAxisSizingMode = "FIXED";
@@ -1862,13 +1875,13 @@ async function generatePalette(colors, config = {}) {
 
     // Primary: 500x500
     if (colorsArray[0]) {
-      const primarySwatch = createColorSwatch(colorsArray[0], 500, 500);
+      const primarySwatch = createColorSwatch(colorsArray[0], 500, 500, colorPrimitives);
       largeSwatchesFrame.appendChild(primarySwatch);
     }
 
     // Secondary: 250x500
     if (colorsArray[1]) {
-      const secondarySwatch = createColorSwatch(colorsArray[1], 250, 500);
+      const secondarySwatch = createColorSwatch(colorsArray[1], 250, 500, colorPrimitives);
       largeSwatchesFrame.appendChild(secondarySwatch);
     }
 
@@ -1883,12 +1896,12 @@ async function generatePalette(colors, config = {}) {
       rightColumn.fills = [];
 
       if (colorsArray[2]) {
-        const tertiarySwatch = createColorSwatch(colorsArray[2], 250, 250);
+        const tertiarySwatch = createColorSwatch(colorsArray[2], 250, 250, colorPrimitives);
         rightColumn.appendChild(tertiarySwatch);
       }
 
       if (colorsArray[3]) {
-        const accentSwatch = createColorSwatch(colorsArray[3], 250, 250);
+        const accentSwatch = createColorSwatch(colorsArray[3], 250, 250, colorPrimitives);
         rightColumn.appendChild(accentSwatch);
       }
 
@@ -2438,7 +2451,7 @@ figma.ui.onmessage = async (msg) => {
     if (config.downloadColorPalette) {
       try {
         console.log("Generating palette...");
-        await generatePalette(colors, config);
+        await generatePalette(colors, config, colorPrimitives);
       } catch (error) {
         console.error("Error generating palette:", error);
         figma.notify("Error generating palette");
