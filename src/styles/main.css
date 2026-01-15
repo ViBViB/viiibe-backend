@@ -1083,7 +1083,8 @@ header {
   align-items: center;
   gap: 0px;
   max-width: 520px;
-  /* margin-top: -90px; */
+  margin-top: -60px;
+  /* Pull content upward */
 }
 
 .search-illustration {
