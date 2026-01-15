@@ -25,6 +25,8 @@ body {
   background: var(--bg);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
+  box-shadow: none !important;
+  /* Remove any default shadow */
 }
 
 /* 2. LAYOUT SYSTEM (UPDATED) */
@@ -34,6 +36,8 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
+  box-shadow: none !important;
+  /* Remove any default shadow */
 }
 
 /* Cada vista ahora se comporta como pantalla completa */
