@@ -776,8 +776,7 @@ header {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 10001;
-  /* Above footer overlay and terms text */
+  z-index: 4000;
   display: none;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -796,8 +795,7 @@ header {
   background: #fff;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
-  z-index: 10002;
-  /* Above backdrop */
+  z-index: 4001;
   transform: translateY(100%);
   transition: transform 0.3s ease;
   max-height: 80vh;
