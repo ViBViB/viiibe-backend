@@ -60,6 +60,12 @@ body.drawer-open #termsContainer {
   display: none;
 }
 
+/* Hide footer and terms text in moodboard view (results) */
+#view-moodboard.active~#view-wrapper::after,
+#view-moodboard.active~#termsContainer {
+  display: none;
+}
+
 /* Cada vista ahora se comporta como pantalla completa */
 .view {
   position: absolute;
