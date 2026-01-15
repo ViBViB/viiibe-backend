@@ -1044,50 +1044,57 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Terms of Use modal event listeners
-    const termsModal = document.getElementById('termsModal');
+    // Terms of Use drawer event listeners
+    const termsDrawer = document.getElementById('termsDrawer');
+    const termsDrawerBackdrop = document.getElementById('termsDrawerBackdrop');
     const termsLinkSearch = document.getElementById('termsLinkSearch');
     const termsLinkDrawer = document.getElementById('termsLinkDrawer');
-    const closeTermsBtn = document.getElementById('closeTermsBtn');
+    const termsDrawerCloseBtn = document.getElementById('termsDrawerCloseBtn');
 
-    function openTermsModal() {
-        if (termsModal) {
-            termsModal.style.display = 'flex';
+    function openTermsDrawer() {
+        console.log('📖 Opening terms drawer');
+        if (termsDrawer && termsDrawerBackdrop) {
+            termsDrawerBackdrop.classList.add('active');
+            termsDrawer.classList.add('active');
         }
     }
 
-    function closeTermsModal() {
-        if (termsModal) {
-            termsModal.style.display = 'none';
+    function closeTermsDrawer() {
+        console.log('📕 Closing terms drawer');
+        if (termsDrawer && termsDrawerBackdrop) {
+            termsDrawerBackdrop.classList.remove('active');
+            termsDrawer.classList.remove('active');
         }
     }
 
     if (termsLinkSearch) {
+        console.log('✅ Terms link found and event listener attached');
         termsLinkSearch.onclick = (e) => {
+            console.log('🔗 Terms link clicked!');
             e.preventDefault();
-            openTermsModal();
+            openTermsDrawer();
         };
+    } else {
+        console.log('❌ Terms link NOT found');
     }
 
     if (termsLinkDrawer) {
         termsLinkDrawer.onclick = (e) => {
             e.preventDefault();
-            openTermsModal();
+            openTermsDrawer();
         };
     }
 
-    if (closeTermsBtn) {
-        closeTermsBtn.onclick = () => {
-            closeTermsModal();
+    if (termsDrawerCloseBtn) {
+        termsDrawerCloseBtn.onclick = () => {
+            closeTermsDrawer();
         };
     }
 
-    // Close terms modal when clicking outside
-    if (termsModal) {
-        termsModal.onclick = (e) => {
-            if (e.target === termsModal) {
-                closeTermsModal();
-            }
+    // Close terms drawer when clicking backdrop
+    if (termsDrawerBackdrop) {
+        termsDrawerBackdrop.onclick = () => {
+            closeTermsDrawer();
         };
     }
 
