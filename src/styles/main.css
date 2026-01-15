@@ -54,15 +54,10 @@ body {
   z-index: 9999;
 }
 
-/* Hide footer overlay when drawer is open */
+/* Hide footer overlay when drawer is open OR when not in search view */
 body.drawer-open #view-wrapper::after,
-body.drawer-open #termsContainer {
-  display: none;
-}
-
-/* Hide footer and terms text in moodboard view (results) */
-#view-moodboard.active~#view-wrapper::after,
-#view-moodboard.active~#termsContainer {
+body.drawer-open #termsContainer,
+body:not(:has(#view-search.active)) #view-wrapper::after {
   display: none;
 }
 
