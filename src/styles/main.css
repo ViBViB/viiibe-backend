@@ -55,7 +55,8 @@ body {
 }
 
 /* Hide footer overlay when drawer is open */
-body.drawer-open #view-wrapper::after {
+body.drawer-open #view-wrapper::after,
+body.drawer-open #termsContainer {
   display: none;
 }
 
