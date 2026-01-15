@@ -47,8 +47,8 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 50px;
-  /* Tall enough to cover shadow and contain terms text */
+  height: 60px;
+  /* Tall enough to fully cover shadow and contain terms text */
   background: #FFFFFF;
   pointer-events: none;
   z-index: 9999;
