@@ -54,8 +54,8 @@ body {
 .view.centered {
   justify-content: center;
   align-items: center;
-  padding: 8px 24px 24px 24px;
-  /* Reduced top padding from 24px to 8px */
+  padding: -24px 24px 16px 24px;
+  /* Negative top padding to pull content up */
 }
 
 /* 3. CONTAINERS */
