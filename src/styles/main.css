@@ -54,6 +54,11 @@ body {
   z-index: 9999;
 }
 
+/* Hide footer overlay when drawer is open */
+body.drawer-open #view-wrapper::after {
+  display: none;
+}
+
 /* Cada vista ahora se comporta como pantalla completa */
 .view {
   position: absolute;

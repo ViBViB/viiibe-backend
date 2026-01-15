@@ -45,6 +45,7 @@ function openDrawer() {
     if (drawer && backdrop) {
         backdrop.classList.add('active');
         drawer.classList.add('active');
+        document.body.classList.add('drawer-open'); // Hide footer overlay
     }
 }
 
@@ -54,6 +55,7 @@ function closeDrawer() {
     if (drawer && backdrop) {
         backdrop.classList.remove('active');
         drawer.classList.remove('active');
+        document.body.classList.remove('drawer-open'); // Show footer overlay
     }
 }
 
@@ -1056,6 +1058,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (termsDrawer && termsDrawerBackdrop) {
             termsDrawerBackdrop.classList.add('active');
             termsDrawer.classList.add('active');
+            document.body.classList.add('drawer-open'); // Hide footer overlay
         }
     }
 
@@ -1064,6 +1067,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (termsDrawer && termsDrawerBackdrop) {
             termsDrawerBackdrop.classList.remove('active');
             termsDrawer.classList.remove('active');
+            document.body.classList.remove('drawer-open'); // Show footer overlay
         }
     }
 
