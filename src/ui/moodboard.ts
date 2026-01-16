@@ -10,6 +10,7 @@ export function switchTab(activeTabId: string) {
     [sections.moodboard, sections.colors, sections.typography, sections.layout].forEach(s => s && (s.style.display = 'none'));
 
     // Get toolbar buttons
+    const toolbarContainer = document.getElementById('toolbarContainer');
     const curateBtn = document.getElementById('curateBtn');
     const createBtn = document.getElementById('createBtn');
     const buttonsWrapper = document.getElementById('buttonsWrapper');
@@ -18,7 +19,8 @@ export function switchTab(activeTabId: string) {
     if (activeTabId === 'moodboard') {
         tabs.moodboard?.classList.add('active');
         if (sections.moodboard) sections.moodboard.style.display = 'block';
-        // Show both Curate and Create buttons
+        // Show toolbar container and both Curate and Create buttons
+        if (toolbarContainer) toolbarContainer.style.display = 'flex';
         if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'block';
         if (createBtn) createBtn.style.display = 'block';
@@ -28,7 +30,8 @@ export function switchTab(activeTabId: string) {
     else if (activeTabId === 'colors') {
         tabs.colors?.classList.add('active');
         if (sections.colors) sections.colors.style.display = 'block';
-        // Show only Create button
+        // Show toolbar container and only Create button
+        if (toolbarContainer) toolbarContainer.style.display = 'flex';
         if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'none';
         if (createBtn) createBtn.style.display = 'block';
@@ -39,7 +42,8 @@ export function switchTab(activeTabId: string) {
     else if (activeTabId === 'typography') {
         tabs.typography?.classList.add('active');
         if (sections.typography) sections.typography.style.display = 'block';
-        // Show only Create button
+        // Show toolbar container and only Create button
+        if (toolbarContainer) toolbarContainer.style.display = 'flex';
         if (buttonsWrapper) buttonsWrapper.style.display = 'flex';
         if (curateBtn) curateBtn.style.display = 'none';
         if (createBtn) createBtn.style.display = 'block';
@@ -50,7 +54,8 @@ export function switchTab(activeTabId: string) {
     else if (activeTabId === 'layout') {
         tabs.layout?.classList.add('active');
         if (sections.layout) sections.layout.style.display = 'block';
-        // Hide all buttons
+        // Hide toolbar container and all buttons
+        if (toolbarContainer) toolbarContainer.style.display = 'none';
         if (buttonsWrapper) buttonsWrapper.style.display = 'none';
         // Hide reload button
         if (reloadButton) reloadButton.style.display = 'none';
