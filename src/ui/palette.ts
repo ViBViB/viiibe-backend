@@ -47,7 +47,18 @@ const COLOR_NAMES: { [key: string]: { name: string, hex: string } } = {
     'rust': { name: 'Rust', hex: '#B7410E' },
     'copper': { name: 'Copper', hex: '#B87333' },
 
-    // Grays
+    // Creams/Beiges (warm, low saturation)
+    'cream': { name: 'Cream', hex: '#FFFDD0' },
+    'vanilla': { name: 'Vanilla', hex: '#F3E5AB' },
+    'linen': { name: 'Linen', hex: '#FAF0E6' },
+    'sand': { name: 'Sand', hex: '#C2B280' },
+    'wheat': { name: 'Wheat', hex: '#F5DEB3' },
+
+    // Grays (cool, desaturated)
+    'dove': { name: 'Dove', hex: '#D5D5D5' },
+    'smoke': { name: 'Smoke', hex: '#E8E8E8' },
+    'stone': { name: 'Stone', hex: '#A8A8A8' },
+    'concrete': { name: 'Concrete', hex: '#B0B0B0' },
     'silver': { name: 'Silver', hex: '#C0C0C0' },
     'graphite': { name: 'Graphite', hex: '#383838' },
     'slate': { name: 'Slate', hex: '#708090' },
@@ -55,6 +66,9 @@ const COLOR_NAMES: { [key: string]: { name: string, hex: string } } = {
     'ash': { name: 'Ash', hex: '#B2BEB5' },
 
     // Blues
+    'powder': { name: 'Powder', hex: '#B0E0E6' },
+    'periwinkle': { name: 'Periwinkle', hex: '#CCCCFF' },
+    'steel': { name: 'Steel', hex: '#4682B4' },
     'ocean': { name: 'Ocean', hex: '#006994' },
     'sky': { name: 'Sky', hex: '#87CEEB' },
     'navy': { name: 'Navy', hex: '#000080' },
@@ -62,6 +76,8 @@ const COLOR_NAMES: { [key: string]: { name: string, hex: string } } = {
     'azure': { name: 'Azure', hex: '#007FFF' },
 
     // Greens
+    'seafoam': { name: 'Seafoam', hex: '#93E9BE' },
+    'pistachio': { name: 'Pistachio', hex: '#93C572' },
     'forest': { name: 'Forest', hex: '#228B22' },
     'mint': { name: 'Mint', hex: '#98FF98' },
     'olive': { name: 'Olive', hex: '#808000' },
@@ -69,6 +85,8 @@ const COLOR_NAMES: { [key: string]: { name: string, hex: string } } = {
     'sage': { name: 'Sage', hex: '#9DC183' },
 
     // Yellows
+    'lemon': { name: 'Lemon', hex: '#FFF44F' },
+    'honey': { name: 'Honey', hex: '#FFB347' },
     'sunshine': { name: 'Sunshine', hex: '#FFD700' },
     'butter': { name: 'Butter', hex: '#FFFACD' },
     'mustard': { name: 'Mustard', hex: '#FFDB58' },
@@ -91,23 +109,50 @@ const COLOR_NAMES: { [key: string]: { name: string, hex: string } } = {
     'pearl': { name: 'Pearl', hex: '#F0EAD6' }
 };
 
-// Get descriptive color name using nearest-color algorithm
+// Get descriptive color name using HSL-aware algorithm
 function getColorName(hex: string): string {
     const rgb = hexToRgb(hex);
-    let minDistance = Infinity;
+    const [h, s, l] = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+    // Step 1: Determine if color is achromatic (gray/black/white)
+    const isAchromatic = s < 15;
+
+    // Step 2: Filter candidates by saturation category
+    const candidates: Array<[string, { name: string, hex: string }]> = [];
+    for (const key in COLOR_NAMES) {
+        const candRgb = hexToRgb(COLOR_NAMES[key].hex);
+        const [candH, candS, candL] = rgbToHsl(candRgb.r, candRgb.g, candRgb.b);
+        const candIsAchromatic = candS < 15;
+
+        // Only compare within same category (chromatic vs achromatic)
+        if (isAchromatic === candIsAchromatic) {
+            candidates.push([key, COLOR_NAMES[key]]);
+        }
+    }
+
+    // Step 3: Find nearest by weighted HSL distance
+    let minDist = Infinity;
     let closestName = 'Color';
 
-    for (const key in COLOR_NAMES) {
-        const namedRgb = hexToRgb(COLOR_NAMES[key].hex);
-        const distance = Math.sqrt(
-            Math.pow(rgb.r - namedRgb.r, 2) +
-            Math.pow(rgb.g - namedRgb.g, 2) +
-            Math.pow(rgb.b - namedRgb.b, 2)
-        );
+    for (const [key, value] of candidates) {
+        const candRgb = hexToRgb(value.hex);
+        const [candH, candS, candL] = rgbToHsl(candRgb.r, candRgb.g, candRgb.b);
 
-        if (distance < minDistance) {
-            minDistance = distance;
-            closestName = COLOR_NAMES[key].name;
+        let dist;
+        if (isAchromatic) {
+            // For grays: only lightness matters
+            dist = Math.abs(l - candL);
+        } else {
+            // For colors: weighted hue + saturation + lightness
+            // Hue difference (circular, 0-360)
+            const hueDiff = Math.min(Math.abs(h - candH), 360 - Math.abs(h - candH));
+            // Weight hue most, then saturation, then lightness
+            dist = (hueDiff * 2) + Math.abs(s - candS) + Math.abs(l - candL);
+        }
+
+        if (dist < minDist) {
+            minDist = dist;
+            closestName = value.name;
         }
     }
 
