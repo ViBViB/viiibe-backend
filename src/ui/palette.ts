@@ -1000,7 +1000,7 @@ export async function scoreImageForColor(imgEl: HTMLImageElement, colorName: str
 }
 
 /**
- * Detect the dominant edge color of an image by sampling border pixels
+ * Detect the dominant edge color of an image by sampling corner pixels
  * Used for adaptive lightbox backgrounds
  */
 export function detectEdgeColor(imgEl: HTMLImageElement): string {
@@ -1016,37 +1016,45 @@ export function detectEdgeColor(imgEl: HTMLImageElement): string {
         // Draw image to canvas
         ctx.drawImage(imgEl, 0, 0);
 
-        const edgePixels: number[][] = [];
-        const sampleInterval = 10; // Sample every 10px
+        const cornerPixels: number[][] = [];
+        const cornerSize = 20; // Sample 20x20px area from each corner
 
-        // Sample top edge
-        for (let x = 0; x < canvas.width; x += sampleInterval) {
-            const pixel = ctx.getImageData(x, 0, 1, 1).data;
-            edgePixels.push([pixel[0], pixel[1], pixel[2]]);
+        // Sample top-left corner
+        for (let x = 0; x < cornerSize; x += 5) {
+            for (let y = 0; y < cornerSize; y += 5) {
+                const pixel = ctx.getImageData(x, y, 1, 1).data;
+                cornerPixels.push([pixel[0], pixel[1], pixel[2]]);
+            }
         }
 
-        // Sample bottom edge
-        for (let x = 0; x < canvas.width; x += sampleInterval) {
-            const pixel = ctx.getImageData(x, canvas.height - 1, 1, 1).data;
-            edgePixels.push([pixel[0], pixel[1], pixel[2]]);
+        // Sample top-right corner
+        for (let x = canvas.width - cornerSize; x < canvas.width; x += 5) {
+            for (let y = 0; y < cornerSize; y += 5) {
+                const pixel = ctx.getImageData(x, y, 1, 1).data;
+                cornerPixels.push([pixel[0], pixel[1], pixel[2]]);
+            }
         }
 
-        // Sample left edge
-        for (let y = 0; y < canvas.height; y += sampleInterval) {
-            const pixel = ctx.getImageData(0, y, 1, 1).data;
-            edgePixels.push([pixel[0], pixel[1], pixel[2]]);
+        // Sample bottom-left corner
+        for (let x = 0; x < cornerSize; x += 5) {
+            for (let y = canvas.height - cornerSize; y < canvas.height; y += 5) {
+                const pixel = ctx.getImageData(x, y, 1, 1).data;
+                cornerPixels.push([pixel[0], pixel[1], pixel[2]]);
+            }
         }
 
-        // Sample right edge
-        for (let y = 0; y < canvas.height; y += sampleInterval) {
-            const pixel = ctx.getImageData(canvas.width - 1, y, 1, 1).data;
-            edgePixels.push([pixel[0], pixel[1], pixel[2]]);
+        // Sample bottom-right corner
+        for (let x = canvas.width - cornerSize; x < canvas.width; x += 5) {
+            for (let y = canvas.height - cornerSize; y < canvas.height; y += 5) {
+                const pixel = ctx.getImageData(x, y, 1, 1).data;
+                cornerPixels.push([pixel[0], pixel[1], pixel[2]]);
+            }
         }
 
-        // Calculate average color
-        const avgR = Math.round(edgePixels.reduce((sum, p) => sum + p[0], 0) / edgePixels.length);
-        const avgG = Math.round(edgePixels.reduce((sum, p) => sum + p[1], 0) / edgePixels.length);
-        const avgB = Math.round(edgePixels.reduce((sum, p) => sum + p[2], 0) / edgePixels.length);
+        // Calculate average color from corners
+        const avgR = Math.round(cornerPixels.reduce((sum, p) => sum + p[0], 0) / cornerPixels.length);
+        const avgG = Math.round(cornerPixels.reduce((sum, p) => sum + p[1], 0) / cornerPixels.length);
+        const avgB = Math.round(cornerPixels.reduce((sum, p) => sum + p[2], 0) / cornerPixels.length);
 
         return `rgb(${avgR}, ${avgG}, ${avgB})`;
     } catch (error) {
