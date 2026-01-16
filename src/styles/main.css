@@ -1803,8 +1803,8 @@ header {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 54px;
-  /* Increased from 40px to match Lottie scale */
+  width: 65px;
+  /* Increased to 65px per user feedback */
   height: auto;
   z-index: 1;
 }
