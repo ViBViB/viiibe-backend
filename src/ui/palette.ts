@@ -998,3 +998,59 @@ export async function scoreImageForColor(imgEl: HTMLImageElement, colorName: str
 
     return totalWeight > 0 ? matchCount / totalWeight : 0;
 }
+
+/**
+ * Detect the dominant edge color of an image by sampling border pixels
+ * Used for adaptive lightbox backgrounds
+ */
+export function detectEdgeColor(imgEl: HTMLImageElement): string {
+    try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '#FFFFFF';
+
+        // Use natural dimensions to get actual image size
+        canvas.width = imgEl.naturalWidth;
+        canvas.height = imgEl.naturalHeight;
+
+        // Draw image to canvas
+        ctx.drawImage(imgEl, 0, 0);
+
+        const edgePixels: number[][] = [];
+        const sampleInterval = 10; // Sample every 10px
+
+        // Sample top edge
+        for (let x = 0; x < canvas.width; x += sampleInterval) {
+            const pixel = ctx.getImageData(x, 0, 1, 1).data;
+            edgePixels.push([pixel[0], pixel[1], pixel[2]]);
+        }
+
+        // Sample bottom edge
+        for (let x = 0; x < canvas.width; x += sampleInterval) {
+            const pixel = ctx.getImageData(x, canvas.height - 1, 1, 1).data;
+            edgePixels.push([pixel[0], pixel[1], pixel[2]]);
+        }
+
+        // Sample left edge
+        for (let y = 0; y < canvas.height; y += sampleInterval) {
+            const pixel = ctx.getImageData(0, y, 1, 1).data;
+            edgePixels.push([pixel[0], pixel[1], pixel[2]]);
+        }
+
+        // Sample right edge
+        for (let y = 0; y < canvas.height; y += sampleInterval) {
+            const pixel = ctx.getImageData(canvas.width - 1, y, 1, 1).data;
+            edgePixels.push([pixel[0], pixel[1], pixel[2]]);
+        }
+
+        // Calculate average color
+        const avgR = Math.round(edgePixels.reduce((sum, p) => sum + p[0], 0) / edgePixels.length);
+        const avgG = Math.round(edgePixels.reduce((sum, p) => sum + p[1], 0) / edgePixels.length);
+        const avgB = Math.round(edgePixels.reduce((sum, p) => sum + p[2], 0) / edgePixels.length);
+
+        return `rgb(${avgR}, ${avgG}, ${avgB})`;
+    } catch (error) {
+        console.error('Error detecting edge color:', error);
+        return '#FFFFFF'; // Fallback to white
+    }
+}

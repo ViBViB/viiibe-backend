@@ -9,7 +9,7 @@ import viiibeLogo from './assets/viiibe-logo.json';
 // STYLE GUIDE DATA COLLECTION
 // ==============================================================
 
-import { calculatePaletteFromImages, extractAndGeneratePalette } from './ui/palette';
+import { calculatePaletteFromImages, extractAndGeneratePalette, detectEdgeColor } from './ui/palette';
 
 // ==============================================================
 // MINI-PRD CONTROLLER
@@ -675,6 +675,18 @@ document.addEventListener('DOMContentLoaded', function () {
     let imgUrls: string[] = [];
     let currIdx = -1;
     const dImg = document.getElementById('detailsImage') as HTMLImageElement;
+    const lightbox = document.getElementById('lightbox');
+
+    // Apply adaptive background color when lightbox image loads
+    if (dImg) {
+        dImg.addEventListener('load', () => {
+            if (lightbox) {
+                const bgColor = detectEdgeColor(dImg);
+                lightbox.style.backgroundColor = bgColor;
+                console.log('🎨 Applied lightbox background color:', bgColor);
+            }
+        });
+    }
 
     window.onmessage = (event) => {
         const msg = event?.data?.pluginMessage;
