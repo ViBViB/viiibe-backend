@@ -869,10 +869,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                 showView('details');
                                 dImg.src = imgUrls[urlIndex];  // Use URL from array (may be fallback)
 
-                                // Apply stored edge color to lightbox background
+                                // Apply stored edge color to lightbox and details container
                                 if (lightbox) {
                                     const storedColor = img.getAttribute('data-edge-color') || '#FFFFFF';
-                                    lightbox.style.backgroundColor = storedColor;
+                                    // Use setProperty with !important to override CSS
+                                    lightbox.style.setProperty('background-color', storedColor, 'important');
+
+                                    // Also apply to details container
+                                    const detailsContainer = document.querySelector('.container.details') as HTMLElement;
+                                    if (detailsContainer) {
+                                        detailsContainer.style.setProperty('background-color', storedColor, 'important');
+                                    }
+
                                     console.log('🎨 Applied stored edge color to lightbox:', storedColor);
                                 }
                             };
