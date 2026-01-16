@@ -860,6 +860,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             // Set image source (same for grid and lightbox)
                             img.src = proxyUrl;
 
+                            // Handle case where image loads from cache before onload is attached
+                            if (img.complete) {
+                                img.onload(new Event('load'));
+                            }
+
                             // Create overlay
                             const overlay = document.createElement('div');
                             overlay.className = 'pin-overlay';
