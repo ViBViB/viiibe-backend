@@ -1000,8 +1000,9 @@ export async function scoreImageForColor(imgEl: HTMLImageElement, colorName: str
 }
 
 /**
- * Detect the dominant edge color of an image by sampling corner pixels
+ * Detect the dominant edge color of an image by sampling bottom corner pixels
  * Used for adaptive lightbox backgrounds
+ * Focuses on bottom corners since that's the area visible when image is shorter than viewport
  */
 export function detectEdgeColor(imgEl: HTMLImageElement): string {
     try {
@@ -1017,23 +1018,7 @@ export function detectEdgeColor(imgEl: HTMLImageElement): string {
         ctx.drawImage(imgEl, 0, 0);
 
         const cornerPixels: number[][] = [];
-        const cornerSize = 20; // Sample 20x20px area from each corner
-
-        // Sample top-left corner
-        for (let x = 0; x < cornerSize; x += 5) {
-            for (let y = 0; y < cornerSize; y += 5) {
-                const pixel = ctx.getImageData(x, y, 1, 1).data;
-                cornerPixels.push([pixel[0], pixel[1], pixel[2]]);
-            }
-        }
-
-        // Sample top-right corner
-        for (let x = canvas.width - cornerSize; x < canvas.width; x += 5) {
-            for (let y = 0; y < cornerSize; y += 5) {
-                const pixel = ctx.getImageData(x, y, 1, 1).data;
-                cornerPixels.push([pixel[0], pixel[1], pixel[2]]);
-            }
-        }
+        const cornerSize = 30; // Sample 30x30px area from each bottom corner
 
         // Sample bottom-left corner
         for (let x = 0; x < cornerSize; x += 5) {
@@ -1051,7 +1036,7 @@ export function detectEdgeColor(imgEl: HTMLImageElement): string {
             }
         }
 
-        // Calculate average color from corners
+        // Calculate average color from bottom corners only
         const avgR = Math.round(cornerPixels.reduce((sum, p) => sum + p[0], 0) / cornerPixels.length);
         const avgG = Math.round(cornerPixels.reduce((sum, p) => sum + p[1], 0) / cornerPixels.length);
         const avgB = Math.round(cornerPixels.reduce((sum, p) => sum + p[2], 0) / cornerPixels.length);
