@@ -586,7 +586,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     img.className = 'pin-image';
                     img.setAttribute('data-url', srcUrl);
                     img.crossOrigin = 'Anonymous';
+
+                    // Detect and store edge color when image loads
+                    img.onload = () => {
+                        try {
+                            const edgeColor = detectEdgeColor(img);
+                            img.setAttribute('data-edge-color', edgeColor);
+                            console.log(`🎨 Stored edge color for reloaded image ${urlIndex}:`, edgeColor);
+                        } catch (error) {
+                            console.warn('Failed to detect edge color on reload:', error);
+                            img.setAttribute('data-edge-color', '#FFFFFF');
+                        }
+                    };
+
                     img.src = proxyUrl;
+
+                    // Handle cached images
+                    if (img.complete) {
+                        img.onload(new Event('load'));
+                    }
+
                     img.alt = pin.title || 'Pin';
                     img.loading = 'lazy';
 
@@ -600,6 +619,28 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (dImg) {
                             showView('details');
                             dImg.src = imgUrls[urlIndex];
+
+                            // Apply stored edge color
+                            const lightbox = document.getElementById('lightbox');
+                            if (lightbox) {
+                                const clickedDiv = (event.currentTarget as HTMLElement).parentElement;
+                                const clickedImg = clickedDiv?.querySelector('.pin-image') as HTMLImageElement;
+                                const storedColor = clickedImg?.getAttribute('data-edge-color') || '#FFFFFF';
+
+                                lightbox.style.setProperty('background-color', storedColor, 'important');
+
+                                const detailsContainer = document.querySelector('.container.details') as HTMLElement;
+                                if (detailsContainer) {
+                                    detailsContainer.style.setProperty('background-color', storedColor, 'important');
+                                }
+
+                                const viewDetails = document.getElementById('view-details') as HTMLElement;
+                                if (viewDetails) {
+                                    viewDetails.style.setProperty('background-color', storedColor, 'important');
+                                }
+
+                                console.log('🎨 Applied stored edge color to lightbox (reload):', storedColor);
+                            }
                         }
                     };
 
