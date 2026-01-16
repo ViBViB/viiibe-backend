@@ -21,7 +21,7 @@ const NLP_KEYWORDS = {
     'Healthcare': ['healthcare', 'health', 'medical', 'hospital', 'clinic', 'doctor', 'medicine', 'wellness', 'therapy'],
     'Ecommerce': ['ecommerce', 'e-commerce', 'shop', 'store', 'retail', 'shopping', 'marketplace', 'cart', 'checkout', 'product'],
     'Education': ['education', 'learning', 'course', 'school', 'university', 'training', 'academy', 'student', 'teacher'],
-    'Real Estate': ['real estate', 'property', 'house', 'home', 'apartment', 'realty', 'housing', 'rent', 'buy home'],
+    'Real Estate': ['real estate', 'property', 'house', 'apartment', 'realty', 'housing', 'rent', 'buy property', 'sell property'],
     'Tech': ['tech', 'technology', 'software', 'digital', 'cloud', 'ai', 'ml', 'startup', 'innovation'],
     'Saas': ['saas', 'software as a service', 'platform', 'web app', 'webapp', 'cloud software'],
     'Food': ['food', 'restaurant', 'cafe', 'bakery', 'dining', 'culinary', 'recipe', 'cooking', 'chef'],
@@ -40,10 +40,10 @@ const NLP_KEYWORDS = {
     'Beauty': ['beauty', 'cosmetics', 'salon', 'spa', 'makeup', 'skincare', 'haircare', 'aesthetics'],
     'Transportation': ['transportation', 'transport', 'mobility', 'transit', 'automotive', 'vehicle'],
     'Digital Agency': ['digital agency', 'agency', 'marketing agency', 'creative agency', 'advertising', 'branding'],
-    'Home Services': ['home services', 'home service', 'cleaning', 'maintenance', 'repair', 'handyman', 'plumbing']
+    'Home Services': ['home services', 'home service', 'cleaning', 'maintenance', 'repair', 'handyman', 'plumbing', 'hvac']
   },
   projectTypes: {
-    'landing page': ['landing', 'página', 'homepage', 'home page', 'landing page', 'hero', 'hero section'],
+    'landing page': ['landing', 'página', 'homepage', 'home page', 'landing page', 'hero', 'hero section', 'website'],
     'dashboard': ['dashboard', 'panel', 'analytics', 'admin', 'admin panel', 'control panel', 'metrics'],
     'mobile app': ['mobile', 'app', 'ios', 'android', 'smartphone', 'phone', 'aplicación móvil', 'aplicacion movil'],
     'ecommerce': ['ecommerce', 'e-commerce', 'shop', 'store', 'tienda', 'shopping', 'cart', 'checkout', 'product'],
