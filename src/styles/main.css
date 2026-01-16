@@ -670,7 +670,6 @@ header {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: #000;
   padding: 0;
   overflow: hidden;
   display: block;
