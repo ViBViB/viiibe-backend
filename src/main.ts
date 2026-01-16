@@ -891,8 +891,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                         viewDetails.style.setProperty('background-color', storedColor, 'important');
                                     }
 
-                                    // Also apply to body
-                                    document.body.style.setProperty('background-color', storedColor, 'important');
 
                                     console.log('🎨 Applied stored edge color to lightbox:', storedColor);
                                 }
