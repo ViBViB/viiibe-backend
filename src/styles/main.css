@@ -1783,33 +1783,37 @@ header {
   font-weight: 500;
   letter-spacing: 0.3px;
   margin: 0;
-}/* Logo Animation Overlay */
+}
+
+/* Logo Animation Overlay */
 .logo-animation-container {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: relative;
+  width: 80px;
+  height: 65px;
+  /* Slightly larger than 55px */
+  margin: 0 auto 24px;
+  /* Reduced margin to match original visual */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo-background {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60px;
-    /* Adjust size based on visual */
-    height: auto;
-    z-index: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  /* Reduced from 60px */
+  height: auto;
+  z-index: 1;
 }
 
 #lottie-logo.loading-logo {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    margin-bottom: 0;
-    /* Override existing margin */
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 0;
+  /* Override existing margin */
 }
