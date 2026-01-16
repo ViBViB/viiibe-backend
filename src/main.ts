@@ -881,6 +881,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                         detailsContainer.style.setProperty('background-color', storedColor, 'important');
                                     }
 
+                                    // Also apply to view-details
+                                    const viewDetails = document.getElementById('view-details') as HTMLElement;
+                                    if (viewDetails) {
+                                        viewDetails.style.setProperty('background-color', storedColor, 'important');
+                                    }
+
                                     console.log('🎨 Applied stored edge color to lightbox:', storedColor);
                                 }
                             };
