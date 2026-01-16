@@ -40,26 +40,7 @@ body {
   /* Remove any default shadow */
 }
 
-/* Cover Figma's default bottom shadow */
-#view-wrapper::after {
-  content: '';
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  /* Tall enough to fully cover shadow and contain terms text */
-  background: #FFFFFF;
-  pointer-events: none;
-  z-index: 9999;
-}
 
-/* Hide footer overlay when drawer is open OR when not in search view */
-body.drawer-open #view-wrapper::after,
-body.drawer-open #termsContainer,
-body:not(:has(#view-search.active)) #view-wrapper::after {
-  display: none;
-}
 
 /* Cada vista ahora se comporta como pantalla completa */
 .view {
