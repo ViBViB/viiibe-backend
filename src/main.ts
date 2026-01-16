@@ -677,17 +677,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const dImg = document.getElementById('detailsImage') as HTMLImageElement;
     const lightbox = document.getElementById('lightbox');
 
-    // Apply adaptive background color when lightbox image loads
-    if (dImg) {
-        dImg.addEventListener('load', () => {
-            if (lightbox) {
-                const bgColor = detectEdgeColor(dImg);
-                lightbox.style.backgroundColor = bgColor;
-                console.log('🎨 Applied lightbox background color:', bgColor);
-            }
-        });
-    }
-
     window.onmessage = (event) => {
         const msg = event?.data?.pluginMessage;
         if (!msg) return;
@@ -803,6 +792,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                 loadedCount++;
                                 console.log(`✅ Image ${loadedCount}/${totalImages} loaded: ${srcUrl.substring(0, 80)}...`);
 
+                                // Detect and store edge color for lightbox
+                                try {
+                                    const edgeColor = detectEdgeColor(img);
+                                    img.setAttribute('data-edge-color', edgeColor);
+                                    console.log(`🎨 Stored edge color for image ${urlIndex}:`, edgeColor);
+                                } catch (error) {
+                                    console.warn('Failed to detect edge color:', error);
+                                    img.setAttribute('data-edge-color', '#FFFFFF'); // Fallback
+                                }
+
                                 // Continue to next step when most images are loaded (80%)
                                 if (loadedCount >= Math.ceil(totalImages * 0.8)) {
                                     updateProgress(4);
@@ -869,6 +868,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                 currIdx = urlIndex;  // Use index directly instead of searching
                                 showView('details');
                                 dImg.src = imgUrls[urlIndex];  // Use URL from array (may be fallback)
+
+                                // Apply stored edge color to lightbox background
+                                if (lightbox) {
+                                    const storedColor = img.getAttribute('data-edge-color') || '#FFFFFF';
+                                    lightbox.style.backgroundColor = storedColor;
+                                    console.log('🎨 Applied stored edge color to lightbox:', storedColor);
+                                }
                             };
 
                             div.appendChild(img);
