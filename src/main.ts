@@ -1059,12 +1059,56 @@ document.addEventListener('DOMContentLoaded', function () {
     if (detailsNextBtn) detailsNextBtn.onclick = () => {
         currIdx = (currIdx + 1) % imgUrls.length;
         dImg.src = imgUrls[currIdx];
+
+        // Update background color for new image
+        const allGridImages = document.querySelectorAll('.pin-image') as NodeListOf<HTMLImageElement>;
+        if (allGridImages[currIdx]) {
+            const storedColor = allGridImages[currIdx].getAttribute('data-edge-color') || '#FFFFFF';
+
+            if (lightbox) {
+                lightbox.style.setProperty('background-color', storedColor, 'important');
+            }
+
+            const detailsContainer = document.querySelector('.container.details') as HTMLElement;
+            if (detailsContainer) {
+                detailsContainer.style.setProperty('background-color', storedColor, 'important');
+            }
+
+            const viewDetails = document.getElementById('view-details') as HTMLElement;
+            if (viewDetails) {
+                viewDetails.style.setProperty('background-color', storedColor, 'important');
+            }
+
+            console.log('🎨 Applied edge color on next:', storedColor);
+        }
     };
 
     const detailsPrevBtn = document.getElementById('detailsPrevBtn');
     if (detailsPrevBtn) detailsPrevBtn.onclick = () => {
         currIdx = (currIdx - 1 + imgUrls.length) % imgUrls.length;
         dImg.src = imgUrls[currIdx];
+
+        // Update background color for new image
+        const allGridImages = document.querySelectorAll('.pin-image') as NodeListOf<HTMLImageElement>;
+        if (allGridImages[currIdx]) {
+            const storedColor = allGridImages[currIdx].getAttribute('data-edge-color') || '#FFFFFF';
+
+            if (lightbox) {
+                lightbox.style.setProperty('background-color', storedColor, 'important');
+            }
+
+            const detailsContainer = document.querySelector('.container.details') as HTMLElement;
+            if (detailsContainer) {
+                detailsContainer.style.setProperty('background-color', storedColor, 'important');
+            }
+
+            const viewDetails = document.getElementById('view-details') as HTMLElement;
+            if (viewDetails) {
+                viewDetails.style.setProperty('background-color', storedColor, 'important');
+            }
+
+            console.log('🎨 Applied edge color on prev:', storedColor);
+        }
     };
 
     const detailsDeleteBtn = document.getElementById('detailsDeleteBtn');
