@@ -1649,6 +1649,9 @@ async function generateMoodboard(images) {
     gridFrame.resize(gridWidth, maxHeight);
     container.appendChild(gridFrame);
 
+    // Zoom to fit the entire Mood board
+    figma.viewport.scrollAndZoomIntoView([container]);
+
     console.log("Moodboard generated with", gridFrame.children.length, "images");
   } catch (error) {
     console.error("Error in generateMoodboard:", error);
@@ -1997,6 +2000,9 @@ async function generatePalette(colors, config = {}) {
       container.appendChild(scaleRow);
     }
 
+    // Zoom to fit the entire Color palette
+    figma.viewport.scrollAndZoomIntoView([container]);
+
     const message = config.createFigmaVariables
       ? "✅ Palette generated with Tailwind scales and Figma Variables!"
       : "✅ Palette generated with Tailwind scales (no variables)!";
@@ -2292,6 +2298,9 @@ async function generateTypography(items, config = {}) {
 
       }
     }
+
+    // Zoom to fit the entire Type Scale page
+    figma.viewport.scrollAndZoomIntoView([container]);
 
     const message = config.createFigmaStyles
       ? "✅ Typography page generated with Text Styles"
