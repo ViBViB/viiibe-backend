@@ -110,14 +110,15 @@ const COLOR_NAMES: { [key: string]: { name: string, hex: string } } = {
 };
 
 // Get descriptive color name using HSL-aware algorithm
-function getColorName(hex: string): string {
+// usedNames: array of names already assigned to prevent duplicates
+function getColorName(hex: string, usedNames: string[] = []): string {
     const rgb = hexToRgb(hex);
     const [h, s, l] = rgbToHsl(rgb.r, rgb.g, rgb.b);
 
     // Step 1: Determine if color is achromatic (gray/black/white)
     const isAchromatic = s < 15;
 
-    // Step 2: Filter candidates by saturation category
+    // Step 2: Filter candidates by saturation category AND exclude used names
     const candidates: Array<[string, { name: string, hex: string }]> = [];
     for (const key in COLOR_NAMES) {
         const candRgb = hexToRgb(COLOR_NAMES[key].hex);
@@ -125,8 +126,21 @@ function getColorName(hex: string): string {
         const candIsAchromatic = candS < 15;
 
         // Only compare within same category (chromatic vs achromatic)
-        if (isAchromatic === candIsAchromatic) {
+        // AND skip names that are already used
+        if (isAchromatic === candIsAchromatic && !usedNames.includes(COLOR_NAMES[key].name)) {
             candidates.push([key, COLOR_NAMES[key]]);
+        }
+    }
+
+    // If all names in this category are used, fall back to all candidates (without filtering)
+    if (candidates.length === 0) {
+        for (const key in COLOR_NAMES) {
+            const candRgb = hexToRgb(COLOR_NAMES[key].hex);
+            const [candH, candS, candL] = rgbToHsl(candRgb.r, candRgb.g, candRgb.b);
+            const candIsAchromatic = candS < 15;
+            if (isAchromatic === candIsAchromatic) {
+                candidates.push([key, COLOR_NAMES[key]]);
+            }
         }
     }
 
@@ -808,11 +822,17 @@ function renderColorMapUI(data: any) {
         .slice(0, 4);
 
     // Store in window for backend access
-    (window as any).viibeColorMap = displayColors.map((c: any) => ({
-        role: c.role,
-        hex: c.hex, // Use pre-calculated hex instead of recalculating
-        name: getColorName(c.hex) // Add color name for Figma display
-    }));
+    // Track used names to prevent duplicates
+    const usedNames: string[] = [];
+    (window as any).viibeColorMap = displayColors.map((c: any) => {
+        const name = getColorName(c.hex, usedNames);
+        usedNames.push(name); // Add to used names
+        return {
+            role: c.role,
+            hex: c.hex, // Use pre-calculated hex instead of recalculating
+            name: name // Add color name for Figma display
+        };
+    });
     console.log('🎨 Stored colorMap in window:', (window as any).viibeColorMap);
     console.log('🎨 Color names generated:', (window as any).viibeColorMap.map((c: any) => `${c.role}: ${c.name} (${c.hex})`));
 
@@ -831,7 +851,7 @@ function renderColorMapUI(data: any) {
         padding: 0;
     `;
 
-    displayColors.forEach((color: any) => {
+    displayColors.forEach((color: any, index: number) => {
         const bar = document.createElement('div');
 
         bar.style.cssText = `
@@ -874,9 +894,9 @@ function renderColorMapUI(data: any) {
             margin-bottom: 8px;
         `;
 
-        // Color name (Flag red, Sandy clay, etc.)
+        // Color name (Flag red, Sandy clay, etc.) - use pre-calculated name from viibeColorMap
         const name = document.createElement('div');
-        name.textContent = getColorName(color.hex);
+        name.textContent = (window as any).viibeColorMap[index]?.name || getColorName(color.hex);
         name.style.cssText = `
             font-size: 24px;
             font-weight: 600;
