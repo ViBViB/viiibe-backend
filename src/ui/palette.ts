@@ -886,7 +886,7 @@ function renderColorMapUI(data: any) {
         const role = document.createElement('div');
         role.textContent = color.role;
         role.style.cssText = `
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
             text-transform: capitalize;
             letter-spacing: 0.5px;
