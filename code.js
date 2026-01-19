@@ -49,7 +49,21 @@ const NLP_KEYWORDS = {
     'ecommerce': ['ecommerce', 'e-commerce', 'shop', 'store', 'tienda', 'shopping', 'cart', 'checkout', 'product'],
     'saas': ['saas', 'software', 'platform', 'plataforma', 'web app', 'webapp'],
     'portfolio': ['portfolio', 'portafolio', 'showcase', 'work', 'projects'],
-    'blog': ['blog', 'article', 'post', 'content', 'editorial']
+    'blog': ['blog', 'article', 'post', 'content', 'editorial'],
+    // New page types for better search precision
+    'about us': ['about', 'about us', 'about page', 'our story', 'who we are', 'company', 'team page', 'nosotros', 'quienes somos'],
+    'contact': ['contact', 'contact us', 'contact page', 'get in touch', 'reach us', 'contacto', 'contactanos'],
+    'pricing': ['pricing', 'pricing page', 'plans', 'subscription', 'packages', 'cost', 'precios', 'planes'],
+    'product detail': ['product detail', 'product page', 'item detail', 'single product', 'producto'],
+    'product listing': ['products', 'product listing', 'catalog', 'shop page', 'all products', 'productos', 'catalogo'],
+    'checkout': ['checkout', 'payment', 'order', 'purchase', 'buy now', 'pago', 'compra'],
+    'login': ['login', 'sign in', 'signin', 'log in', 'authentication', 'iniciar sesion'],
+    'signup': ['signup', 'sign up', 'register', 'registration', 'create account', 'registro', 'registrarse'],
+    'services': ['services', 'what we do', 'our services', 'offerings', 'servicios'],
+    'faq': ['faq', 'frequently asked questions', 'help', 'support', 'preguntas frecuentes'],
+    'case study': ['case study', 'success story', 'client work', 'caso de estudio'],
+    '404': ['404', 'error page', 'not found', 'page not found', 'error 404'],
+    'coming soon': ['coming soon', 'under construction', 'launching soon', 'proximamente']
   },
   styles: {
     'minimalist': ['minimalist', 'minimal', 'clean', 'simple', 'whitespace', 'white space', 'espacio', 'limpio', 'minimalista', 'sencillo'],
