@@ -1663,6 +1663,20 @@ async function generateMoodboard(images) {
     gridFrame.resize(gridWidth, maxHeight);
     container.appendChild(gridFrame);
 
+    // 9. Agregar disclaimer legal
+    console.log("Adding legal disclaimer...");
+    await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+
+    const disclaimer = figma.createText();
+    disclaimer.fontName = { family: "Inter", style: "Regular" };
+    disclaimer.characters = "Disclaimer: These images are curated for inspiration purposes only. Viiibe! does not claim ownership of these images. All rights belong to their respective authors and creators. Use of these images should comply with applicable copyright laws.";
+    disclaimer.fontSize = 11;
+    disclaimer.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 }, opacity: 0.5 }];
+    disclaimer.textAlignHorizontal = "CENTER";
+    disclaimer.resize(gridWidth, disclaimer.height);
+    container.appendChild(disclaimer);
+    console.log("Legal disclaimer added!");
+
     // Zoom to fit the entire Mood board
     figma.viewport.scrollAndZoomIntoView([container]);
 
