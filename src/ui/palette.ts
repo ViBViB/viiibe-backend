@@ -891,7 +891,7 @@ function renderColorMapUI(data: any) {
             text-transform: capitalize;
             letter-spacing: 0.5px;
             opacity: 0.7;
-            margin-bottom: 8px;
+            margin-bottom: 0px;
         `;
 
         // Color name (Flag red, Sandy clay, etc.) - use pre-calculated name from viibeColorMap
@@ -901,7 +901,7 @@ function renderColorMapUI(data: any) {
             font-size: 20px;
             font-weight: 600;
             line-height: 1.2;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         `;
 
         // Hex code
