@@ -886,7 +886,7 @@ function renderColorMapUI(data: any) {
         const role = document.createElement('div');
         role.textContent = color.role;
         role.style.cssText = `
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
             text-transform: capitalize;
             letter-spacing: 0.5px;
@@ -898,7 +898,7 @@ function renderColorMapUI(data: any) {
         const name = document.createElement('div');
         name.textContent = (window as any).viibeColorMap[index]?.name || getColorName(color.hex);
         name.style.cssText = `
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 600;
             line-height: 1.2;
             margin-bottom: 8px;
@@ -908,7 +908,7 @@ function renderColorMapUI(data: any) {
         const hex = document.createElement('div');
         hex.textContent = color.hex;
         hex.style.cssText = `
-            font-size: 14px;
+            font-size: 10px;
             font-weight: 400;
             opacity: 0.8;
         `;
