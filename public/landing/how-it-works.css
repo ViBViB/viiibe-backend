@@ -1,0 +1,234 @@
+/* How It Works Section Styles */
+
+/* Section title */
+.how-it-works .section-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Container for the carousel */
+.how-it-works-container {
+    position: relative;
+    padding: 60px 50px;
+}
+
+/* Wrapper for carousel */
+.sticky-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0px;
+}
+
+/* Animation canvas */
+.animation-canvas {
+    position: relative;
+    width: 100%;
+    height: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Carousel viewport - shows limited items */
+.carousel-viewport {
+    width: 100%;
+    max-width: 2400px;
+    height: auto;
+    overflow: visible;
+    position: relative;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.carousel-viewport.active {
+    opacity: 1;
+}
+
+/* Carousel track - holds all items */
+.carousel-track {
+    display: flex;
+    gap: 12px;
+    transition: transform 0.5s ease;
+}
+
+/* Carousel item wrapper */
+.carousel-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    height: 100%;
+}
+
+/* Carousel items */
+.carousel-item {
+    width: 731px;
+    height: 818px;
+    flex-shrink: 0;
+    background-size: cover;
+    background-position: center;
+    border-radius: 16px;
+    transition: opacity 0.4s ease, transform 0.5s ease;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
+    opacity: 0.3;
+    /* Default: 30% opacity */
+}
+
+/* Arc effect - center rises, sides drop */
+.carousel-item-wrapper {
+    transition: transform 0.5s ease;
+}
+
+/* Center item - highest point of arc */
+.carousel-item-wrapper.center {
+    transform: translateY(-120px);
+}
+
+/* Items at distance 1 from center */
+.carousel-item-wrapper.distance-1 {
+    transform: translateY(-40px);
+}
+
+/* Items at distance 2 from center */
+.carousel-item-wrapper.distance-2 {
+    transform: translateY(40px);
+}
+
+/* Items at distance 3+ from center */
+.carousel-item-wrapper.distance-3 {
+    transform: translateY(80px);
+}
+
+.carousel-item-caption {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    text-align: center;
+    opacity: 0;
+    /* Hidden by default */
+    transition: opacity 0.4s ease 0.2s;
+}
+
+/* Center item (focused) - full opacity and visible caption */
+.carousel-item-wrapper.center .carousel-item {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.carousel-item-wrapper.center .carousel-item-caption {
+    opacity: 1;
+}
+
+/* Side items - low opacity, no caption */
+.carousel-item-wrapper:not(.center) .carousel-item {
+    opacity: 0.3;
+}
+
+.carousel-item-wrapper:not(.center) .carousel-item-caption {
+    opacity: 0;
+}
+
+.carousel-item-wrapper:nth-child(1) .carousel-item {
+    background-image: url('images/01.png');
+}
+
+.carousel-item-wrapper:nth-child(2) .carousel-item {
+    background-image: url('images/02.png');
+}
+
+.carousel-item-wrapper:nth-child(3) .carousel-item {
+    background-image: url('images/03.png');
+}
+
+.carousel-item-wrapper:nth-child(4) .carousel-item {
+    background-image: url('images/04.png');
+}
+
+.carousel-item-wrapper:nth-child(5) .carousel-item {
+    background-image: url('images/05.png');
+}
+
+.carousel-item-wrapper:nth-child(6) .carousel-item {
+    background-image: url('images/06.png');
+}
+
+.carousel-item-wrapper:nth-child(7) .carousel-item {
+    background-image: url('images/07.png');
+}
+
+.carousel-item-wrapper:nth-child(8) .carousel-item {
+    background-image: url('images/08.png');
+}
+
+.carousel-item-wrapper:nth-child(9) .carousel-item {
+    background-image: url('images/09.png');
+}
+
+.carousel-item-wrapper:nth-child(10) .carousel-item {
+    background-image: url('images/10.png');
+}
+
+/* Navigation arrows - centered below carousel */
+.carousel-navigation {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.carousel-navigation.active {
+    opacity: 1;
+}
+
+.nav-arrow {
+    width: 60px;
+    height: 60px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.nav-arrow svg {
+    width: 60px;
+    height: 60px;
+}
+
+.nav-arrow:hover {
+    background: black;
+}
+
+.nav-arrow:hover svg circle {
+    stroke: white;
+    stroke-opacity: 1;
+}
+
+.nav-arrow:hover svg path {
+    stroke: white;
+    stroke-width: 2;
+}
+
+.nav-arrow:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.nav-arrow:disabled:hover svg circle {
+    stroke-opacity: 0.3;
+}
+
+.nav-arrow:disabled:hover svg path {
+    stroke-width: 1.6;
+}
