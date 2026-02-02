@@ -1778,263 +1778,271 @@ async function generatePalette(colors, config = {}) {
     // (Typography variables are disabled due to memory issues)
     console.log("⏭️ Skipping Typography Styles creation (typography variables disabled)");
 
-    // 3. Crear página y frame
-    console.log("Creating Color palette page...");
-    let page = figma.root.children.find((p) => p.name === "Color palette");
-    if (!page) {
-      page = figma.createPage();
-      page.name = "Color palette";
-      console.log("✅ Color palette page created");
-    } else {
-      console.log("Color palette page already exists, reusing");
-    }
-
-    // 2. Limpiar página si tiene contenido
-    const children = Array.from(page.children);
-    children.forEach(child => child.remove());
-
-    // 3. Crear frame contenedor con autolayout
-    const container = figma.createFrame();
-    container.name = "Viiibe! Color Palette";
-    container.layoutMode = "VERTICAL";
-    container.primaryAxisSizingMode = "AUTO";
-    container.counterAxisSizingMode = "AUTO";
-    container.paddingLeft = 80;
-    container.paddingRight = 80;
-    container.paddingTop = 80;
-    container.paddingBottom = 80;
-    container.itemSpacing = 60;
-    container.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-    page.appendChild(container);
-
-    // 4. Cargar fuentes
-    console.log("Loading fonts for palette...");
-    await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-    await figma.loadFontAsync({ family: "Inter", style: "Bold" });
-    await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-    console.log("Fonts loaded for palette!");
-
-    // 5. Crear título principal
-    const mainTitle = figma.createText();
-    mainTitle.fontName = { family: "Inter", style: "Bold" };
-    mainTitle.characters = "Color palette";
-    mainTitle.fontSize = 32;
-    mainTitle.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
-    container.appendChild(mainTitle);
-
-    // ========================================
-    // SECTION 1: LARGE COLOR SWATCHES (MOCKUP LAYOUT)
-    // ========================================
-    // Layout: Primary (500x500) | Secondary (250x500) | [Tertiary (250x250) / Accent (250x250)]
-
-    const largeSwatchesFrame = figma.createFrame();
-    largeSwatchesFrame.name = "Large Swatches";
-    largeSwatchesFrame.layoutMode = "HORIZONTAL";
-    largeSwatchesFrame.primaryAxisSizingMode = "AUTO";
-    largeSwatchesFrame.counterAxisSizingMode = "AUTO";
-    largeSwatchesFrame.itemSpacing = 0;
-    largeSwatchesFrame.fills = [];
-    container.appendChild(largeSwatchesFrame);
-
-    // Get colors array (should have role, hex, and name from frontend)
-    const colorsArray = baseColors; // baseColors comes from the filtered colors sent by frontend
-    console.log(`Creating mockup layout with ${colorsArray.length} colors`);
-
-    // Helper function to create a color swatch
-    function createColorSwatch(colorData, width, height, colorPrimitives) {
-      const { role, hex, name } = colorData;
-      console.log(`Creating ${width}x${height} swatch for ${role}: ${hex} (name: ${name || 'undefined'})`);
-
-      const swatchContainer = figma.createFrame();
-      swatchContainer.name = role;
-      swatchContainer.resize(width, height);
-
-      // Use variable reference if available, otherwise use hardcoded color
-      if (colorPrimitives && colorPrimitives[role] && colorPrimitives[role]["500"]) {
-        const variable = colorPrimitives[role]["500"];
-        console.log(`🔗 Attempting to link ${role} to variable:`, variable.name, variable.id);
-
-        // Create fill with variable binding directly in the paint object
-        const fillWithVariable = {
-          type: "SOLID",
-          color: hexToFigmaRgb(hex),
-          boundVariables: {
-            color: {
-              type: "VARIABLE_ALIAS",
-              id: variable.id
-            }
-          }
-        };
-
-        swatchContainer.fills = [fillWithVariable];
-        console.log(`✅ Successfully linked ${role} swatch to variable: ${variable.name}`);
+    // Only create the visual Color palette page if explicitly requested
+    if (config.downloadColorPalette) {
+      // 3. Crear página y frame
+      console.log("Creating Color palette page...");
+      let page = figma.root.children.find((p) => p.name === "Color palette");
+      if (!page) {
+        page = figma.createPage();
+        page.name = "Color palette";
+        console.log("✅ Color palette page created");
       } else {
-        swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(hex) }];
-        console.log(`⚠️ Using hardcoded color for ${role} (variable not available)`);
-      }
-      swatchContainer.layoutMode = "VERTICAL";
-      swatchContainer.primaryAxisSizingMode = "FIXED";
-      swatchContainer.counterAxisSizingMode = "FIXED";
-      swatchContainer.primaryAxisAlignItems = "MAX";
-      swatchContainer.counterAxisAlignItems = "MIN";
-      swatchContainer.paddingLeft = 30;
-      swatchContainer.paddingRight = 30;
-      swatchContainer.paddingTop = 30;
-      swatchContainer.paddingBottom = 30;
-
-      // Determine text color based on background
-      const rgb = hexToFigmaRgb(hex);
-      const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
-      const textColor = yiq >= 0.5 ? { r: 0, g: 0, b: 0 } : { r: 1, g: 1, b: 1 };
-
-      // Role label (14px, Medium)
-      const roleLabel = figma.createText();
-      roleLabel.fontName = { family: "Inter", style: "Medium" };
-      roleLabel.characters = role;
-      roleLabel.fontSize = 14;
-      roleLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
-      swatchContainer.appendChild(roleLabel);
-
-      // Color name (20px, Medium)
-      const colorNameLabel = figma.createText();
-      colorNameLabel.fontName = { family: "Inter", style: "Medium" };
-      colorNameLabel.characters = name || getColorNameFromHex(hex);
-      colorNameLabel.fontSize = 20;
-      colorNameLabel.fills = [{ type: "SOLID", color: textColor }];
-      swatchContainer.appendChild(colorNameLabel);
-
-      // Hex label (14px, Medium)
-      const hexLabel = figma.createText();
-      hexLabel.fontName = { family: "Inter", style: "Medium" };
-      hexLabel.characters = hex.toUpperCase();
-      hexLabel.fontSize = 14;
-      hexLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
-      swatchContainer.appendChild(hexLabel);
-
-      return swatchContainer;
-    }
-
-    // Primary: 500x500
-    if (colorsArray[0]) {
-      const primarySwatch = createColorSwatch(colorsArray[0], 500, 500, colorPrimitives);
-      largeSwatchesFrame.appendChild(primarySwatch);
-    }
-
-    // Secondary: 250x500
-    if (colorsArray[1]) {
-      const secondarySwatch = createColorSwatch(colorsArray[1], 250, 500, colorPrimitives);
-      largeSwatchesFrame.appendChild(secondarySwatch);
-    }
-
-    // Tertiary & Accent: 250x250 stacked vertically
-    if (colorsArray[2] || colorsArray[3]) {
-      const rightColumn = figma.createFrame();
-      rightColumn.name = "Right Column";
-      rightColumn.layoutMode = "VERTICAL";
-      rightColumn.primaryAxisSizingMode = "AUTO";
-      rightColumn.counterAxisSizingMode = "AUTO";
-      rightColumn.itemSpacing = 0;
-      rightColumn.fills = [];
-
-      if (colorsArray[2]) {
-        const tertiarySwatch = createColorSwatch(colorsArray[2], 250, 250, colorPrimitives);
-        rightColumn.appendChild(tertiarySwatch);
+        console.log("Color palette page already exists, reusing");
       }
 
-      if (colorsArray[3]) {
-        const accentSwatch = createColorSwatch(colorsArray[3], 250, 250, colorPrimitives);
-        rightColumn.appendChild(accentSwatch);
-      }
+      // 2. Limpiar página si tiene contenido
+      const children = Array.from(page.children);
+      children.forEach(child => child.remove());
 
-      largeSwatchesFrame.appendChild(rightColumn);
-    }
+      // 3. Crear frame contenedor con autolayout
+      const container = figma.createFrame();
+      container.name = "Viiibe! Color Palette";
+      container.layoutMode = "VERTICAL";
+      container.primaryAxisSizingMode = "AUTO";
+      container.counterAxisSizingMode = "AUTO";
+      container.paddingLeft = 80;
+      container.paddingRight = 80;
+      container.paddingTop = 80;
+      container.paddingBottom = 80;
+      container.itemSpacing = 60;
+      container.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      page.appendChild(container);
 
-    console.log(`✅ Completed mockup layout`);
+      // 4. Cargar fuentes
+      console.log("Loading fonts for palette...");
+      await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+      await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+      await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+      console.log("Fonts loaded for palette!");
 
-    // ========================================
-    // SECTION 2: COLOR SCALES
-    // ========================================
+      // 5. Crear título principal
+      const mainTitle = figma.createText();
+      mainTitle.fontName = { family: "Inter", style: "Bold" };
+      mainTitle.characters = "Color palette";
+      mainTitle.fontSize = 32;
+      mainTitle.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
+      container.appendChild(mainTitle);
 
-    // Scales title
-    const scalesTitle = figma.createText();
-    scalesTitle.fontName = { family: "Inter", style: "Bold" };
-    scalesTitle.characters = "Color scales";
-    scalesTitle.fontSize = 32;
-    scalesTitle.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
-    container.appendChild(scalesTitle);
+      // ========================================
+      // SECTION 1: LARGE COLOR SWATCHES (MOCKUP LAYOUT)
+      // ========================================
+      // Layout: Primary (500x500) | Secondary (250x500) | [Tertiary (250x250) / Accent (250x250)]
 
-    // All shades for Tailwind scales
-    const allShades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+      const largeSwatchesFrame = figma.createFrame();
+      largeSwatchesFrame.name = "Large Swatches";
+      largeSwatchesFrame.layoutMode = "HORIZONTAL";
+      largeSwatchesFrame.primaryAxisSizingMode = "AUTO";
+      largeSwatchesFrame.counterAxisSizingMode = "AUTO";
+      largeSwatchesFrame.itemSpacing = 0;
+      largeSwatchesFrame.fills = [];
+      container.appendChild(largeSwatchesFrame);
 
-    for (const colorData of colorsArray) {
-      const { role } = colorData;
-      const scale = colorScales[role];
+      // Get colors array (should have role, hex, and name from frontend)
+      const colorsArray = baseColors; // baseColors comes from the filtered colors sent by frontend
+      console.log(`Creating mockup layout with ${colorsArray.length} colors`);
 
-      // Row container for this color's scale
-      const scaleRow = figma.createFrame();
-      scaleRow.name = `${role} Scale`;
-      scaleRow.layoutMode = "HORIZONTAL";
-      scaleRow.primaryAxisSizingMode = "FIXED";
-      scaleRow.counterAxisSizingMode = "AUTO";
-      scaleRow.itemSpacing = 0; // No spacing between swatches
-      scaleRow.fills = [];
-      scaleRow.resize(1000, 100); // 1000px width, fixed height
-      scaleRow.cornerRadius = 0; // No rounded corners
+      // Helper function to create a color swatch
+      function createColorSwatch(colorData, width, height, colorPrimitives) {
+        const { role, hex, name } = colorData;
+        console.log(`Creating ${width}x${height} swatch for ${role}: ${hex} (name: ${name || 'undefined'})`);
 
-      // Create swatches for each shade
-      const swatchWidth = 1000 / allShades.length; // Equal width for each swatch
+        const swatchContainer = figma.createFrame();
+        swatchContainer.name = role;
+        swatchContainer.resize(width, height);
 
-      allShades.forEach(shade => {
-        const swatchGroup = figma.createFrame();
-        swatchGroup.name = shade;
-        swatchGroup.layoutMode = "VERTICAL";
-        swatchGroup.primaryAxisSizingMode = "FIXED";
-        swatchGroup.counterAxisSizingMode = "AUTO";
-        swatchGroup.itemSpacing = 4;
-        swatchGroup.fills = [];
-        swatchGroup.resize(swatchWidth, 100);
-        swatchGroup.cornerRadius = 0; // No rounded corners
+        // Use variable reference if available, otherwise use hardcoded color
+        if (colorPrimitives && colorPrimitives[role] && colorPrimitives[role]["500"]) {
+          const variable = colorPrimitives[role]["500"];
+          console.log(`🔗 Attempting to link ${role} to variable:`, variable.name, variable.id);
 
-        // Color rectangle
-        const rect = figma.createRectangle();
-        rect.resize(swatchWidth, 60); // Fill width of swatch
-        rect.cornerRadius = 0; // No rounded corners
-        rect.fills = [{ type: "SOLID", color: hexToFigmaRgb(scale[shade]) }];
-        swatchGroup.appendChild(rect);
+          // Create fill with variable binding directly in the paint object
+          const fillWithVariable = {
+            type: "SOLID",
+            color: hexToFigmaRgb(hex),
+            boundVariables: {
+              color: {
+                type: "VARIABLE_ALIAS",
+                id: variable.id
+              }
+            }
+          };
 
-        // Shade number label
-        const shadeLabel = figma.createText();
-        shadeLabel.fontName = { family: "Inter", style: "Medium" };
-        shadeLabel.characters = shade;
-        shadeLabel.fontSize = 12;
-        shadeLabel.resize(swatchWidth, shadeLabel.height);
-        shadeLabel.textAlignHorizontal = "CENTER";
-        shadeLabel.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
-        swatchGroup.appendChild(shadeLabel);
+          swatchContainer.fills = [fillWithVariable];
+          console.log(`✅ Successfully linked ${role} swatch to variable: ${variable.name}`);
+        } else {
+          swatchContainer.fills = [{ type: "SOLID", color: hexToFigmaRgb(hex) }];
+          console.log(`⚠️ Using hardcoded color for ${role} (variable not available)`);
+        }
+        swatchContainer.layoutMode = "VERTICAL";
+        swatchContainer.primaryAxisSizingMode = "FIXED";
+        swatchContainer.counterAxisSizingMode = "FIXED";
+        swatchContainer.primaryAxisAlignItems = "MAX";
+        swatchContainer.counterAxisAlignItems = "MIN";
+        swatchContainer.paddingLeft = 30;
+        swatchContainer.paddingRight = 30;
+        swatchContainer.paddingTop = 30;
+        swatchContainer.paddingBottom = 30;
 
-        // Hex label
+        // Determine text color based on background
+        const rgb = hexToFigmaRgb(hex);
+        const yiq = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
+        const textColor = yiq >= 0.5 ? { r: 0, g: 0, b: 0 } : { r: 1, g: 1, b: 1 };
+
+        // Role label (14px, Medium)
+        const roleLabel = figma.createText();
+        roleLabel.fontName = { family: "Inter", style: "Medium" };
+        roleLabel.characters = role;
+        roleLabel.fontSize = 14;
+        roleLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
+        swatchContainer.appendChild(roleLabel);
+
+        // Color name (20px, Medium)
+        const colorNameLabel = figma.createText();
+        colorNameLabel.fontName = { family: "Inter", style: "Medium" };
+        colorNameLabel.characters = name || getColorNameFromHex(hex);
+        colorNameLabel.fontSize = 20;
+        colorNameLabel.fills = [{ type: "SOLID", color: textColor }];
+        swatchContainer.appendChild(colorNameLabel);
+
+        // Hex label (14px, Medium)
         const hexLabel = figma.createText();
-        hexLabel.fontName = { family: "Inter", style: "Regular" };
-        hexLabel.characters = scale[shade].toUpperCase();
-        hexLabel.fontSize = 10;
-        hexLabel.resize(swatchWidth, hexLabel.height);
-        hexLabel.textAlignHorizontal = "CENTER";
-        hexLabel.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
-        swatchGroup.appendChild(hexLabel);
+        hexLabel.fontName = { family: "Inter", style: "Medium" };
+        hexLabel.characters = hex.toUpperCase();
+        hexLabel.fontSize = 14;
+        hexLabel.fills = [{ type: "SOLID", color: textColor, opacity: 0.7 }];
+        swatchContainer.appendChild(hexLabel);
 
-        scaleRow.appendChild(swatchGroup);
-      });
+        return swatchContainer;
+      }
 
-      container.appendChild(scaleRow);
+      // Primary: 500x500
+      if (colorsArray[0]) {
+        const primarySwatch = createColorSwatch(colorsArray[0], 500, 500, colorPrimitives);
+        largeSwatchesFrame.appendChild(primarySwatch);
+      }
+
+      // Secondary: 250x500
+      if (colorsArray[1]) {
+        const secondarySwatch = createColorSwatch(colorsArray[1], 250, 500, colorPrimitives);
+        largeSwatchesFrame.appendChild(secondarySwatch);
+      }
+
+      // Tertiary & Accent: 250x250 stacked vertically
+      if (colorsArray[2] || colorsArray[3]) {
+        const rightColumn = figma.createFrame();
+        rightColumn.name = "Right Column";
+        rightColumn.layoutMode = "VERTICAL";
+        rightColumn.primaryAxisSizingMode = "AUTO";
+        rightColumn.counterAxisSizingMode = "AUTO";
+        rightColumn.itemSpacing = 0;
+        rightColumn.fills = [];
+
+        if (colorsArray[2]) {
+          const tertiarySwatch = createColorSwatch(colorsArray[2], 250, 250, colorPrimitives);
+          rightColumn.appendChild(tertiarySwatch);
+        }
+
+        if (colorsArray[3]) {
+          const accentSwatch = createColorSwatch(colorsArray[3], 250, 250, colorPrimitives);
+          rightColumn.appendChild(accentSwatch);
+        }
+
+        largeSwatchesFrame.appendChild(rightColumn);
+      }
+
+      console.log(`✅ Completed mockup layout`);
+
+      // ========================================
+      // SECTION 2: COLOR SCALES
+      // ========================================
+
+      // Scales title
+      const scalesTitle = figma.createText();
+      scalesTitle.fontName = { family: "Inter", style: "Bold" };
+      scalesTitle.characters = "Color scales";
+      scalesTitle.fontSize = 32;
+      scalesTitle.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
+      container.appendChild(scalesTitle);
+
+      // All shades for Tailwind scales
+      const allShades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+
+      for (const colorData of colorsArray) {
+        const { role } = colorData;
+        const scale = colorScales[role];
+
+        // Row container for this color's scale
+        const scaleRow = figma.createFrame();
+        scaleRow.name = `${role} Scale`;
+        scaleRow.layoutMode = "HORIZONTAL";
+        scaleRow.primaryAxisSizingMode = "FIXED";
+        scaleRow.counterAxisSizingMode = "AUTO";
+        scaleRow.itemSpacing = 0; // No spacing between swatches
+        scaleRow.fills = [];
+        scaleRow.resize(1000, 100); // 1000px width, fixed height
+        scaleRow.cornerRadius = 0; // No rounded corners
+
+        // Create swatches for each shade
+        const swatchWidth = 1000 / allShades.length; // Equal width for each swatch
+
+        allShades.forEach(shade => {
+          const swatchGroup = figma.createFrame();
+          swatchGroup.name = shade;
+          swatchGroup.layoutMode = "VERTICAL";
+          swatchGroup.primaryAxisSizingMode = "FIXED";
+          swatchGroup.counterAxisSizingMode = "AUTO";
+          swatchGroup.itemSpacing = 4;
+          swatchGroup.fills = [];
+          swatchGroup.resize(swatchWidth, 100);
+          swatchGroup.cornerRadius = 0; // No rounded corners
+
+          // Color rectangle
+          const rect = figma.createRectangle();
+          rect.resize(swatchWidth, 60); // Fill width of swatch
+          rect.cornerRadius = 0; // No rounded corners
+          rect.fills = [{ type: "SOLID", color: hexToFigmaRgb(scale[shade]) }];
+          swatchGroup.appendChild(rect);
+
+          // Shade number label
+          const shadeLabel = figma.createText();
+          shadeLabel.fontName = { family: "Inter", style: "Medium" };
+          shadeLabel.characters = shade;
+          shadeLabel.fontSize = 12;
+          shadeLabel.resize(swatchWidth, shadeLabel.height);
+          shadeLabel.textAlignHorizontal = "CENTER";
+          shadeLabel.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
+          swatchGroup.appendChild(shadeLabel);
+
+          // Hex label
+          const hexLabel = figma.createText();
+          hexLabel.fontName = { family: "Inter", style: "Regular" };
+          hexLabel.characters = scale[shade].toUpperCase();
+          hexLabel.fontSize = 10;
+          hexLabel.resize(swatchWidth, hexLabel.height);
+          hexLabel.textAlignHorizontal = "CENTER";
+          hexLabel.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+          swatchGroup.appendChild(hexLabel);
+
+          scaleRow.appendChild(swatchGroup);
+        });
+
+        container.appendChild(scaleRow);
+      }
+
+      // Zoom to fit the entire Color palette
+      figma.viewport.scrollAndZoomIntoView([container]);
+
+      const message = config.createFigmaVariables
+        ? "✅ Palette generated with Tailwind scales and Figma Variables!"
+        : "✅ Palette generated with Tailwind scales (no variables)!";
+      console.log(message);
+    } else {
+      console.log("⏭️ Skipping Color palette page creation (disabled in config)");
+      if (config.createFigmaVariables) {
+        console.log("✅ Figma Variables created without visual page");
+      }
     }
-
-    // Zoom to fit the entire Color palette
-    figma.viewport.scrollAndZoomIntoView([container]);
-
-    const message = config.createFigmaVariables
-      ? "✅ Palette generated with Tailwind scales and Figma Variables!"
-      : "✅ Palette generated with Tailwind scales (no variables)!";
-    console.log(message);
 
     // Return variables for use in typography generation
     return { typeSizes, typography };
@@ -2061,279 +2069,287 @@ async function generateTypography(items, config = {}) {
       console.log("⏭️ Skipping text styles creation (disabled in config)");
     }
 
-    // 1. Crear o encontrar página
-    let page = figma.root.children.find((p) => p.name === "Type scale");
-    if (!page) {
-      page = figma.createPage();
-      page.name = "Type scale";
-    }
-
-    // 2. Limpiar página si tiene contenido
-    const children = Array.from(page.children);
-    children.forEach(child => child.remove());
-
-    // 3. Crear frame contenedor con autolayout - matches .viiibe-type-scale with padding: 80px
-    const container = figma.createFrame();
-    container.name = "Viiibe! Type Scale";
-    container.layoutMode = "VERTICAL";
-    container.primaryAxisSizingMode = "AUTO";
-    container.counterAxisSizingMode = "AUTO";
-    container.paddingLeft = 80;
-    container.paddingRight = 80;
-    container.paddingTop = 80;
-    container.paddingBottom = 80;
-    container.itemSpacing = 60; // gap: 60px from CSS
-    container.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-    page.appendChild(container);
-
-    // 4. Cargar fuentes
-    console.log("Loading fonts for typography...");
-    await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-    await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-    await figma.loadFontAsync({ family: "Inter", style: "Bold" });
-    console.log("Fonts loaded for typography!");
-
-    // ============================================================
-    // BLOQUE 1: HEADER - matches .header with align-self: stretch
-    // ============================================================
-    const headerFrame = figma.createFrame();
-    headerFrame.name = "Header";
-    headerFrame.layoutMode = "HORIZONTAL";
-    headerFrame.primaryAxisSizingMode = "AUTO";
-    headerFrame.counterAxisSizingMode = "AUTO";
-    headerFrame.itemSpacing = 0;
-    headerFrame.primaryAxisAlignItems = "MIN";
-    headerFrame.counterAxisAlignItems = "MIN";
-    headerFrame.fills = [];
-
-    // Título "Viiibe! Type Scale" - matches .text-wrapper with flex: 1
-    const mainTitle = figma.createText();
-    mainTitle.fontName = { family: "Inter", style: "Bold" };
-    mainTitle.characters = "Viiibe! Type Scale";
-    mainTitle.fontSize = 64; // font-size: 64px from CSS
-    mainTitle.layoutGrow = 1; // flex: 1
-    headerFrame.appendChild(mainTitle);
-
-    // Spacer - matches .spacer with flex-grow: 1
-    const spacer = figma.createFrame();
-    spacer.name = "Spacer";
-    spacer.layoutMode = "HORIZONTAL";
-    spacer.layoutGrow = 1;
-    spacer.resize(100, 100); // height: 100px from CSS
-    spacer.fills = [];
-    headerFrame.appendChild(spacer);
-
-    // Descripción / Disclaimer - matches .div with width: 400px
-    const description = figma.createText();
-    description.fontName = { family: "Inter", style: "Regular" };
-    description.characters = "Viiibe! cannot determine with precision the typography used in the moodboard images. This type scale is a contextual suggestion based on your search query, designed to complement the visual direction of your moodboard. The suggested font pairing is commonly used in similar projects and can serve as a starting point for your design system.";
-    description.fontSize = 12;
-    description.lineHeight = { value: 20, unit: "PIXELS" };
-    description.resize(400, description.height);
-    headerFrame.appendChild(description);
-
-    container.appendChild(headerFrame);
-    headerFrame.layoutSizingHorizontal = "FILL"; // Set AFTER appending to parent
-
-    // Divider - matches .divider with align-self: stretch, width: 100%, height: 1px
-    const divider = figma.createRectangle();
-    divider.name = "Divider";
-    divider.resize(100, 1); // Width will be overridden by layoutSizing
-    divider.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
-    container.appendChild(divider);
-    divider.layoutSizingHorizontal = "FILL"; // Set AFTER appending to parent
-
-    // ============================================================
-    // BLOQUE 2: TYPE SCALE VISUALIZATION
-    // ============================================================
-    const categories = ["Display", "Heading", "Body", "Label"];
-
-    // Define type scale manually (for when styles are not created)
-    const typeScaleDefinitions = {
-      "Display": [
-        { name: "Display 2xl", size: 72, weight: "Bold", lineHeight: 1.1 },
-        { name: "Display xl", size: 60, weight: "Bold", lineHeight: 1.1 },
-        { name: "Display lg", size: 48, weight: "Bold", lineHeight: 1.1 },
-        { name: "Display md", size: 36, weight: "Bold", lineHeight: 1.1 },
-        { name: "Display sm", size: 30, weight: "Bold", lineHeight: 1.1 },
-        { name: "Display xs", size: 24, weight: "Bold", lineHeight: 1.1 }
-      ],
-      "Heading": [
-        { name: "H1", size: 48, weight: "Bold", lineHeight: 1.2 },
-        { name: "H2", size: 36, weight: "Bold", lineHeight: 1.2 },
-        { name: "H3", size: 30, weight: "Bold", lineHeight: 1.2 },
-        { name: "H4", size: 24, weight: "Medium", lineHeight: 1.2 },
-        { name: "H5", size: 20, weight: "Medium", lineHeight: 1.2 },
-        { name: "H6", size: 18, weight: "Medium", lineHeight: 1.2 }
-      ],
-      "Body": [
-        { name: "Body xl", size: 20, weight: "Regular", lineHeight: 1.5 },
-        { name: "Body lg", size: 18, weight: "Regular", lineHeight: 1.5 },
-        { name: "Body md", size: 16, weight: "Regular", lineHeight: 1.5 },
-        { name: "Body sm", size: 14, weight: "Regular", lineHeight: 1.5 },
-        { name: "Body xs", size: 12, weight: "Regular", lineHeight: 1.5 }
-      ],
-      "Label": [
-        { name: "Label xl", size: 20, weight: "Medium", lineHeight: 1.2 },
-        { name: "Label lg", size: 18, weight: "Medium", lineHeight: 1.2 },
-        { name: "Label md", size: 16, weight: "Medium", lineHeight: 1.2 },
-        { name: "Label sm", size: 14, weight: "Medium", lineHeight: 1.2 },
-        { name: "Label xs", size: 12, weight: "Medium", lineHeight: 1.2 }
-      ]
-    };
-
-    // ALWAYS use direct values (text styles creation is disabled due to memory issues)
-    // This bypasses the config.createFigmaStyles check since we can't create styles reliably
-    if (config.createFigmaStyles) {
-      // Use existing Text Styles
-      console.log("Using Text Styles for typography visualization");
-      const localStyles = figma.getLocalTextStyles();
-
-      for (const category of categories) {
-        // Create Category Header
-        const categoryHeader = figma.createText();
-        categoryHeader.fontName = { family: "Inter", style: "Bold" };
-        categoryHeader.characters = category;
-        categoryHeader.fontSize = 24;
-        categoryHeader.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.1 } }];
-        container.appendChild(categoryHeader);
-
-        // Create Frame for this category
-        const categoryFrame = figma.createFrame();
-        categoryFrame.name = category;
-        categoryFrame.layoutMode = "VERTICAL";
-        categoryFrame.primaryAxisSizingMode = "AUTO";
-        categoryFrame.counterAxisSizingMode = "AUTO";
-        categoryFrame.itemSpacing = 24;
-        categoryFrame.fills = [];
-
-        // Find styles for this category
-        const categoryStyles = localStyles.filter(s => s.name.startsWith(`Viiibe!/${category}/`));
-
-        // Sort styles by font size descending
-        categoryStyles.sort((a, b) => b.fontSize - a.fontSize);
-
-        for (const style of categoryStyles) {
-          const row = figma.createFrame();
-          row.layoutMode = "HORIZONTAL";
-          row.counterAxisAlignItems = "CENTER";
-          row.itemSpacing = 40;
-          row.fills = [];
-
-          // 1. Info Column (Name + Specs)
-          const infoCol = figma.createFrame();
-          infoCol.layoutMode = "VERTICAL";
-          infoCol.itemSpacing = 4;
-          infoCol.fills = [];
-          infoCol.resize(200, 100);
-          infoCol.primaryAxisSizingMode = "AUTO";
-
-          const styleName = figma.createText();
-          styleName.fontName = { family: "Inter", style: "Medium" };
-          styleName.characters = style.name.split("/").pop();
-          styleName.fontSize = 14;
-          infoCol.appendChild(styleName);
-
-          const specs = figma.createText();
-          specs.fontName = { family: "Inter", style: "Regular" };
-          specs.characters = `${style.fontSize}px / ${style.lineHeight.unit === "PERCENT" ? style.lineHeight.value + "%" : style.lineHeight.value + "px"}`;
-          specs.fontSize = 12;
-          specs.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
-          infoCol.appendChild(specs);
-
-          row.appendChild(infoCol);
-
-          // 2. Preview Column (using style)
-          const preview = figma.createText();
-          preview.textStyleId = style.id;
-          preview.characters = "The quick brown fox jumps over the lazy dog";
-          row.appendChild(preview);
-
-          categoryFrame.appendChild(row);
-        }
-
-        container.appendChild(categoryFrame);
-
-
+    // Only create the visual Type scale page if explicitly requested
+    if (config.downloadTypeScale) {
+      // 1. Crear o encontrar página
+      let page = figma.root.children.find((p) => p.name === "Type scale");
+      if (!page) {
+        page = figma.createPage();
+        page.name = "Type scale";
       }
+
+      // 2. Limpiar página si tiene contenido
+      const children = Array.from(page.children);
+      children.forEach(child => child.remove());
+
+      // 3. Crear frame contenedor con autolayout - matches .viiibe-type-scale with padding: 80px
+      const container = figma.createFrame();
+      container.name = "Viiibe! Type Scale";
+      container.layoutMode = "VERTICAL";
+      container.primaryAxisSizingMode = "AUTO";
+      container.counterAxisSizingMode = "AUTO";
+      container.paddingLeft = 80;
+      container.paddingRight = 80;
+      container.paddingTop = 80;
+      container.paddingBottom = 80;
+      container.itemSpacing = 60; // gap: 60px from CSS
+      container.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      page.appendChild(container);
+
+      // 4. Cargar fuentes
+      console.log("Loading fonts for typography...");
+      await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+      await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+      await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+      console.log("Fonts loaded for typography!");
+
+      // ============================================================
+      // BLOQUE 1: HEADER - matches .header with align-self: stretch
+      // ============================================================
+      const headerFrame = figma.createFrame();
+      headerFrame.name = "Header";
+      headerFrame.layoutMode = "HORIZONTAL";
+      headerFrame.primaryAxisSizingMode = "AUTO";
+      headerFrame.counterAxisSizingMode = "AUTO";
+      headerFrame.itemSpacing = 0;
+      headerFrame.primaryAxisAlignItems = "MIN";
+      headerFrame.counterAxisAlignItems = "MIN";
+      headerFrame.fills = [];
+
+      // Título "Viiibe! Type Scale" - matches .text-wrapper with flex: 1
+      const mainTitle = figma.createText();
+      mainTitle.fontName = { family: "Inter", style: "Bold" };
+      mainTitle.characters = "Viiibe! Type Scale";
+      mainTitle.fontSize = 64; // font-size: 64px from CSS
+      mainTitle.layoutGrow = 1; // flex: 1
+      headerFrame.appendChild(mainTitle);
+
+      // Spacer - matches .spacer with flex-grow: 1
+      const spacer = figma.createFrame();
+      spacer.name = "Spacer";
+      spacer.layoutMode = "HORIZONTAL";
+      spacer.layoutGrow = 1;
+      spacer.resize(100, 100); // height: 100px from CSS
+      spacer.fills = [];
+      headerFrame.appendChild(spacer);
+
+      // Descripción / Disclaimer - matches .div with width: 400px
+      const description = figma.createText();
+      description.fontName = { family: "Inter", style: "Regular" };
+      description.characters = "Viiibe! cannot determine with precision the typography used in the moodboard images. This type scale is a contextual suggestion based on your search query, designed to complement the visual direction of your moodboard. The suggested font pairing is commonly used in similar projects and can serve as a starting point for your design system.";
+      description.fontSize = 12;
+      description.lineHeight = { value: 20, unit: "PIXELS" };
+      description.resize(400, description.height);
+      headerFrame.appendChild(description);
+
+      container.appendChild(headerFrame);
+      headerFrame.layoutSizingHorizontal = "FILL"; // Set AFTER appending to parent
+
+      // Divider - matches .divider with align-self: stretch, width: 100%, height: 1px
+      const divider = figma.createRectangle();
+      divider.name = "Divider";
+      divider.resize(100, 1); // Width will be overridden by layoutSizing
+      divider.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
+      container.appendChild(divider);
+      divider.layoutSizingHorizontal = "FILL"; // Set AFTER appending to parent
+
+      // ============================================================
+      // BLOQUE 2: TYPE SCALE VISUALIZATION
+      // ============================================================
+      const categories = ["Display", "Heading", "Body", "Label"];
+
+      // Define type scale manually (for when styles are not created)
+      const typeScaleDefinitions = {
+        "Display": [
+          { name: "Display 2xl", size: 72, weight: "Bold", lineHeight: 1.1 },
+          { name: "Display xl", size: 60, weight: "Bold", lineHeight: 1.1 },
+          { name: "Display lg", size: 48, weight: "Bold", lineHeight: 1.1 },
+          { name: "Display md", size: 36, weight: "Bold", lineHeight: 1.1 },
+          { name: "Display sm", size: 30, weight: "Bold", lineHeight: 1.1 },
+          { name: "Display xs", size: 24, weight: "Bold", lineHeight: 1.1 }
+        ],
+        "Heading": [
+          { name: "H1", size: 48, weight: "Bold", lineHeight: 1.2 },
+          { name: "H2", size: 36, weight: "Bold", lineHeight: 1.2 },
+          { name: "H3", size: 30, weight: "Bold", lineHeight: 1.2 },
+          { name: "H4", size: 24, weight: "Medium", lineHeight: 1.2 },
+          { name: "H5", size: 20, weight: "Medium", lineHeight: 1.2 },
+          { name: "H6", size: 18, weight: "Medium", lineHeight: 1.2 }
+        ],
+        "Body": [
+          { name: "Body xl", size: 20, weight: "Regular", lineHeight: 1.5 },
+          { name: "Body lg", size: 18, weight: "Regular", lineHeight: 1.5 },
+          { name: "Body md", size: 16, weight: "Regular", lineHeight: 1.5 },
+          { name: "Body sm", size: 14, weight: "Regular", lineHeight: 1.5 },
+          { name: "Body xs", size: 12, weight: "Regular", lineHeight: 1.5 }
+        ],
+        "Label": [
+          { name: "Label xl", size: 20, weight: "Medium", lineHeight: 1.2 },
+          { name: "Label lg", size: 18, weight: "Medium", lineHeight: 1.2 },
+          { name: "Label md", size: 16, weight: "Medium", lineHeight: 1.2 },
+          { name: "Label sm", size: 14, weight: "Medium", lineHeight: 1.2 },
+          { name: "Label xs", size: 12, weight: "Medium", lineHeight: 1.2 }
+        ]
+      };
+
+      // ALWAYS use direct values (text styles creation is disabled due to memory issues)
+      // This bypasses the config.createFigmaStyles check since we can't create styles reliably
+      if (config.createFigmaStyles) {
+        // Use existing Text Styles
+        console.log("Using Text Styles for typography visualization");
+        const localStyles = figma.getLocalTextStyles();
+
+        for (const category of categories) {
+          // Create Category Header
+          const categoryHeader = figma.createText();
+          categoryHeader.fontName = { family: "Inter", style: "Bold" };
+          categoryHeader.characters = category;
+          categoryHeader.fontSize = 24;
+          categoryHeader.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.1 } }];
+          container.appendChild(categoryHeader);
+
+          // Create Frame for this category
+          const categoryFrame = figma.createFrame();
+          categoryFrame.name = category;
+          categoryFrame.layoutMode = "VERTICAL";
+          categoryFrame.primaryAxisSizingMode = "AUTO";
+          categoryFrame.counterAxisSizingMode = "AUTO";
+          categoryFrame.itemSpacing = 24;
+          categoryFrame.fills = [];
+
+          // Find styles for this category
+          const categoryStyles = localStyles.filter(s => s.name.startsWith(`Viiibe!/${category}/`));
+
+          // Sort styles by font size descending
+          categoryStyles.sort((a, b) => b.fontSize - a.fontSize);
+
+          for (const style of categoryStyles) {
+            const row = figma.createFrame();
+            row.layoutMode = "HORIZONTAL";
+            row.counterAxisAlignItems = "CENTER";
+            row.itemSpacing = 40;
+            row.fills = [];
+
+            // 1. Info Column (Name + Specs)
+            const infoCol = figma.createFrame();
+            infoCol.layoutMode = "VERTICAL";
+            infoCol.itemSpacing = 4;
+            infoCol.fills = [];
+            infoCol.resize(200, 100);
+            infoCol.primaryAxisSizingMode = "AUTO";
+
+            const styleName = figma.createText();
+            styleName.fontName = { family: "Inter", style: "Medium" };
+            styleName.characters = style.name.split("/").pop();
+            styleName.fontSize = 14;
+            infoCol.appendChild(styleName);
+
+            const specs = figma.createText();
+            specs.fontName = { family: "Inter", style: "Regular" };
+            specs.characters = `${style.fontSize}px / ${style.lineHeight.unit === "PERCENT" ? style.lineHeight.value + "%" : style.lineHeight.value + "px"}`;
+            specs.fontSize = 12;
+            specs.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+            infoCol.appendChild(specs);
+
+            row.appendChild(infoCol);
+
+            // 2. Preview Column (using style)
+            const preview = figma.createText();
+            preview.textStyleId = style.id;
+            preview.characters = "The quick brown fox jumps over the lazy dog";
+            row.appendChild(preview);
+
+            categoryFrame.appendChild(row);
+          }
+
+          container.appendChild(categoryFrame);
+
+
+        }
+      } else {
+        // Use direct values (no styles)
+        console.log("Using direct values for typography visualization (no styles)");
+
+        for (const category of categories) {
+          // Create Category Header
+          const categoryHeader = figma.createText();
+          categoryHeader.fontName = { family: "Inter", style: "Bold" };
+          categoryHeader.characters = category;
+          categoryHeader.fontSize = 24;
+          categoryHeader.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.1 } }];
+          container.appendChild(categoryHeader);
+
+          // Create Frame for this category
+          const categoryFrame = figma.createFrame();
+          categoryFrame.name = category;
+          categoryFrame.layoutMode = "VERTICAL";
+          categoryFrame.primaryAxisSizingMode = "AUTO";
+          categoryFrame.counterAxisSizingMode = "AUTO";
+          categoryFrame.itemSpacing = 24;
+          categoryFrame.fills = [];
+
+          const definitions = typeScaleDefinitions[category];
+
+          for (const def of definitions) {
+            const row = figma.createFrame();
+            row.layoutMode = "HORIZONTAL";
+            row.counterAxisAlignItems = "CENTER";
+            row.itemSpacing = 40;
+            row.fills = [];
+
+            // 1. Info Column (Name + Specs)
+            const infoCol = figma.createFrame();
+            infoCol.layoutMode = "VERTICAL";
+            infoCol.itemSpacing = 4;
+            infoCol.fills = [];
+            infoCol.resize(200, 100);
+            infoCol.primaryAxisSizingMode = "AUTO";
+
+            const styleName = figma.createText();
+            styleName.fontName = { family: "Inter", style: "Medium" };
+            styleName.characters = def.name;
+            styleName.fontSize = 14;
+            infoCol.appendChild(styleName);
+
+            const specs = figma.createText();
+            specs.fontName = { family: "Inter", style: "Regular" };
+            specs.characters = `${def.size}px / ${Math.round(def.lineHeight * 100)}%`;
+            specs.fontSize = 12;
+            specs.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+            infoCol.appendChild(specs);
+
+            row.appendChild(infoCol);
+
+            // 2. Preview Column (using direct values)
+            const preview = figma.createText();
+            preview.fontName = { family: "Inter", style: def.weight };
+            preview.fontSize = def.size;
+            preview.lineHeight = { value: def.lineHeight * 100, unit: "PERCENT" };
+            preview.characters = "The quick brown fox jumps over the lazy dog";
+            row.appendChild(preview);
+
+            categoryFrame.appendChild(row);
+          }
+
+          container.appendChild(categoryFrame);
+
+
+        }
+      }
+
+      // Zoom to fit the entire Type Scale page
+      figma.viewport.scrollAndZoomIntoView([container]);
+
+      const message = config.createFigmaStyles
+        ? "✅ Typography page generated with Text Styles"
+        : "✅ Typography page generated with direct values (no styles)";
+      console.log(message);
     } else {
-      // Use direct values (no styles)
-      console.log("Using direct values for typography visualization (no styles)");
-
-      for (const category of categories) {
-        // Create Category Header
-        const categoryHeader = figma.createText();
-        categoryHeader.fontName = { family: "Inter", style: "Bold" };
-        categoryHeader.characters = category;
-        categoryHeader.fontSize = 24;
-        categoryHeader.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.1 } }];
-        container.appendChild(categoryHeader);
-
-        // Create Frame for this category
-        const categoryFrame = figma.createFrame();
-        categoryFrame.name = category;
-        categoryFrame.layoutMode = "VERTICAL";
-        categoryFrame.primaryAxisSizingMode = "AUTO";
-        categoryFrame.counterAxisSizingMode = "AUTO";
-        categoryFrame.itemSpacing = 24;
-        categoryFrame.fills = [];
-
-        const definitions = typeScaleDefinitions[category];
-
-        for (const def of definitions) {
-          const row = figma.createFrame();
-          row.layoutMode = "HORIZONTAL";
-          row.counterAxisAlignItems = "CENTER";
-          row.itemSpacing = 40;
-          row.fills = [];
-
-          // 1. Info Column (Name + Specs)
-          const infoCol = figma.createFrame();
-          infoCol.layoutMode = "VERTICAL";
-          infoCol.itemSpacing = 4;
-          infoCol.fills = [];
-          infoCol.resize(200, 100);
-          infoCol.primaryAxisSizingMode = "AUTO";
-
-          const styleName = figma.createText();
-          styleName.fontName = { family: "Inter", style: "Medium" };
-          styleName.characters = def.name;
-          styleName.fontSize = 14;
-          infoCol.appendChild(styleName);
-
-          const specs = figma.createText();
-          specs.fontName = { family: "Inter", style: "Regular" };
-          specs.characters = `${def.size}px / ${Math.round(def.lineHeight * 100)}%`;
-          specs.fontSize = 12;
-          specs.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
-          infoCol.appendChild(specs);
-
-          row.appendChild(infoCol);
-
-          // 2. Preview Column (using direct values)
-          const preview = figma.createText();
-          preview.fontName = { family: "Inter", style: def.weight };
-          preview.fontSize = def.size;
-          preview.lineHeight = { value: def.lineHeight * 100, unit: "PERCENT" };
-          preview.characters = "The quick brown fox jumps over the lazy dog";
-          row.appendChild(preview);
-
-          categoryFrame.appendChild(row);
-        }
-
-        container.appendChild(categoryFrame);
-
-
+      console.log("⏭️ Skipping Type scale page creation (disabled in config)");
+      if (config.createFigmaStyles) {
+        console.log("✅ Figma Text Styles created without visual page");
       }
     }
-
-    // Zoom to fit the entire Type Scale page
-    figma.viewport.scrollAndZoomIntoView([container]);
-
-    const message = config.createFigmaStyles
-      ? "✅ Typography page generated with Text Styles"
-      : "✅ Typography page generated with direct values (no styles)";
-    console.log(message);
   } catch (error) {
     console.error("Error in generateTypography:", error);
     throw error;
@@ -2356,6 +2372,21 @@ figma.ui.onmessage = async (msg) => {
   console.log("Message received in code.js:", msg.type);
 
   // OAuth handlers removed - plugin now uses saved pins from Vercel KV
+
+  // ------------------------------------------------------------
+  // COPY TO CLIPBOARD - For color palette hex codes
+  // ------------------------------------------------------------
+  if (msg.type === "copy-to-clipboard") {
+    try {
+      await figma.notify(`Copied ${msg.text}`, { timeout: 1500 });
+      // Note: Figma doesn't have a direct clipboard API, but the notify gives user feedback
+      // The actual copy happens in the browser context via the UI
+      console.log(`📋 Copy to clipboard requested: ${msg.text}`);
+    } catch (error) {
+      console.error("Error copying to clipboard:", error);
+    }
+    return;
+  }
 
   // ------------------------------------------------------------
   // SMART SEARCH (NLP-based) - Now searches saved pins from Vercel KV
@@ -2500,8 +2531,9 @@ figma.ui.onmessage = async (msg) => {
       console.log("Skipping moodboard (disabled in config)");
     }
 
-    // Generate Palette if enabled
-    if (config.downloadColorPalette) {
+    // Generate Palette if enabled OR if Figma Variables are requested
+    // (Variables are created inside generatePalette, so we need to call it even if the page is not wanted)
+    if (config.downloadColorPalette || config.createFigmaVariables) {
       try {
         console.log("Generating palette...");
         await generatePalette(colors, config);
@@ -2513,8 +2545,9 @@ figma.ui.onmessage = async (msg) => {
       console.log("Skipping palette (disabled in config)");
     }
 
-    // Generate Typography if enabled
-    if (config.downloadTypeScale) {
+    // Generate Typography if enabled OR if Figma Styles are requested
+    // (Text Styles are created inside generateTypography, so we need to call it even if the page is not wanted)
+    if (config.downloadTypeScale || config.createFigmaStyles) {
       try {
         console.log("Generating typography...");
         await generateTypography(typography, config);

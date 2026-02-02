@@ -48,13 +48,20 @@ public/
 
 ### Configuración de Vercel
 
-El archivo `vercel.json` está configurado con:
+El archivo `vercel.json` está configurado con redirecciones y reescrituras para asegurar que el CSS/JS cargue correctamente:
 
 ```json
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/viiibe",
+      "destination": "/viiibe/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/viiibe/",
       "destination": "/landing/index.html"
     },
     {
@@ -66,7 +73,9 @@ El archivo `vercel.json` está configurado con:
 ```
 
 Esto hace que:
-- `moood.studio/viiibe` → Sirve `index.html`
+- `moood.studio/viiibe` → Redirige a `/viiibe/` (Súper importante para que las rutas relativas funcionen)
+- `moood.studio/viiibe/` → Sirve `index.html`
+- `moood.studio/viiibe/style.css` → Sirve `/landing/style.css`
 - `moood.studio/viiibe/images/...` → Sirve los assets correctamente
 
 ### Testing Local
