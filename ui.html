@@ -880,6 +880,20 @@
             letter-spacing: 0.5px;
         }
 
+        .chip-pro {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #000;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
         /* Toggle Switch */
         .toggle-switch {
             position: relative;
@@ -1523,14 +1537,20 @@
                 <div class="drawer-section">
                     <div class="drawer-section-title">Advanced download</div>
                     <div class="drawer-option">
-                        <div class="drawer-option-label">Create Figma styles</div>
+                        <div class="drawer-option-label">
+                            Create Figma styles
+                            <span class="chip-pro">PRO</span>
+                        </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggle-styles" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                     <div class="drawer-option">
-                        <div class="drawer-option-label">Create Figma variables</div>
+                        <div class="drawer-option-label">
+                            Create Figma variables
+                            <span class="chip-pro">PRO</span>
+                        </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggle-variables" checked>
                             <span class="toggle-slider"></span>

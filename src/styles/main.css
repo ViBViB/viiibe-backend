@@ -943,6 +943,20 @@ header {
   letter-spacing: 0.5px;
 }
 
+.chip-pro {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #000;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
 /* Larger iOS-style Toggle Switch */
 .toggle-switch {
   position: relative;
@@ -1329,9 +1343,9 @@ header {
   color: #000;
 }
 
-.reload-btn:active {
-  /* Animation removed */
-}
+/* .reload-btn:active {
+  Animation removed
+} */
 
 
 /* Header right section - REMOVED, no longer needed */
@@ -1381,8 +1395,7 @@ header {
 }
 
 .btn-mini-prd {
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)*/
-  ;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
   border: 0;
   border-radius: 12px;
@@ -1619,8 +1632,7 @@ header {
 }
 
 .detail-tag.primary {
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)*/
-  ;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
 }
 
@@ -1703,8 +1715,7 @@ header {
 
 /* PRD Confirmation in Chat */
 .prd-confirmation .message-bubble {
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)*/
-  ;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 20px;
   border-radius: 16px;
