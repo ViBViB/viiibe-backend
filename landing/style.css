@@ -9,6 +9,8 @@ body {
     overflow-x: hidden;
     background: #fff;
     color: #000;
+    padding-bottom: 100vh;
+    /* Space for CTA section to be revealed */
 }
 
 /* Hero Container */
@@ -16,7 +18,9 @@ body {
     min-height: calc(100vh + 1000px);
     /* 100vh (masonry height) + 1000px (phases scroll distance) */
     position: relative;
-    background: transparent;
+    background: #fff;
+    z-index: 4;
+    /* Above masonry and content */
 }
 
 /* Masonry Wrapper - Full width background */
@@ -28,6 +32,7 @@ body {
     height: 200vh;
     overflow: hidden;
     z-index: 1;
+    /* Below content */
 }
 
 /* Masonry Container - Centered with 2D rotation */
@@ -155,7 +160,8 @@ body {
     position: fixed;
     top: 32px;
     right: 32px;
-    z-index: 10;
+    z-index: 9999;
+    /* Always visible above all content */
     color: #000;
 }
 
@@ -219,8 +225,11 @@ body {
 .how-it-works {
     position: relative;
     padding: 120px 0;
-    background: transparent;
-    z-index: 3;
+    padding-top: 160px;
+    /* Extra top padding for logo clearance */
+    background: #fff;
+    z-index: 50;
+    /* Above hero and masonry, below logo */
 }
 
 .section-container {
@@ -241,12 +250,15 @@ body {
 /* ===== PROBLEM STATEMENT SECTION ===== */
 .problem-statement {
     padding: 60px 80px 90px;
-    background: transparent;
+    padding-top: 120px;
+    /* Extra top padding for logo clearance */
+    background: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    z-index: 3;
+    z-index: 50;
+    /* Above hero and masonry, below logo */
     min-height: 100vh;
 }
 
@@ -416,11 +428,162 @@ body {
     line-height: 1.2;
 }
 
-/* Footer Section */
+/* ===== FIXED BACKGROUND CONTAINER (CTA ONLY) ===== */
+.fixed-background {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    /* Only CTA section */
+    z-index: 0;
+    /* Behind everything */
+}
+
+
+/* ===== CTA SECTION ===== */
+.cta-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.95);
+    /* Semi-transparent white background */
+}
+
+/* CTA Masonry Wrapper - Full screen background */
+.cta-masonry-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* CTA Masonry Container - No rotation, completely vertical */
+.cta-masonry-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    transform: translate(-50%, -50%);
+    /* No rotation - completely vertical */
+    display: flex;
+    gap: 16px;
+    height: 120%;
+}
+
+/* CTA Masonry Columns */
+.cta-masonry-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-width: 150px;
+    animation-duration: 60s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+/* Alternate animation directions */
+.cta-masonry-column[data-direction="up"] {
+    animation-name: scrollUp;
+}
+
+.cta-masonry-column[data-direction="down"] {
+    animation-name: scrollDown;
+}
+
+/* CTA Masonry Images - 50% blur and 30% opacity */
+.cta-masonry-column img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    filter: blur(8px);
+    opacity: 0.3;
+}
+
+/* CTA Content - Centered */
+.cta-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 900px;
+    padding: 0 40px;
+}
+
+/* CTA Headline - Same size as main hero headline */
+.cta-headline {
+    font-size: 72px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 40px;
+    letter-spacing: -0.01em;
+    color: #000;
+}
+
+/* CTA Button - White background */
+.cta-content .cta-button {
+    background: #FFF;
+}
+
+/* CTA Button Hover - Same as hero button */
+.cta-content .cta-button:hover {
+    background: #000;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.cta-content .cta-button:hover svg path {
+    stroke: #fff;
+}
+
+/* CTA Footer Text - Copyright and Disclaimer at bottom */
+.cta-footer-text {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    max-width: 800px;
+    padding: 0 40px;
+    z-index: 3;
+}
+
+.cta-copyright {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 8px;
+}
+
+.cta-disclaimer {
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(0, 0, 0, 0.4);
+    margin: 0;
+}
+
+/* Footer Section - In normal document flow */
 .footer {
-    background: transparent;
+    position: relative;
+    width: 100%;
+    background: #fff;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
     padding: 80px 0;
+    z-index: 5;
+    /* Above fixed background */
 }
 
 .footer-container {
