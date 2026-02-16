@@ -758,7 +758,8 @@ body {
     }
 
     .problem-statement {
-        padding: 20px 24px 60px;
+        padding: 80px 24px 60px;
+        /* Increased from 20px to give more space from Scroll Down on mobile */
         min-height: auto;
         text-align: left;
     }
