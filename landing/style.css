@@ -252,7 +252,8 @@ body {
 /* ===== PROBLEM STATEMENT SECTION ===== */
 .problem-statement {
     padding: 60px 80px 90px;
-    padding-top: 120px;
+    padding-top: 240px;
+    /* Increased from 120px to give more space from Scroll Down */
     /* Extra top padding for logo clearance */
     background: #fff;
     display: flex;
