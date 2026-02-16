@@ -16,9 +16,10 @@
         <div id="view-search" class="view centered active">
             <div class="container search-agent" style="position: relative;">
                 <img src="moodboard-illustration.png" alt="Moodboard" class="search-illustration" />
-                <h1 class="agent-title">From vibe to build-ready</h1>
+                <h1 class="agent-title">Stop Scrolling Pinterest to get UI inspiration.</h1>
                 <p class="agent-subtitle">Describe the inspiration you need, and Viiibe! will generate a
-                    production-ready mood board with color palette, type scale, and Figma variables.</p>
+                    production-ready UI mood board with color palette, type scale, and variables. Right inside Figma.
+                </p>
                 <div class="agent-input-wrapper">
                     <textarea id="searchInput" class="agent-input"
                         placeholder="e.g., red, modern landing page for the fitness industry"></textarea>
@@ -31,35 +32,91 @@
                     </button>
                 </div>
             </div>
-            <!-- Terms of Use Link - Fixed at bottom of plugin window -->
-            <div id="termsContainer"
-                style="position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; z-index: 10000;">
-                <span style="font-size: 12px; color: #999;">
-                    Read the <a id="termsLinkSearch" href="#"
-                        style="color: #999; text-decoration: underline; cursor: pointer;">Attribution & Terms</a> before
-                    using Viiibe!
-                </span>
-            </div>
         </div>
 
         <!-- 3.5 LOADING (Searching) -->
         <div id="view-loading" class="view centered">
             <div class="container loading-simple">
-                <div class="logo-animation-container">
-                    <img src="viiibe-logo-bg.png" class="logo-background" alt="" />
-                    <div id="lottie-logo" class="loading-logo"></div>
+                <!-- Brand Motif Background -->
+                <div class="loading-masonry-bg">
+                    <div class="loading-masonry-col" data-dir="up">
+                        <div class="masonry-block" style="height: 180px;"></div>
+                        <div class="masonry-block" style="height: 350px;"></div>
+                        <div class="masonry-block" style="height: 120px;"></div>
+                        <!-- Repeated for infinite scroll -->
+                        <div class="masonry-block" style="height: 180px;"></div>
+                        <div class="masonry-block" style="height: 350px;"></div>
+                        <div class="masonry-block" style="height: 120px;"></div>
+                    </div>
+                    <div class="loading-masonry-col" data-dir="down">
+                        <div class="masonry-block" style="height: 300px;"></div>
+                        <div class="masonry-block" style="height: 250px;"></div>
+                        <div class="masonry-block" style="height: 200px;"></div>
+                        <!-- Repeated -->
+                        <div class="masonry-block" style="height: 300px;"></div>
+                        <div class="masonry-block" style="height: 250px;"></div>
+                        <div class="masonry-block" style="height: 200px;"></div>
+                    </div>
+                    <div class="loading-masonry-col" data-dir="up">
+                        <div class="masonry-block" style="height: 240px;"></div>
+                        <div class="masonry-block" style="height: 240px;"></div>
+                        <div class="masonry-block" style="height: 100px;"></div>
+                        <!-- Repeated -->
+                        <div class="masonry-block" style="height: 240px;"></div>
+                        <div class="masonry-block" style="height: 240px;"></div>
+                        <div class="masonry-block" style="height: 100px;"></div>
+                    </div>
                 </div>
-                <h2 class="loading-title-simple">Viiibe! is creating your mood board</h2>
-                <p class="loading-subtitle">This might take a second or two...</p>
+
+
+                <!-- Centered Text Content -->
+                <div class="loading-content">
+                    <h2 class="loading-title-simple">Viiibe! is creating your mood board</h2>
+                    <p class="loading-subtitle">This might take a second or two...</p>
+                </div>
             </div>
         </div>
 
+
         <!-- 3.6 GENERATING STYLE GUIDE -->
         <div id="view-generating" class="view centered">
-            <div class="container generating">
-                <div class="spinner" style="margin-bottom: 24px;"></div>
-                <p class="generating-message">Putting it all together: color palette, type scale, and a beautiful Viiibe
-                    board...</p>
+            <div class="container loading-simple">
+                <!-- Brand Motif Background -->
+                <div class="loading-masonry-bg">
+                    <div class="loading-masonry-col" data-dir="up">
+                        <div class="masonry-block" style="height: 180px;"></div>
+                        <div class="masonry-block" style="height: 350px;"></div>
+                        <div class="masonry-block" style="height: 120px;"></div>
+                        <!-- Repeated for infinite scroll -->
+                        <div class="masonry-block" style="height: 180px;"></div>
+                        <div class="masonry-block" style="height: 350px;"></div>
+                        <div class="masonry-block" style="height: 120px;"></div>
+                    </div>
+                    <div class="loading-masonry-col" data-dir="down">
+                        <div class="masonry-block" style="height: 300px;"></div>
+                        <div class="masonry-block" style="height: 250px;"></div>
+                        <div class="masonry-block" style="height: 200px;"></div>
+                        <!-- Repeated -->
+                        <div class="masonry-block" style="height: 300px;"></div>
+                        <div class="masonry-block" style="height: 250px;"></div>
+                        <div class="masonry-block" style="height: 200px;"></div>
+                    </div>
+                    <div class="loading-masonry-col" data-dir="up">
+                        <div class="masonry-block" style="height: 240px;"></div>
+                        <div class="masonry-block" style="height: 240px;"></div>
+                        <div class="masonry-block" style="height: 100px;"></div>
+                        <!-- Repeated -->
+                        <div class="masonry-block" style="height: 240px;"></div>
+                        <div class="masonry-block" style="height: 240px;"></div>
+                        <div class="masonry-block" style="height: 100px;"></div>
+                    </div>
+                </div>
+
+                <!-- Centered Text Content -->
+                <div class="loading-content">
+                    <h2 class="loading-title-simple">Putting it all together</h2>
+                    <p class="loading-subtitle">Creating your color palette, type scale, and Figma variables...</p>
+                </div>
             </div>
         </div>
 
@@ -373,7 +430,7 @@
                     <li>✓ Early access to new features</li>
                 </ul>
                 <div class="modal-buttons">
-                    <button id="upgradeBtn" class="btn-primary" style="flex: 1;">Upgrade to Pro - $9/month</button>
+                    <button id="upgradeBtn" class="btn-primary" style="flex: 1;">Unlock Lifetime Access - $9</button>
                     <button id="cancelUpgradeBtn" class="secondary">Maybe later</button>
                 </div>
             </div>
@@ -383,94 +440,228 @@
         <div id="drawerBackdrop" class="drawer-backdrop"></div>
         <div id="styleGuideDrawer" class="drawer">
             <div class="drawer-header">
-                <div class="drawer-title">Get your Viiibe!</div>
+                <div id="drawerBackBtn" class="drawer-back-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </div>
+                <div id="drawerTitle" class="drawer-title">Get your Viiibe!</div>
                 <div id="drawerCloseBtn" class="drawer-close">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 4L4 12M4 4L12 12" stroke="black" stroke-width="2" stroke-linecap="round" />
                     </svg>
                 </div>
             </div>
-            <div class="drawer-content">
-                <!-- SECTION 1: Inspiration -->
-                <div class="drawer-section">
-                    <div class="drawer-section-header">
-                        <div>
-                            <div class="drawer-section-title">Download Inspiration</div>
+
+            <div class="drawer-container">
+                <!-- MAIN VIEW -->
+                <div id="drawerMainView" class="drawer-main-view">
+                    <div class="drawer-content">
+                        <!-- SECTION 1: Inspiration -->
+                        <div class="drawer-section">
+                            <div class="drawer-section-header">
+                                <div>
+                                    <div class="drawer-section-title">Download Inspiration</div>
+                                </div>
+                            </div>
+                            <div class="drawer-option">
+                                <div class="drawer-option-label">Mood board</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggle-moodboard" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: Style Guide -->
+                        <div class="drawer-section">
+                            <div class="drawer-section-header">
+                                <div>
+                                    <div class="drawer-section-title">Download Style Guide</div>
+                                </div>
+                            </div>
+                            <div class="drawer-option">
+                                <div class="drawer-option-label">Color palette</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggle-palette">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="drawer-option">
+                                <div class="drawer-option-label">Type scale</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggle-typography">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 3: Fundamentals -->
+                        <div class="drawer-section">
+                            <div class="drawer-section-header">
+                                <div>
+                                    <div class="drawer-section-title">Download Fundamentals</div>
+                                </div>
+                                <div id="fundamentals-badge" class="drawer-section-badge badge-fundamentals">3 FREE
+                                    DOWNLOADS</div>
+                            </div>
+                            <div class="drawer-option">
+                                <div class="drawer-option-label">
+                                    Figma styles
+                                    <span class="chip-pro">PRO</span>
+                                </div>
+                                <label class="toggle-switch pro-toggle" data-feature="Figma Styles">
+                                    <input type="checkbox" id="toggle-styles">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="drawer-option">
+                                <div class="drawer-option-label">
+                                    Figma variables
+                                    <span class="chip-pro">PRO</span>
+                                </div>
+                                <label class="toggle-switch pro-toggle" data-feature="Figma Variables">
+                                    <input type="checkbox" id="toggle-variables">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="drawer-option" style="opacity: 0.4;">
+                                <div class="drawer-option-label">
+                                    Figma components
+                                    <span class="chip-soon">Soon</span>
+                                </div>
+                                <label class="toggle-switch" style="pointer-events: none;">
+                                    <input type="checkbox" id="toggle-components" disabled>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
-                    <div class="drawer-option">
-                        <div class="drawer-option-label">Mood board</div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggle-moodboard" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
+
+                    <div class="drawer-footer" style="display: flex; align-items: center; justify-content: center;">
+                        <!-- Download Button (Centered) -->
+                        <button id="generateStyleGuideBtn" class="btn-download-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 15L12 3M12 15L8 11M12 15L16 11" stroke="white" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M3 17V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V17"
+                                    stroke="white" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
-                <!-- SECTION 2: Style Guide -->
-                <div class="drawer-section">
-                    <div class="drawer-section-header">
-                        <div>
-                            <div class="drawer-section-title">Download Style Guide</div>
-                        </div>
+                <!-- UPGRADE VIEW -->
+                <div id="drawerUpgradeView" class="drawer-upgrade-view">
+                    <div class="upgrade-hero">
+                        <span class="upgrade-badge">EARLY BIRD LIMITED</span>
+                        <div class="upgrade-price">$9</div>
+                        <div class="upgrade-subtitle">One-time payment • Lifetime Access</div>
                     </div>
-                    <div class="drawer-option">
-                        <div class="drawer-option-label">Color palette</div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggle-palette">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="drawer-option">
-                        <div class="drawer-option-label">Type scale</div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggle-typography">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
 
-                <!-- SECTION 3: Fundamentals -->
-                <div class="drawer-section">
-                    <div class="drawer-section-header">
-                        <div>
-                            <div class="drawer-section-title">Download Fundamentals</div>
-                        </div>
-                    </div>
-                    <div class="drawer-option">
-                        <div class="drawer-option-label">
-                            Figma styles
-                            <span class="chip-pro">PRO</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggle-styles">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="drawer-option">
-                        <div class="drawer-option-label">
-                            Figma variables
-                            <span class="chip-pro">PRO</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggle-variables">
-                            <span class="toggle-slider"></span>
-                        </label>
+                    <ul class="upgrade-features">
+                        <li>
+                            <span class="icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M5.8913 18.0198H7.05494M16.364 13.3653H19.2731C20.5584 13.3653 21.6004 14.4072 21.6004 15.6926V19.1835C21.6004 20.4688 20.5584 21.5107 19.2731 21.5107H7.05494M11.1277 6.74824L14.7048 3.17114C15.6136 2.26229 17.0872 2.26229 17.996 3.17114L20.4645 5.63959C21.3733 6.54845 21.3733 8.02199 20.4645 8.93085L10.5458 18.8495M4.72766 21.5107H8.21857C9.50389 21.5107 10.5458 20.4688 10.5458 19.1835V5.21983C10.5458 3.93451 9.50389 2.89256 8.21857 2.89256H4.72766C3.44235 2.89256 2.40039 3.93451 2.40039 5.21983V19.1835C2.40039 20.4688 3.44235 21.5107 4.72766 21.5107Z"
+                                        stroke="black" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="feature-title">Download Design Fundamentals</div>
+                                <div class="feature-text">Export Figma Styles & Variables directly to your file</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M11.2004 2.3999C11.2004 1.84762 10.7527 1.3999 10.2004 1.3999C9.64811 1.3999 9.20039 1.84762 9.20039 2.3999H10.2004H11.2004ZM9.20039 21.5999C9.20039 22.1522 9.64811 22.5999 10.2004 22.5999C10.7527 22.5999 11.2004 22.1522 11.2004 21.5999H10.2004H9.20039ZM6.00039 2.3999V3.3999H18.0004V2.3999V1.3999H6.00039V2.3999ZM21.6004 5.9999H20.6004V17.9999H21.6004H22.6004V5.9999H21.6004ZM18.0004 21.5999V20.5999H6.00039V21.5999V22.5999H18.0004V21.5999ZM2.40039 17.9999H3.40039V5.9999H2.40039H1.40039V17.9999H2.40039ZM6.00039 21.5999V20.5999C4.56445 20.5999 3.40039 19.4358 3.40039 17.9999H2.40039H1.40039C1.40039 20.5404 3.45988 22.5999 6.00039 22.5999V21.5999ZM21.6004 17.9999H20.6004C20.6004 19.4358 19.4363 20.5999 18.0004 20.5999V21.5999V22.5999C20.5409 22.5999 22.6004 20.5404 22.6004 17.9999H21.6004ZM18.0004 2.3999V3.3999C19.4363 3.3999 20.6004 4.56396 20.6004 5.9999H21.6004H22.6004C22.6004 3.45939 20.5409 1.3999 18.0004 1.3999V2.3999ZM6.00039 2.3999V1.3999C3.45988 1.3999 1.40039 3.45939 1.40039 5.9999H2.40039H3.40039C3.40039 4.56396 4.56445 3.3999 6.00039 3.3999V2.3999ZM10.2004 2.3999H9.20039V21.5999H10.2004H11.2004V2.3999H10.2004ZM10.2004 11.9999V12.9999H21.0004V11.9999V10.9999H10.2004V11.9999Z"
+                                        fill="black" />
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="feature-title">Get a curated Component Library <span
+                                        class="feature-soon">(soon)</span></div>
+                                <div class="feature-text">Export Figma Styles & Variables directly to your file</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10.8914 3.17203C11.2723 2.14253 12.7284 2.14253 13.1094 3.17203L15.0055 8.29616C15.1253 8.61984 15.3805 8.87503 15.7041 8.9948L20.8283 10.8909C21.8578 11.2718 21.8578 12.728 20.8283 13.1089L15.7041 15.005C15.3805 15.1248 15.1253 15.38 15.0055 15.7036L13.1094 20.8278C12.7284 21.8573 11.2723 21.8573 10.8914 20.8278L8.99529 15.7036C8.87552 15.38 8.62032 15.1248 8.29665 15.005L3.17251 13.1089C2.14302 12.728 2.14302 11.2719 3.17251 10.8909L8.29665 8.9948C8.62032 8.87503 8.87552 8.61984 8.99529 8.29617L10.8914 3.17203Z"
+                                        stroke="black" stroke-width="2" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="feature-title">Free Lifetime Updates</div>
+                                <div class="feature-text">Unlock all future agents and advanced features</div>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <button id="unlockProBtn" class="btn-upgrade-pro">Unlock Lifetime Access</button>
+                    <div class="upgrade-footer">
+                        <p class="upgrade-footer-text">
+                            <span>Secure payment handled by</span>
+                            <svg width="32" height="13" viewBox="0 0 32 13" fill="none"
+                                xmlns="http://www.w3.org/2000/svg" style="display: block; margin-left: 2px;">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M3.34438 5.49684C2.65475 5.262 2.2768 5.07936 2.2768 4.79234C2.2768 4.54877 2.49412 4.40963 2.88148 4.40963C3.59004 4.40963 4.31744 4.66188 4.81818 4.88797L5.1016 3.27898C4.70481 3.105 3.89231 2.81799 2.76811 2.81799C1.97453 2.81799 1.31317 3.00931 0.840843 3.36593C0.34953 3.7399 0.0944505 4.27917 0.0944505 4.93148C0.0944505 6.11431 0.878609 6.61881 2.15401 7.04497C2.97593 7.31457 3.24993 7.50596 3.24993 7.80165C3.24993 8.08867 2.98536 8.2539 2.50354 8.2539C1.90835 8.2539 0.92587 7.9843 0.283422 7.63642L0 9.26283C0.547926 9.54985 1.56825 9.84554 2.6264 9.84554C3.46718 9.84554 4.16631 9.66289 4.6387 9.31501C5.16771 8.9323 5.44171 8.36701 5.44171 7.63642C5.44171 6.42742 4.6387 5.92299 3.34438 5.49684ZM10.0556 4.54877L10.339 2.94845H8.84277V1.00573L6.83104 1.31049L6.54053 2.94845L5.83297 3.05412L5.56811 4.54877H6.53763V7.6886C6.53763 8.50615 6.76437 9.0715 7.22727 9.41938C7.61463 9.7064 8.17198 9.84554 8.95614 9.84554C9.56075 9.84554 9.9292 9.74991 10.1843 9.68898V7.99297C10.0426 8.02781 9.72138 8.08867 9.50407 8.08867C9.04117 8.08867 8.84277 7.87125 8.84277 7.37549V4.54877H10.0556ZM14.549 2.85497C13.8877 2.85497 13.3586 3.17461 13.1508 3.74864L13.0091 2.94845H10.959V9.71508H13.3019V5.32286C13.5948 4.99234 14.0105 4.87283 14.5773 4.87283C14.7002 4.87283 14.8324 4.87283 14.993 4.89893V2.90716C14.8324 2.87239 14.6907 2.85497 14.549 2.85497ZM16.7408 2.27872C17.421 2.27872 17.969 1.76561 17.969 1.13939C17.969 0.504433 17.421 0 16.7408 0C16.0511 0 15.5032 0.504433 15.5032 1.13939C15.5032 1.76561 16.0511 2.27872 16.7408 2.27872ZM15.5599 2.94845H17.9123V9.71508H15.5599V2.94845ZM24.5786 3.55725C24.1629 3.0615 23.5866 2.81799 22.8497 2.81799C22.1695 2.81799 21.5743 3.07891 21.0169 3.62685L20.8941 2.94845H18.8345V12.22L21.1775 11.8634V9.68898C21.5365 9.79335 21.9049 9.84554 22.2356 9.84554C22.8214 9.84554 23.6716 9.7064 24.3329 9.04541C24.9659 8.41045 25.2871 7.42768 25.2871 6.13173C25.2871 4.98366 25.0509 4.11394 24.5786 3.55725ZM22.6324 7.73205C22.4434 8.06257 22.1506 8.23655 21.8105 8.23655C21.5743 8.23655 21.3664 8.19304 21.1775 8.10608V4.88797C21.5743 4.50532 21.9333 4.46181 22.0656 4.46181C22.6607 4.46181 22.9536 5.05326 22.9536 6.21001C22.9536 6.871 22.8497 7.38417 22.6324 7.73205ZM32.0043 6.27087C32.0043 5.1924 31.7492 4.34003 31.2484 3.7399C30.7383 3.1311 29.973 2.81799 29 2.81799C27.0065 2.81799 25.769 4.1748 25.769 6.34915C25.769 7.56682 26.0996 8.48005 26.7514 9.06276C27.3372 9.58461 28.1781 9.84554 29.2645 9.84554C30.2659 9.84554 31.1918 9.62812 31.7775 9.2715L31.5224 7.79297C30.9461 8.07999 30.2754 8.23655 29.5196 8.23655C29.0661 8.23655 28.7543 8.14953 28.5276 7.96688C28.2819 7.77556 28.1402 7.46245 28.093 7.01888H31.9759C31.9853 6.91451 32.0043 6.42742 32.0043 6.27087ZM28.0741 5.69683C28.1402 4.73141 28.4236 4.27917 28.9621 4.27917C29.4912 4.27917 29.7652 4.74015 29.803 5.69683H28.0741Z"
+                                    fill="#A6A6A6" />
+                            </svg>
+                        </p>
                     </div>
                 </div>
             </div>
-            <div class="drawer-footer"
-                style="display: flex; align-items: center; justify-content: center; padding: 20px 24px;">
-                <!-- Download Button (Centered) -->
-                <button id="generateStyleGuideBtn" class="btn-download-circle">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 15L12 3M12 15L8 11M12 15L16 11" stroke="white" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M3 17V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V17" stroke="white"
-                            stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                </button>
+        </div>
+
+        <!-- DEBUG PANEL (Hidden, opens with Cmd+Shift+D) -->
+        <div id="debugPanel" class="debug-panel">
+            <div class="debug-header">
+                <div class="debug-title">🛠️ Debug Panel</div>
+                <div id="debugCloseBtn" class="debug-close">×</div>
             </div>
+            <div class="debug-content">
+                <div class="debug-status">
+                    <div class="debug-status-label">Current Status:</div>
+                    <div id="debugCurrentStatus" class="debug-status-value">Loading...</div>
+                </div>
+                <div class="debug-actions">
+                    <button id="debugResetFree" class="debug-btn">
+                        🔄 Reset to FREE (0/3)
+                    </button>
+                    <button id="debugSet3Downloads" class="debug-btn">
+                        📥 Set 3/3 Downloads (Trigger Upgrade)
+                    </button>
+                    <button id="debugActivatePro" class="debug-btn">
+                        ⭐ Activate PRO
+                    </button>
+                    <button id="debugRefreshStatus" class="debug-btn secondary">
+                        🔍 Refresh Status
+                    </button>
+                </div>
+                <div class="debug-info">
+                    Press <kbd>Esc</kbd> three times quickly to toggle this panel
+                </div>
+            </div>
+        </div>
+        <!-- Terms of Use Link - Fixed at bottom of plugin window -->
+        <div id="termsContainer"
+            style="position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; z-index: 10000;">
+            <span style="font-size: 12px; color: #999;">
+                Read the <a id="termsLinkSearch" href="#"
+                    style="color: #999; text-decoration: underline; cursor: pointer;">Attribution & Terms</a> before
+                using Viiibe!
+            </span>
         </div>
     </div>
     <script type="module" src="/src/main.ts"></script>

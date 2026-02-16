@@ -28,12 +28,41 @@ export const sections = {
 };
 
 export function showView(viewId: string) {
-    const center = ['auth', 'authorization', 'search', 'loading', 'generating', 'confirmation', 'empty'].includes(viewId);
-    wrapper?.classList.toggle('centered', center);
-    Object.values(views).forEach(v => v?.classList.remove('active'));
+    const currentActive = Object.values(views).find(v => v?.classList.contains('active'));
     // @ts-ignore
-    views[viewId]?.classList.add('active');
+    const targetView = views[viewId];
+
+    if (!targetView) {
+        console.warn(`View ${viewId} not found`);
+        return;
+    }
+
+    if (currentActive && currentActive !== targetView) {
+        // Start fade out of current
+        currentActive.classList.add('fade-out');
+        currentActive.classList.remove('active');
+
+        // Show new one after a short delay
+        setTimeout(() => {
+            const center = ['auth', 'authorization', 'search', 'loading', 'generating', 'confirmation', 'empty'].includes(viewId);
+            wrapper?.classList.toggle('centered', center);
+
+            Object.values(views).forEach(v => {
+                v?.classList.remove('active');
+                v?.classList.remove('fade-out');
+            });
+
+            targetView.classList.add('active');
+        }, 300);
+    } else {
+        // First load or no transition needed
+        const center = ['auth', 'authorization', 'search', 'loading', 'generating', 'confirmation', 'empty'].includes(viewId);
+        wrapper?.classList.toggle('centered', center);
+        Object.values(views).forEach(v => v?.classList.remove('active'));
+        targetView.classList.add('active');
+    }
 }
+
 
 export function showToast(msg: string) {
     const t = document.getElementById('toast');

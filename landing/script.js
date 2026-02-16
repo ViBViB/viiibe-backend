@@ -17,6 +17,28 @@ let ticking = false;
 
 function handleScroll() {
     const scrollY = window.scrollY;
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+        // Reset styles for mobile to ensure natural document flow
+        masonryWrapper.style.position = 'relative';
+        masonryWrapper.style.top = '0';
+        masonryWrapper.style.opacity = '1';
+        contentWrapper.style.position = 'relative';
+        contentWrapper.style.width = '100%';
+        contentWrapper.style.height = 'auto';
+        contentWrapper.style.opacity = '1';
+        masonryContainer.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+        const content = document.querySelector('.content');
+        if (content) {
+            content.style.clipPath = 'none';
+            content.style.position = 'relative';
+            content.style.left = '0';
+            content.style.bottom = '0';
+            content.style.width = '100%';
+        }
+        return;
+    }
 
     // PHASE 1: Content disappears + Rotation (0px to MAX_SCROLL)
     const phase1Progress = Math.min(scrollY / MAX_SCROLL, 1);
@@ -43,7 +65,7 @@ function handleScroll() {
     // As container shrinks from right, clip more from the LEFT
     // clipLeft increases as containerWidthPx decreases
     const clipLeft = Math.max(0, initialContainerWidth - containerWidthPx - 50); // 50px is left padding
-    content.style.clipPath = `inset(0 0 0 ${clipLeft}px)`; // inset(top right bottom LEFT)
+    if (content) content.style.clipPath = `inset(0 0 0 ${clipLeft}px)`; // inset(top right bottom LEFT)
 
     // Hide initial content completely when width is very small
     if (contentWidth < 5) {
@@ -69,25 +91,6 @@ function handleScroll() {
         masonryWrapper.style.top = '0';
     }
 
-    // PHASE 3: Masonry Fade-out (after phase2End)
-    // How it Works section scrolls in normally while masonry fades out
-    const phase3Start = phase2End;
-    const phase3End = phase3Start + MASONRY_FADEOUT_SCROLL;
-
-    // TEMPORARILY COMMENTED FOR TESTING - to see when "How it Works" appears
-    /*
-    if (scrollY < phase3Start) {
-        // Before Phase 3: Masonry is fully visible
-        masonryWrapper.style.opacity = '1';
-    } else {
-        // Phase 3: Masonry fades out
-        const phase3Progress = Math.min((scrollY - phase3Start) / MASONRY_FADEOUT_SCROLL, 1);
-        const masonryOpacity = 1 - phase3Progress;
-        
-        masonryWrapper.style.opacity = masonryOpacity;
-    }
-    */
-
     ticking = false;
 }
 
@@ -98,17 +101,25 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Duplicate images for infinite scroll effect
+// Update window resize handler to jump to correct state
+window.addEventListener('resize', () => {
+    handleScroll();
+});
+
+// Duplicate images for infinite scroll effect (Triple Clone Strategy)
 function duplicateImages() {
-    const columns = document.querySelectorAll('.masonry-column');
+    const columns = document.querySelectorAll('.masonry-column, .cta-masonry-column');
 
     columns.forEach(column => {
         const images = Array.from(column.querySelectorAll('img'));
-        // Clone all images and append them for seamless loop
-        images.forEach(img => {
-            const clone = img.cloneNode(true);
-            column.appendChild(clone);
-        });
+        // Clone all images twice and append them for a seamless triple loop
+        // Set 1 (original) | Set 2 (clone) | Set 3 (clone)
+        for (let i = 0; i < 2; i++) {
+            images.forEach(img => {
+                const clone = img.cloneNode(true);
+                column.appendChild(clone);
+            });
+        }
     });
 }
 
@@ -116,10 +127,11 @@ function duplicateImages() {
 duplicateImages();
 
 // CTA Button click handler
-const ctaButton = document.querySelector('.cta-button');
-ctaButton.addEventListener('click', () => {
-    // TODO: Add your Figma plugin installation link
-    window.open('https://www.figma.com/community/plugin/your-plugin-id', '_blank');
+const ctaButtons = document.querySelectorAll('.cta-button');
+ctaButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        window.open('https://www.figma.com/community/plugin/1603792827026673789', '_blank');
+    });
 });
 
 // Initial state

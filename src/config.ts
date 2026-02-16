@@ -7,7 +7,7 @@
 
 // Backend API Base URL
 // This is the ONLY place where the backend URL should be defined
-export const API_BASE_URL = 'https://moood-refactor.vercel.app/api';
+export const API_BASE_URL = 'https://viiibe-backend.vercel.app/api';
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -43,6 +43,28 @@ export function getPinterestProxyUrl(endpoint: string, params?: Record<string, s
 }
 
 /**
+ * Upgrade Pinterest URL to high resolution (/736x/)
+ * This is the optimal balance between quality and speed for moodboards
+ */
+export function upgradeTo736x(url: string): string {
+    if (!url || typeof url !== 'string') return url;
+
+    // If already 736x, return as is
+    if (url.includes('/736x/')) {
+        return url;
+    }
+
+    // Replace any resolution path with /736x/
+    // This handles: /236x/, /474x/, /564x/
+    // We don't downgrade /originals/ if it's already there
+    if (url.includes('/originals/')) {
+        return url;
+    }
+
+    return url.replace(/\/(236x|474x|564x)\//, '/736x/');
+}
+
+/**
  * Upgrade Pinterest URL to highest resolution (/originals/)
  * Handles existing pins in database that may have low-resolution URLs
  */
@@ -58,4 +80,5 @@ export function upgradeToOriginals(url: string): string {
     // This handles: /236x/, /474x/, /564x/, /736x/
     return url.replace(/\/(236x|474x|564x|736x)\//, '/originals/');
 }
+
 

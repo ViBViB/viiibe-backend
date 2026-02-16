@@ -1,17 +1,24 @@
 {
   "name": "Viiibe!",
-  "id": "viiibe",
+  "id": "1603792827026673789",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "dist/index.html",
   "editorType": [
     "figma"
   ],
+  "documentAccess": "dynamic-page",
   "networkAccess": {
     "allowedDomains": [
-      "https://moood-refactor.vercel.app",
-      "https://*.vercel.app"
+      "https://viiibe-backend.vercel.app",
+      "https://*.vercel.app",
+      "https://api.stripe.com",
+      "https://fonts.googleapis.com",
+      "https://fonts.gstatic.com"
     ],
-    "reasoning": "All API calls go through our Vercel backend. Pinterest images are proxied through /api/image-proxy to avoid CORS."
-  }
+    "reasoning": "All API calls go through our Vercel backend. Pinterest images are proxied through /api/image-proxy to avoid CORS. Google Fonts are used for the typography feature."
+  },
+  "permissions": [
+    "currentuser"
+  ]
 }

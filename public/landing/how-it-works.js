@@ -21,14 +21,21 @@
         // Allow all items to be centered
         const maxIndex = carouselItemWrappers.length - 1;
 
-        // Calculate initial offset to center first item
+        // Calculate offset to center the specific item
         const viewportWidth = carouselViewport.offsetWidth;
-        const itemWidth = 731 + 24; // width + gap
-        const initialOffset = (viewportWidth / 2) - (731 / 2) - 12; // Center first item
+        const activeWrapper = carouselItemWrappers[index];
+        const itemWidth = activeWrapper.offsetWidth;
 
-        // Slide the track with initial offset
-        const slideOffset = index * itemWidth;
-        carouselTrack.style.transform = `translateX(${initialOffset - slideOffset}px)`;
+        // Match CSS gaps: 96px for desktop, 24px for mobile
+        const isMobile = window.innerWidth <= 768;
+        const gap = isMobile ? 24 : 96;
+
+        // Final position should be: viewportCenter - itemCenter
+        // Item center relative to track is: index * (itemWidth + gap) + itemWidth / 2
+        const itemCenterOnTrack = index * (itemWidth + gap) + (itemWidth / 2);
+        const transformX = (viewportWidth / 2) - itemCenterOnTrack;
+
+        carouselTrack.style.transform = `translateX(${transformX}px)`;
 
         // Update center class and distance classes for arc effect
         carouselItemWrappers.forEach((wrapper, i) => {
@@ -69,4 +76,9 @@
 
     // Initialize carousel with first item centered
     goToSlide(0);
+
+    // Recalculate on resize
+    window.addEventListener('resize', () => {
+        goToSlide(currentIndex);
+    });
 })();

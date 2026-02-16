@@ -1,7 +1,7 @@
 import './styles/main.css';
 import { showView, showToast, tabs } from './ui/views';
 import { switchTab, startSearch, applyVisualFilter, updateProgress } from './ui/moodboard';
-import { getImageProxyUrl, upgradeToOriginals } from './config';
+import { API_BASE_URL, getImageProxyUrl, upgradeToOriginals, upgradeTo736x } from './config';
 import lottie, { AnimationItem } from 'lottie-web';
 import viiibeLogo from './assets/viiibe-logo.json';
 
@@ -27,8 +27,116 @@ const PINS_PER_PAGE = 20;
 let currentQuery = '';
 
 // Fundamentals download tracking
+let figmaUserId = 'anonymous-user';
 let fundamentalsDownloadsUsed = 0;
 const FUNDAMENTALS_FREE_LIMIT = 3;
+let isPro = false; // To be synced with backend/KV later
+let pollingInterval: any = null;
+
+// Stripe Configuration (Replace with your Price ID)
+const STRIPE_PRICE_ID = 'price_1SzlyRRdpVcohn7Xmzb4J7GY';
+
+async function syncWithBackend(showSuccessToast: boolean = false) {
+    // Add cache buster to prevent browser/Figma caching of the status
+    const cacheBuster = Date.now();
+    console.log(`📡 [Backend Sync] Checking status for user: ${figmaUserId} (t=${cacheBuster})`);
+
+    try {
+        const response = await fetch(`https://viiibe-backend.vercel.app/api/user-status?userId=${figmaUserId}&t=${cacheBuster}`, {
+            method: 'GET',
+            cache: 'no-store' // Prevent caching without custom headers
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            const wasProBefore = isPro;
+
+            // Check all possible flags for PRO status
+            isPro = data.isPro ||
+                (data.debug && data.debug.is_pro_val) ||
+                (data.raw_data && data.raw_data.is_pro) ||
+                (data.raw_data && data.raw_data.status === 'PRO_FORCED') ||
+                (data.raw_data && data.raw_data.status === 'PRO_VERIFIED') ||
+                false;
+
+            // Log detailed debug info for troubleshooting
+            console.log('📡 [Backend Sync] Debug info:', {
+                is_pro_result: isPro,
+                was_pro_before: wasProBefore,
+                raw_data: data
+            });
+
+            // ALWAYS sync with backend as source of truth
+            // This allows resets to work properly
+            fundamentalsDownloadsUsed = data.downloadsCount;
+
+            updateFundamentalsBadge();
+
+            // If we just detected PRO status change
+            if (isPro && !wasProBefore) {
+                console.log('✨ [Sync] PRO status just activated!');
+
+                // Stop any active polling
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                    console.log('⏹️ [Polling] Stopped polling - PRO confirmed');
+                }
+
+                // If we are in the upgrade view, switch back to main
+                const drawer = document.getElementById('styleGuideDrawer');
+                if (drawer && drawer.classList.contains('show-upgrade')) {
+                    console.log('✨ [Sync] Closing upgrade view.');
+                    switchToMainDrawer();
+                }
+
+                // Show success toast
+                showToast('🎉 Viiibe Pro Unlocked!');
+            } else if (isPro && wasProBefore && showSuccessToast) {
+                // Already PRO, but user requested sync (e.g., from upgrade button)
+                showToast('✅ You already have Viiibe Pro!');
+            }
+
+            console.log(`📡 [Backend Sync] Status: ${isPro ? 'PRO' : 'FREE'}, Downloads: ${fundamentalsDownloadsUsed}`);
+
+            return isPro;
+        }
+    } catch (e) {
+        console.warn('📡 [Backend Sync] Failed to sync with backend:', e);
+        return false;
+    }
+}
+
+// Monitor localStorage for payment completion signal from success.html
+function startPaymentCompletionMonitor() {
+    console.log('👀 [Payment Monitor] Starting localStorage monitor...');
+
+    const checkInterval = setInterval(() => {
+        try {
+            const proActivated = localStorage.getItem('viiibe_pro_activated');
+            if (proActivated) {
+                const timestamp = parseInt(proActivated);
+                const now = Date.now();
+
+                // If flag was set in the last 60 seconds, it's fresh
+                if (now - timestamp < 60000) {
+                    console.log('🎊 [Payment Monitor] Detected PRO activation flag! Syncing...');
+                    localStorage.removeItem('viiibe_pro_activated'); // Clear flag
+                    syncWithBackend(false); // Sync immediately
+                    clearInterval(checkInterval); // Stop monitoring
+                }
+            }
+        } catch (e) {
+            console.warn('⚠️ [Payment Monitor] localStorage check failed:', e);
+        }
+    }, 1000); // Check every second
+
+    // Stop monitoring after 2 minutes
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        console.log('⏹️ [Payment Monitor] Stopped monitoring after 2 minutes');
+    }, 120000);
+}
 
 interface StyleGuideConfig {
     downloadMoodboard: boolean;
@@ -56,42 +164,118 @@ function closeDrawer() {
         backdrop.classList.remove('active');
         drawer.classList.remove('active');
         document.body.classList.remove('drawer-open'); // Show footer overlay
+
+        // Reset to main view after animation finishes
+        setTimeout(() => {
+            switchToMainDrawer();
+        }, 300);
+    }
+}
+
+function switchToUpgradeDrawer(featureName: string = "") {
+    const drawer = document.getElementById('styleGuideDrawer');
+    const title = document.getElementById('drawerTitle');
+
+    if (drawer) {
+        if (isPro) {
+            // If already PRO, just stay in main view or show success
+            switchToMainDrawer();
+            showToast('You already have Viiibe! Pro');
+            return;
+        }
+
+        drawer.classList.add('show-upgrade');
+        if (title) title.textContent = featureName ? `Unlock ${featureName}` : "Get Viiibe Pro";
+
+        // If polling is active, update button state to show we are waiting
+        const unlockBtn = document.getElementById('unlockProBtn');
+        if (unlockBtn && pollingInterval) {
+            unlockBtn.textContent = 'Verifying payment...';
+            unlockBtn.setAttribute('disabled', 'true');
+        }
+    }
+}
+
+function switchToMainDrawer() {
+    const drawer = document.getElementById('styleGuideDrawer');
+    const title = document.getElementById('drawerTitle');
+    if (drawer) {
+        drawer.classList.remove('show-upgrade');
+        if (title) title.textContent = "Get your Viiibe!";
     }
 }
 
 // Fundamentals tracking functions
 function checkFundamentalsLimit(): boolean {
-    try {
-        // Get from localStorage (may fail in Figma plugin environment)
-        fundamentalsDownloadsUsed = parseInt(localStorage.getItem('fundamentalsDownloads') || '0');
-    } catch (e) {
-        // localStorage not available in Figma plugins, default to 0
-        console.warn('localStorage not available, using default value');
-        fundamentalsDownloadsUsed = 0;
+    if (isPro) return true; // PRO users have no limit
+
+    // If we haven't loaded any count yet, try fallback
+    if (fundamentalsDownloadsUsed === 0) {
+        try {
+            const local = localStorage.getItem('fundamentalsDownloads');
+            if (local) fundamentalsDownloadsUsed = parseInt(local);
+        } catch (e) { }
     }
-    return fundamentalsDownloadsUsed < FUNDAMENTALS_FREE_LIMIT;
+
+    const hasLimitRemaining = fundamentalsDownloadsUsed < FUNDAMENTALS_FREE_LIMIT;
+    console.log(`🔍 Limit check: ${fundamentalsDownloadsUsed}/${FUNDAMENTALS_FREE_LIMIT} (Has remaining: ${hasLimitRemaining})`);
+    return hasLimitRemaining;
 }
 
-function incrementFundamentalsDownload() {
+async function incrementFundamentalsDownload() {
+    // 1. Increment locally immediately for instant feedback
     fundamentalsDownloadsUsed++;
+    console.log(`📊 Incrementing! New count: ${fundamentalsDownloadsUsed}`);
+    updateFundamentalsBadge();
+
+    // 2. Persist to Figma clientStorage immediately (via code.js)
+    // This is the MOST reliable way in Figma
+    parent.postMessage({
+        pluginMessage: {
+            type: "sync-downloads",
+            count: fundamentalsDownloadsUsed
+        }
+    }, "*");
+
+    // 3. Persist to localStorage (as fallback)
     try {
         localStorage.setItem('fundamentalsDownloads', fundamentalsDownloadsUsed.toString());
     } catch (e) {
-        // localStorage not available in Figma plugins, skip saving
-        console.warn('localStorage not available, cannot persist download count');
+        console.warn('localStorage write failed');
     }
-    updateFundamentalsBadge();
-    console.log(`📊 Fundamentals downloads used: ${fundamentalsDownloadsUsed}/${FUNDAMENTALS_FREE_LIMIT}`);
+
+    // 4. Sync with cloud backend (fire and forget)
+    fetch(`https://viiibe-backend.vercel.app/api/increment-downloads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: figmaUserId })
+    }).then(() => console.log('📡 [Backend Sync] Cloud incremented'))
+        .catch(e => console.warn('📡 [Backend Sync] Cloud failed', e));
 }
 
 function updateFundamentalsBadge() {
     const badge = document.getElementById('fundamentals-badge');
+    const unlockBtn = document.getElementById('unlockProBtn');
+
+    if (unlockBtn) {
+        unlockBtn.style.display = isPro ? 'none' : 'block';
+    }
+
     if (!badge) return;
+
+    if (isPro) {
+        badge.textContent = 'VIIIBE! PRO ACTIVE';
+        badge.className = 'drawer-section-badge badge-pro-active';
+        badge.style.color = '#10B981'; // Green for Pro
+        badge.style.fontWeight = '700';
+        return;
+    }
 
     const remaining = FUNDAMENTALS_FREE_LIMIT - fundamentalsDownloadsUsed;
     if (remaining > 0) {
         badge.textContent = `${remaining} FREE DOWNLOAD${remaining === 1 ? '' : 'S'}`;
         badge.className = 'drawer-section-badge badge-fundamentals';
+        badge.style.color = ''; // Reset
     } else {
         badge.textContent = 'UPGRADE TO PRO';
         badge.className = 'drawer-section-badge badge-fundamentals';
@@ -105,6 +289,7 @@ function showUpgradeModal() {
         modal.style.display = 'flex';
     }
 }
+
 
 function closeUpgradeModal() {
     const modal = document.getElementById('upgradeModal');
@@ -212,6 +397,9 @@ async function collectAllData(): Promise<{ images: any[], colors: any[], typogra
 document.addEventListener('DOMContentLoaded', function () {
     console.log('🚀 Viiibe Plugin Loaded');
 
+    // Start monitoring for payment completion signals
+    startPaymentCompletionMonitor();
+
     // Initialize Lottie animation
     const lottieContainer = document.getElementById('lottie-logo');
     if (lottieContainer) {
@@ -224,6 +412,104 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         console.log('✨ Lottie animation loaded');
     }
+
+    // DEBUG PANEL - Toggle with Cmd+Shift+D
+    const debugPanel = document.getElementById('debugPanel');
+    const debugCloseBtn = document.getElementById('debugCloseBtn');
+    const debugResetFree = document.getElementById('debugResetFree');
+    const debugSet3Downloads = document.getElementById('debugSet3Downloads');
+    const debugActivatePro = document.getElementById('debugActivatePro');
+    const debugRefreshStatus = document.getElementById('debugRefreshStatus');
+    const debugCurrentStatus = document.getElementById('debugCurrentStatus');
+
+    // Toggle debug panel with triple Escape press
+    let escapeCount = 0;
+    let escapeTimer: any = null;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            escapeCount++;
+
+            // Reset counter after 1 second
+            if (escapeTimer) clearTimeout(escapeTimer);
+            escapeTimer = setTimeout(() => {
+                escapeCount = 0;
+            }, 1000);
+
+            // Toggle on triple press
+            if (escapeCount === 3) {
+                e.preventDefault();
+                e.stopPropagation();
+                debugPanel?.classList.toggle('active');
+                if (debugPanel?.classList.contains('active')) {
+                    updateDebugStatus();
+                }
+                escapeCount = 0;
+            }
+        }
+    });
+
+    // Close debug panel
+    debugCloseBtn?.addEventListener('click', () => {
+        debugPanel?.classList.remove('active');
+    });
+
+    // Update debug status display
+    function updateDebugStatus() {
+        if (debugCurrentStatus) {
+            const status = isPro ? '⭐ PRO ACTIVE' : `📥 FREE (${fundamentalsDownloadsUsed}/3 downloads)`;
+            debugCurrentStatus.textContent = status;
+        }
+    }
+
+    // Debug actions
+    debugResetFree?.addEventListener('click', async () => {
+        try {
+            const response = await fetch(`https://viiibe-backend.vercel.app/api/complete-reset?userId=${figmaUserId}&secret=viiibe-debug-2026`);
+            const data = await response.json();
+            if (data.success) {
+                showToast('✅ Reset to FREE (0/3)');
+                await syncWithBackend();
+                updateDebugStatus();
+            }
+        } catch (error) {
+            showToast('❌ Reset failed');
+        }
+    });
+
+    debugSet3Downloads?.addEventListener('click', async () => {
+        try {
+            const response = await fetch(`https://viiibe-backend.vercel.app/api/set-downloads?userId=${figmaUserId}&downloads=3&secret=viiibe-debug-2026`);
+            const data = await response.json();
+            if (data.success) {
+                showToast('✅ Set to 3/3 downloads');
+                await syncWithBackend();
+                updateDebugStatus();
+            }
+        } catch (error) {
+            showToast('❌ Failed to set downloads');
+        }
+    });
+
+    debugActivatePro?.addEventListener('click', async () => {
+        try {
+            const response = await fetch(`https://viiibe-backend.vercel.app/api/admin-check-user?userId=${figmaUserId}&secret=viiibe-debug-2026&force=true`);
+            const data = await response.json();
+            if (data.success) {
+                showToast('✅ PRO activated');
+                await syncWithBackend();
+                updateDebugStatus();
+            }
+        } catch (error) {
+            showToast('❌ Failed to activate PRO');
+        }
+    });
+
+    debugRefreshStatus?.addEventListener('click', async () => {
+        await syncWithBackend();
+        updateDebugStatus();
+        showToast('🔄 Status refreshed');
+    });
 
     // Plugin always starts on search view - no auth needed
 
@@ -344,7 +630,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (miniPRDController.isPRDComplete()) {
                 // Show confirmation IN THE CHAT after a short delay
                 setTimeout(() => {
-                    showInlinePRDConfirmation();
+                    // @ts-ignore - function is defined in current scope
+                    if (typeof showInlinePRDConfirmation === 'function') {
+                        // @ts-ignore
+                        showInlinePRDConfirmation();
+                    } else {
+                        // Fallback call if it's already defined
+                        showConfirmation();
+                    }
                 }, 1000);
             }
 
@@ -423,7 +716,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (prd.colors.length > 0) query += prd.colors.join(' ') + ' ';
 
                     // Start search
-                    startSearch(query.trim(), false, prd);
+                    startSearch(query.trim(), false);
 
                     // Reset controller
                     miniPRDController = null;
@@ -491,17 +784,17 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmGenerateBtn.onclick = () => {
             if (!miniPRDController) return;
 
-            const intent = miniPRDController.getIntent();
+            const intent = (miniPRDController as any).getIntent ? (miniPRDController as any).getIntent() : {};
 
             // Build search query from intent
             let query = '';
             if (intent.projectType) query += intent.projectType + ' ';
             if (intent.industry) query += intent.industry + ' ';
-            if (intent.styles.length > 0) query += intent.styles.join(' ') + ' ';
-            if (intent.colors.length > 0) query += intent.colors.join(' ') + ' ';
+            if (intent.styles && intent.styles.length > 0) query += intent.styles.join(' ') + ' ';
+            if (intent.colors && intent.colors.length > 0) query += intent.colors.join(' ') + ' ';
 
-            // Start search with the generated query AND the intent object
-            startSearch(query.trim(), false, intent);
+            // Start search with the generated query
+            startSearch(query.trim(), false);
 
             // Reset controller
             miniPRDController = null;
@@ -599,6 +892,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     };
 
+                    img.onerror = () => {
+                        if (img.src !== srcUrl) {
+                            console.warn('⚠️ Detail Proxy failed, falling back to direct:', srcUrl);
+                            img.src = srcUrl;
+                        }
+                    };
                     img.src = proxyUrl;
 
                     // Handle cached images
@@ -613,7 +912,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const overlay = document.createElement('div');
                     overlay.className = 'pin-overlay';
                     overlay.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`;
-                    overlay.onclick = () => {
+                    overlay.onclick = (event) => {
                         currIdx = urlIndex;
                         const dImg = document.getElementById('detailsImage') as HTMLImageElement;
                         if (dImg) {
@@ -722,6 +1021,35 @@ document.addEventListener('DOMContentLoaded', function () {
         const msg = event?.data?.pluginMessage;
         if (!msg) return;
 
+        if (msg.type === 'figma-user-init') {
+            // CRITICAL: Trim userId to prevent database key mismatches
+            figmaUserId = msg.userId.trim();
+
+            // Prioritize local downloads from Figma's clientStorage if backend hasn't synced yet
+            if (msg.localDownloads > fundamentalsDownloadsUsed) {
+                fundamentalsDownloadsUsed = msg.localDownloads;
+                updateFundamentalsBadge();
+            }
+
+            console.log('📨 Received figma-user-init:', {
+                userId: figmaUserId,
+                localDownloads: msg.localDownloads
+            });
+
+            syncWithBackend(); // Real source of truth for PRO and count
+            return;
+        }
+
+        if (msg.type === 'reset-local-storage') {
+            console.log('🔄 Resetting local storage...');
+            fundamentalsDownloadsUsed = 0;
+            isPro = false;
+            updateFundamentalsBadge();
+            syncWithBackend();
+            showToast('✅ Local storage reset!');
+            return;
+        }
+
         if (msg.type === 'show-view') {
             console.log('📨 Received show-view message:', msg.view);
 
@@ -808,11 +1136,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         const totalImages = pinsToShow.length;
 
                         pinsToShow.forEach((pin: any, index: number) => {
-                            const srcUrl = pin.imageUrl || pin.image;
+                            let srcUrl = pin.imageUrl || pin.image;
                             if (!srcUrl) return;
 
-                            // Use URL as-is from database (don't upgrade to /originals/)
-                            // The URLs in database already work - upgrading breaks them
+                            // Upgrade to 736x for better resolution in the Figma grid
+                            srcUrl = upgradeTo736x(srcUrl);
                             const proxyUrl = getImageProxyUrl(srcUrl);
 
                             // Store proxy URL for lightbox navigation
@@ -862,7 +1190,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             img.onerror = () => {
                                 // If /originals/ URL failed, try downgrading to /736x/
                                 if (srcUrl.includes('/originals/') && !img.getAttribute('data-fallback-tried')) {
-                                    const fallbackUrl = srcUrl.replace('/originals/', '/736x/');
+                                    const fallbackUrl = upgradeTo736x(srcUrl);
                                     const fallbackProxyUrl = getImageProxyUrl(fallbackUrl);
 
                                     console.warn(`⚠️ /originals/ failed (403), trying /736x/ fallback...`);
@@ -899,6 +1227,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             };
 
                             // Set image source (same for grid and lightbox)
+                            // Set image source with fallback
+                            img.onerror = () => {
+                                if (img.src !== srcUrl) {
+                                    console.warn('⚠️ Proxy failed, falling back to direct URL:', srcUrl);
+                                    img.src = srcUrl;
+                                }
+                            };
+                            img.onerror = () => {
+                                if (img.src !== srcUrl) {
+                                    console.warn('⚠️ Grid Proxy failed, falling back to direct:', srcUrl);
+                                    img.src = srcUrl;
+                                }
+                            };
                             img.src = proxyUrl;
 
                             // Handle case where image loads from cache before onload is attached
@@ -1056,60 +1397,48 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     const detailsNextBtn = document.getElementById('detailsNextBtn');
-    if (detailsNextBtn) detailsNextBtn.onclick = () => {
-        currIdx = (currIdx + 1) % imgUrls.length;
-        dImg.src = imgUrls[currIdx];
+    const navigateLightbox = (direction: number) => {
+        if (!dImg || imgUrls.length === 0) return;
 
-        // Update background color for new image
-        const allGridImages = document.querySelectorAll('.pin-image') as NodeListOf<HTMLImageElement>;
-        if (allGridImages[currIdx]) {
-            const storedColor = allGridImages[currIdx].getAttribute('data-edge-color') || '#FFFFFF';
+        // Apply switching class for fade/scale out
+        dImg.classList.add('switching');
 
-            if (lightbox) {
-                lightbox.style.setProperty('background-color', storedColor, 'important');
+        // Wait for half the transition time before swapping content
+        setTimeout(() => {
+            currIdx = (currIdx + direction + imgUrls.length) % imgUrls.length;
+            dImg.src = imgUrls[currIdx];
+
+            // Update background color for new image
+            const allGridImages = document.querySelectorAll('.pin-image') as NodeListOf<HTMLImageElement>;
+            if (allGridImages[currIdx]) {
+                const storedColor = allGridImages[currIdx].getAttribute('data-edge-color') || '#FFFFFF';
+
+                if (lightbox) {
+                    lightbox.style.setProperty('background-color', storedColor, 'important');
+                }
+
+                const detailsContainer = document.querySelector('.container.details') as HTMLElement;
+                if (detailsContainer) {
+                    detailsContainer.style.setProperty('background-color', storedColor, 'important');
+                }
+
+                const viewDetails = document.getElementById('view-details') as HTMLElement;
+                if (viewDetails) {
+                    viewDetails.style.setProperty('background-color', storedColor, 'important');
+                }
             }
 
-            const detailsContainer = document.querySelector('.container.details') as HTMLElement;
-            if (detailsContainer) {
-                detailsContainer.style.setProperty('background-color', storedColor, 'important');
-            }
-
-            const viewDetails = document.getElementById('view-details') as HTMLElement;
-            if (viewDetails) {
-                viewDetails.style.setProperty('background-color', storedColor, 'important');
-            }
-
-            console.log('🎨 Applied edge color on next:', storedColor);
-        }
+            // Remove switching class after a small buffer to trigger fade in
+            setTimeout(() => {
+                dImg.classList.remove('switching');
+            }, 30);
+        }, 150);
     };
+
+    if (detailsNextBtn) detailsNextBtn.onclick = () => navigateLightbox(1);
 
     const detailsPrevBtn = document.getElementById('detailsPrevBtn');
-    if (detailsPrevBtn) detailsPrevBtn.onclick = () => {
-        currIdx = (currIdx - 1 + imgUrls.length) % imgUrls.length;
-        dImg.src = imgUrls[currIdx];
-
-        // Update background color for new image
-        const allGridImages = document.querySelectorAll('.pin-image') as NodeListOf<HTMLImageElement>;
-        if (allGridImages[currIdx]) {
-            const storedColor = allGridImages[currIdx].getAttribute('data-edge-color') || '#FFFFFF';
-
-            if (lightbox) {
-                lightbox.style.setProperty('background-color', storedColor, 'important');
-            }
-
-            const detailsContainer = document.querySelector('.container.details') as HTMLElement;
-            if (detailsContainer) {
-                detailsContainer.style.setProperty('background-color', storedColor, 'important');
-            }
-
-            const viewDetails = document.getElementById('view-details') as HTMLElement;
-            if (viewDetails) {
-                viewDetails.style.setProperty('background-color', storedColor, 'important');
-            }
-
-            console.log('🎨 Applied edge color on prev:', storedColor);
-        }
-    };
+    if (detailsPrevBtn) detailsPrevBtn.onclick = () => navigateLightbox(-1);
 
     const detailsDeleteBtn = document.getElementById('detailsDeleteBtn');
     if (detailsDeleteBtn) detailsDeleteBtn.onclick = () => {
@@ -1129,7 +1458,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Remove the container if found
             if (containerToRemove) {
-                containerToRemove.remove();
+                (containerToRemove as HTMLElement).remove();
             }
 
             // Remove from imgUrls array
@@ -1140,19 +1469,153 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 // Adjust index if we deleted the last image
                 if (currIdx >= imgUrls.length) currIdx = 0;
-                // Load the next image directly
-                dImg.src = imgUrls[currIdx];
+                // Use the new navigation logic for a smooth transition to next available image
+                navigateLightbox(0); // direction 0 because we already spliced, so currIdx points to the "next" image
             }
         }
     };
 
+    const refreshStatusBtn = document.getElementById('refreshStatusBtn');
+    if (refreshStatusBtn) {
+        refreshStatusBtn.onclick = async (e) => {
+            e.preventDefault();
+            refreshStatusBtn.textContent = 'Checking...';
+            await syncWithBackend();
+            if (isPro) {
+                showToast('🎉 Viiibe Pro active!');
+            } else {
+                showToast('No PRO status found yet...');
+                refreshStatusBtn.textContent = 'Already paid? Refresh status';
+            }
+        };
+    }
+
     // DRAWER LISTENERS
     const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+    const drawerBackBtn = document.getElementById('drawerBackBtn');
     const drawerBackdrop = document.getElementById('drawerBackdrop');
     const generateStyleGuideBtn = document.getElementById('generateStyleGuideBtn');
+    const unlockProBtn = document.getElementById('unlockProBtn');
 
     if (drawerCloseBtn) drawerCloseBtn.onclick = () => closeDrawer();
+    if (drawerBackBtn) drawerBackBtn.onclick = () => switchToMainDrawer();
     if (drawerBackdrop) drawerBackdrop.onclick = () => closeDrawer();
+
+    if (unlockProBtn) {
+        unlockProBtn.onclick = async () => {
+            console.log('💳 Initiating Stripe Checkout...');
+            unlockProBtn.textContent = 'Processing...';
+            unlockProBtn.setAttribute('disabled', 'true');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/stripe-checkout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: figmaUserId,
+                        priceId: STRIPE_PRICE_ID
+                    })
+                });
+
+                const data = await response.json();
+                if (data.url) {
+                    console.log('✅ Checkout URL received:', data.url);
+                    parent.postMessage({
+                        pluginMessage: {
+                            type: "open-url",
+                            url: data.url
+                        }
+                    }, "*");
+
+                    startStatusPolling();
+                    showToast('Opening Stripe Checkout...');
+                } else {
+                    console.error('❌ Server error:', data);
+                    throw new Error(data.message || 'Failed to get checkout URL');
+                }
+            } catch (error: any) {
+                console.error('❌ Payment error:', error);
+                showToast(`Error: ${error.message || 'Could not start payment'}`);
+            } finally {
+                // Only reset button if we are NOT polling for success
+                if (!pollingInterval) {
+                    unlockProBtn.textContent = 'Unlock Lifetime Access';
+                    unlockProBtn.removeAttribute('disabled');
+                } else {
+                    // Keep the "Verifying..." label and disabled state
+                    unlockProBtn.textContent = 'Verifying payment...';
+                    unlockProBtn.setAttribute('disabled', 'true');
+                }
+            }
+        };
+    }
+
+    function startStatusPolling() {
+        if (pollingInterval) clearInterval(pollingInterval);
+
+        console.log('🔄 Starting payment verification polling...');
+        let pollCount = 0;
+        const MAX_POLLS = 60; // 60 attempts × 3 seconds = 3 minutes max
+
+        pollingInterval = setInterval(async () => {
+            pollCount++;
+            console.log(`🔄 Poll attempt ${pollCount}/${MAX_POLLS}`);
+
+            // Use syncWithBackend which has all the PRO detection logic
+            const isProNow = await syncWithBackend(false);
+
+            if (isProNow) {
+                console.log('✨ Payment verified! User is now PRO!');
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+
+                // UI is already updated by syncWithBackend
+                // Just switch back to main drawer view
+                setTimeout(() => {
+                    switchToMainDrawer();
+                }, 1000);
+            }
+
+            // Stop polling after max attempts
+            if (pollCount >= MAX_POLLS) {
+                console.log('🛑 Polling max attempts reached.');
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+
+                const unlockBtn = document.getElementById('unlockProBtn');
+                if (unlockBtn) {
+                    unlockBtn.textContent = 'Unlock Lifetime Access';
+                    unlockBtn.removeAttribute('disabled');
+                }
+
+                showToast('⚠️ Verification timeout. Please refresh the plugin if payment completed.');
+            }
+        }, 3000); // Check every 3 seconds (faster than before)
+    }
+
+    // Pro toggle handlers
+    document.querySelectorAll('.pro-toggle').forEach(toggle => {
+        const input = toggle.querySelector('input') as HTMLInputElement;
+        if (input) {
+            input.onclick = (e) => {
+                if (isPro) return; // PRO users can always toggle
+
+                // If not PRO, check if they have free downloads left
+                const hasFreeRemaining = checkFundamentalsLimit();
+
+                // If they are trying to turn it ON but have no downloads left
+                if (!hasFreeRemaining && input.checked) {
+                    e.preventDefault(); // Prevent turning on
+                    input.checked = false;
+                    const feature = toggle.getAttribute('data-feature') || "Pro features";
+                    console.log(`🔒 Free limit reached for ${feature}. Opening upgrade view.`);
+                    switchToUpgradeDrawer();
+                }
+                // If they have free downloads left, we LET THEM turn it on.
+                // The "credit" will be consumed only when they click the main Download button.
+            };
+        }
+    });
 
     // Upgrade modal event listeners
     const upgradeBtn = document.getElementById('upgradeBtn');
@@ -1229,7 +1692,8 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Initialize badge on page load
+    // Initialize state from localStorage and update badge on page load
+    checkFundamentalsLimit();
     updateFundamentalsBadge();
 
     if (generateStyleGuideBtn) {
@@ -1240,11 +1704,11 @@ document.addEventListener('DOMContentLoaded', function () {
             // Check if any Fundamentals are selected
             const hasFundamentals = config.createFigmaStyles || config.createFigmaVariables;
 
-            if (hasFundamentals) {
+            if (hasFundamentals && !isPro) {
                 if (!checkFundamentalsLimit()) {
-                    // Show upgrade modal
+                    // Show upgrade view inside drawer instead of old modal
                     console.log('❌ Fundamentals limit reached');
-                    showUpgradeModal();
+                    switchToUpgradeDrawer();
                     return;
                 }
             }
@@ -1281,8 +1745,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }, "*");
 
-            // Increment Fundamentals counter if applicable
-            if (hasFundamentals) {
+            // Increment Fundamentals counter if applicable (only for non-pro users)
+            if (hasFundamentals && !isPro) {
                 incrementFundamentalsDownload();
             }
         };

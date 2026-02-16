@@ -1,6 +1,7 @@
 import { showView, tabs, sections } from './views';
 import { extractAndGeneratePalette, scoreImageForColor } from './palette';
 import { generateTypographySystem } from './typography';
+import { upgradeToOriginals } from '../config';
 
 let imgUrls: string[] = [];
 let currIdx = 0;
@@ -234,8 +235,8 @@ export function showMoodboard(data: any) {
                 if (dImg) {
                     dImg.src = ''; // Clear previous
                     showView('details');
-                    // Upgrade to full resolution for lightbox (736x -> originals)
-                    const fullResUrl = pin.image.replace('/736x/', '/originals/');
+                    // Upgrade to full resolution for lightbox
+                    const fullResUrl = upgradeToOriginals(pin.image);
                     parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
                 }
             };
@@ -305,8 +306,8 @@ export async function applyVisualFilter(colorName: string) {
                             if (dImg) {
                                 dImg.src = ''; // Clear previous
                                 showView('details');
-                                // Use the URL from visibleUrls array
-                                const fullResUrl = visibleUrls[newIndex].replace('/736x/', '/originals/');
+                                // Use higher resolution for lightbox
+                                const fullResUrl = upgradeToOriginals(visibleUrls[newIndex]);
                                 parent.postMessage({ pluginMessage: { type: 'fetch-image', url: fullResUrl, target: 'lightbox' } }, '*');
                             }
                         };

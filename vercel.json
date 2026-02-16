@@ -11,6 +11,18 @@
     ],
     "rewrites": [
         {
+            "source": "/success.html",
+            "destination": "/landing/success.html"
+        },
+        {
+            "source": "/cancel.html",
+            "destination": "/landing/cancel.html"
+        },
+        {
+            "source": "/reset-tool.html",
+            "destination": "/landing/reset-tool.html"
+        },
+        {
             "source": "/viiibe/",
             "destination": "/landing/index.html"
         },
@@ -24,24 +36,8 @@
             "source": "/api/(.*)",
             "headers": [
                 {
-                    "key": "Access-Control-Allow-Credentials",
-                    "value": "true"
-                },
-                {
-                    "key": "Access-Control-Allow-Origin",
-                    "value": "*"
-                },
-                {
-                    "key": "Access-Control-Allow-Methods",
-                    "value": "GET, POST, PUT, DELETE, OPTIONS"
-                },
-                {
-                    "key": "Access-Control-Allow-Headers",
-                    "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, Origin"
-                },
-                {
-                    "key": "Access-Control-Max-Age",
-                    "value": "86400"
+                    "key": "Cache-Control",
+                    "value": "no-store, max-age=0"
                 }
             ]
         }
