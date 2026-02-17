@@ -809,13 +809,17 @@ body {
 
     .cta-section {
         position: relative;
+        width: 100%;
         height: auto;
         padding: 100px 24px;
-        min-height: 500px;
+        min-height: 100vh;
+        /* Ensure enough height to see everything */
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
+        /* Prevent masonry overflow */
     }
 
     .cta-headline {
@@ -828,9 +832,12 @@ body {
         bottom: auto;
         left: auto;
         transform: none;
-        margin-top: 80px;
+        margin: 80px auto 40px;
+        /* Space above and bottom margin */
         width: 100%;
+        max-width: 100%;
         padding: 0;
+        text-align: center;
     }
 
     .footer-logo-text {
