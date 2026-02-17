@@ -844,6 +844,17 @@ body {
     }
 
     .cta-masonry-container {
+        width: 130%;
         height: 100%;
+        gap: 8px;
+    }
+
+    .cta-masonry-column {
+        min-width: 80px;
+        gap: 8px;
+    }
+
+    .cta-masonry-column img {
+        margin-bottom: 8px;
     }
 }
