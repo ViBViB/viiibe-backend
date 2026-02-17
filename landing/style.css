@@ -512,7 +512,7 @@ body {
     animation-name: scrollDown;
 }
 
-/* CTA Masonry Images - 30% opacity */
+/* CTA Masonry Images - 20% opacity */
 .cta-masonry-column img {
     width: 100%;
     height: auto;
@@ -520,7 +520,7 @@ body {
     object-fit: cover;
     display: block;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    opacity: 0.3;
+    opacity: 0.2;
     margin-bottom: 16px;
 }
 
