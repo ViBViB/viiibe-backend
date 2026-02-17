@@ -457,15 +457,11 @@ body {
     height: 100vh;
     overflow: hidden;
     display: flex;
-    flex-direction: column;
-    /* Changed to column for row stacking */
     align-items: center;
     justify-content: center;
     z-index: 2;
     background: rgba(255, 255, 255, 0.95);
     /* Semi-transparent white background */
-    gap: 120px;
-    /* Space between the two rows */
 }
 
 /* CTA Masonry Wrapper - Full screen background */
@@ -562,9 +558,12 @@ body {
     stroke: #fff;
 }
 
-/* CTA Footer Text - Copyright and Disclaimer - Now relative to flow */
+/* CTA Footer Text - Copyright and Disclaimer at bottom */
 .cta-footer-text {
-    position: relative;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
     text-align: center;
     max-width: 800px;
     padding: 0 40px;
