@@ -812,6 +812,10 @@ body {
         height: auto;
         padding: 100px 24px;
         min-height: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 
     .cta-headline {
@@ -821,7 +825,10 @@ body {
 
     .cta-footer-text {
         position: relative;
-        margin-top: 40px;
+        bottom: auto;
+        left: auto;
+        transform: none;
+        margin-top: 80px;
         width: 100%;
         padding: 0;
     }
